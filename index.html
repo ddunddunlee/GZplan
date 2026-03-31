@@ -59,12 +59,12 @@ import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10
 // ════════════════════════════════════════════
 // ★ firebaseConfig 붙여넣기
 const firebaseConfig = {
-  apiKey:            "YOUR_API_KEY",
-  authDomain:        "YOUR_PROJECT.firebaseapp.com",
-  projectId:         "YOUR_PROJECT_ID",
-  storageBucket:     "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId:             "YOUR_APP_ID"
+  apiKey: "AIzaSyA7KylsSyT3_0oQvhBtcrPc-gcdfVq90IQ",
+  authDomain: "gzplan.firebaseapp.com",
+  projectId: "gzplan",
+  storageBucket: "gzplan.firebasestorage.app",
+  messagingSenderId: "186255862586",
+  appId: "1:186255862586:web:f36d21f76012ca43b8fe03",
 };
 // ════════════════════════════════════════════
 
@@ -131,7 +131,7 @@ window.doLogin = async () => {
     go(d.role);
 
   } catch(e) {
-    err.textContent = '오류가 발생했어요. 잠시 후 다시 시도해주세요.';
+    err.textContent = '오류: ' + (e.code || e.message || String(e));
     console.error(e);
   } finally {
     btn.disabled = false;

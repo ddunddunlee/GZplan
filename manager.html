@@ -249,7 +249,7 @@ body {
 <!-- 업무 추가 모달 (팀원별 탭에서만 표시) -->
 <div class="overlay" id="overlay">
   <div class="modal">
-    <h3>새 업무 추가</h3>
+    <h3>새 업무 추가 — <span id="modalMemberName" style="color:var(--text2);font-weight:500"></span></h3>
     <div class="fg">
       <label>업무명</label>
       <input id="iTitle" placeholder="업무 내용을 입력하세요" />
@@ -701,7 +701,11 @@ window.deleteHistory = async (docId, memberId, histId) => {
 // ════════════════════════════════════════════
 // 모달 — 업무 추가 (팀원 탭에서)
 // ════════════════════════════════════════════
-window.openModal  = () => document.getElementById('overlay').classList.add('show');
+window.openModal = () => {
+  document.getElementById('modalMemberName').textContent = curTab;
+  document.getElementById('overlay').classList.add('show');
+  setTimeout(() => document.getElementById('iTitle').focus(), 80);
+};
 window.closeModal = () => {
   document.getElementById('overlay').classList.remove('show');
   ['iTitle', 'iDesc', 'iDue'].forEach(id => document.getElementById(id).value = '');
@@ -711,20 +715,32 @@ window.closeModal = () => {
 window.addTask = async () => {
   if (curTab === '__all__') return;
   const title = document.getElementById('iTitle').value.trim();
-  if (!title) return;
-  const ts = now();
-  await fsAdd(curTab, {
-    title,
-    desc:    document.getElementById('iDesc').value.trim(),
-    assignee: '',
-    due:      document.getElementById('iDue').value || '',
-    status:   document.getElementById('iStatus').value,
-    updated:  ts,
-    pinned:   false,
-    order:    Date.now(),
-    history:  [{ id: Date.now() + '', type: 'create', text: '업무가 등록되었습니다. (팀장)', date: ts, author: '팀장' }]
-  });
-  window.closeModal();
+  if (!title) { toast('업무명을 입력해주세요'); return; }
+  const btn = document.querySelector('#overlay .btn-ok');
+  btn.disabled = true;
+  btn.textContent = '추가 중...';
+  try {
+    const ts = now();
+    await fsAdd(curTab, {
+      title,
+      desc:     document.getElementById('iDesc').value.trim(),
+      assignee: '',
+      due:      document.getElementById('iDue').value || '',
+      status:   document.getElementById('iStatus').value,
+      updated:  ts,
+      pinned:   false,
+      order:    Date.now(),
+      history:  [{ id: Date.now() + '', type: 'create', text: '업무가 등록되었습니다. (팀장)', date: ts, author: '팀장' }]
+    });
+    window.closeModal();
+    toast(`${curTab}에게 업무를 추가했어요 ✓`);
+  } catch (e) {
+    toast('오류: ' + (e.code || e.message));
+    console.error(e);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '추가하기';
+  }
 };
 
 document.getElementById('overlay').addEventListener('click', e => {

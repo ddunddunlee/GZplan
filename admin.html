@@ -193,6 +193,18 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Segoe UI',
     </div>
     <div class="account-list" id="accountList"></div>
 
+  <!-- 보고자 목록 관리 -->
+    <div style="margin-top:2rem">
+      <div class="section-head">
+        <div class="section-title">최종보고자 목록 관리</div>
+        <button class="add-btn" onclick="openReporterModal()">+ 보고자 추가</button>
+      </div>
+      <div style="background:var(--bg);border:.5px solid var(--border);border-radius:var(--radius);padding:1rem 1.25rem;">
+        <div id="reporterList" style="display:flex;flex-wrap:wrap;gap:8px;min-height:32px;"></div>
+        <p style="font-size:12px;color:var(--text3);margin-top:10px">팀원이 업무 추가 시 선택할 수 있는 최종보고자 목록이에요.</p>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -265,6 +277,21 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Segoe UI',
   </div>
 </div>
 
+<!-- 보고자 추가 모달 -->
+<div class="overlay" id="reporterOverlay">
+  <div class="modal">
+    <h3>보고자 추가</h3>
+    <div class="fg">
+      <label>보고자 이름</label>
+      <input id="rName" placeholder="예: CEO, 홀딩스, 본부장" />
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal('reporterOverlay')">취소</button>
+      <button class="btn-ok" onclick="addReporter()">추가하기</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script type="module">
@@ -320,6 +347,7 @@ else {
     document.getElementById('app').style.display  = 'block';
     document.getElementById('topUser').textContent = u.id;
     loadAccounts();
+    loadReporters();
   }
 }
 
@@ -581,6 +609,64 @@ window.deleteAccount = async (id, name) => {
 // ════════════════════════════════════════════
 // 공통 유틸
 // ════════════════════════════════════════════
+// ════════════════════════════════════════════
+// 보고자 목록 관리
+// ════════════════════════════════════════════
+let reporters = [];
+
+async function loadReporters() {
+  try {
+    const snap = await getDoc(doc(db, 'settings', 'reporters'));
+    reporters = snap.exists() ? (snap.data().list || []) : [];
+  } catch { reporters = []; }
+  renderReporters();
+}
+
+function renderReporters() {
+  const el = document.getElementById('reporterList');
+  if (!reporters.length) {
+    el.innerHTML = '<span style="font-size:13px;color:var(--text3)">등록된 보고자가 없어요</span>';
+    return;
+  }
+  el.innerHTML = reporters.map((r, i) => `
+    <span style="display:inline-flex;align-items:center;gap:5px;background:var(--purple-bg);color:var(--purple-t);
+      font-size:13px;font-weight:500;padding:4px 10px;border-radius:999px;">
+      ${r}
+      <button onclick="deleteReporter(${i})"
+        style="background:none;border:none;cursor:pointer;color:inherit;font-size:12px;opacity:.6;padding:0;line-height:1">✕</button>
+    </span>`).join('');
+}
+
+async function saveReporters() {
+  await setDoc(doc(db, 'settings', 'reporters'), { list: reporters });
+}
+
+window.openReporterModal = () => {
+  document.getElementById('rName').value = '';
+  document.getElementById('reporterOverlay').classList.add('show');
+  setTimeout(() => document.getElementById('rName').focus(), 80);
+};
+
+window.addReporter = async () => {
+  const name = document.getElementById('rName').value.trim();
+  if (!name) { toast('이름을 입력해주세요'); return; }
+  if (reporters.includes(name)) { toast('이미 있는 보고자예요'); return; }
+  reporters.push(name);
+  await saveReporters();
+  closeModal('reporterOverlay');
+  renderReporters();
+  toast(`${name} 추가됐어요 ✓`);
+};
+
+window.deleteReporter = async (idx) => {
+  const name = reporters[idx];
+  if (!confirm(`"${name}"을 삭제할까요?`)) return;
+  reporters.splice(idx, 1);
+  await saveReporters();
+  renderReporters();
+  toast(`${name} 삭제됐어요`);
+};
+
 window.closeModal = id => document.getElementById(id).classList.remove('show');
 
 window.togglePwVisible = (inputId, btn) => {

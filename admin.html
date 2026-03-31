@@ -251,12 +251,12 @@ import { getFirestore, collection, doc, getDocs, getDoc, setDoc, updateDoc, dele
 // ════════════════════════════════════════════
 // ★ firebaseConfig 붙여넣기 (모든 파일 동일)
 const firebaseConfig = {
-  apiKey:            "YOUR_API_KEY",
-  authDomain:        "YOUR_PROJECT.firebaseapp.com",
-  projectId:         "YOUR_PROJECT_ID",
-  storageBucket:     "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId:             "YOUR_APP_ID"
+  apiKey: "AIzaSyA7KylsSyT3_0oQvhBtcrPc-gcdfVq90IQ",
+  authDomain: "gzplan.firebaseapp.com",
+  projectId: "gzplan",
+  storageBucket: "gzplan.firebasestorage.app",
+  messagingSenderId: "186255862586",
+  appId: "1:186255862586:web:f36d21f76012ca43b8fe03",
 };
 // ════════════════════════════════════════════
 
@@ -372,24 +372,29 @@ function renderList() {
 
 // ── 초기 팀원 일괄 등록 ──
 window.initAccounts = async () => {
-  const existing = INIT_MEMBERS.filter(m => accounts.find(a => a.docId === m.id)).map(m => m.name);
-  const msg = existing.length
-    ? `이미 등록된 계정: ${existing.join(', ')}\n\n이미 있는 계정은 건너뛰고 나머지만 추가할까요?`
-    : `팀원 7명(${INIT_MEMBERS.map(m=>m.name).join(', ')})을\n비밀번호 1234로 등록할까요?`;
-  if (!confirm(msg)) return;
+  const btn = document.querySelector('.init-btn');
+  btn.disabled = true;
+  btn.textContent = '등록 중...';
 
   let added = 0;
   for (const m of INIT_MEMBERS) {
     if (accounts.find(a => a.docId === m.id)) continue;
-    await setDoc(doc(db, 'accounts', m.id), {
-      displayName: m.name,
-      password:    '1234',
-      role:        'member',
-      disabled:    false,
-      createdAt:   new Date().toISOString()
-    });
-    added++;
+    try {
+      await setDoc(doc(db, 'accounts', m.id), {
+        displayName: m.name,
+        password:    '1234',
+        role:        'member',
+        disabled:    false,
+        createdAt:   new Date().toISOString()
+      });
+      added++;
+      btn.textContent = `등록 중... (${added}명)`;
+    } catch(e) {
+      console.error(m.name, e);
+    }
   }
+
+  btn.disabled = false;
   toast(added ? `${added}명 등록 완료 ✓` : '새로 등록할 계정이 없어요');
   loadAccounts();
 };

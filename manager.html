@@ -148,7 +148,7 @@ const C={apiKey:"AIzaSyA7KylsSyT3_0oQvhBtcrPc-gcdfVq90IQ",authDomain:"gzplan.fir
 const MEMBER_IDS=["강신욱","김용욱","오문식","이길우","이도영","이영찬","이윤형"];
 const db=getFirestore(initializeApp(C));
 const sess=localStorage.getItem('tt_user');
-if(!sess)location.href='index.html';
+if(!sess){location.href='index.html';}else{
 const ME=JSON.parse(sess||'{}');
 if(ME.role!=='manager'&&ME.role!=='admin')location.href='index.html';
 document.getElementById('tbUser').textContent=ME.displayName;
@@ -236,6 +236,7 @@ window.addTask=async()=>{if(curTab==='__all__')return;const title=document.getEl
 document.getElementById('overlay').addEventListener('click',e=>{if(e.target===e.currentTarget)window.closeModal();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')window.closeModal();});
 (()=>{const r=document.getElementById('resizer'),p=document.getElementById('detailPanel');let sx,sw;r.addEventListener('mousedown',e=>{if(!p.classList.contains('open'))return;sx=e.clientX;sw=p.offsetWidth;document.body.style.cursor='col-resize';document.body.style.userSelect='none';const mv=e=>{p.style.width=Math.min(560,Math.max(220,sw+(sx-e.clientX)))+'px';};const up=()=>{document.body.style.cursor='';document.body.style.userSelect='';document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);};document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);});})();
+} // end else
 </script>
 </body>
 </html>

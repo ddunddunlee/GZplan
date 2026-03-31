@@ -281,6 +281,23 @@ body {
   background: var(--text); color: var(--bg); cursor: pointer;
 }
 
+/* ── 중요도 배지 ── */
+.priority-badge {
+  font-size: 11px; font-weight: 700; padding: 2px 8px;
+  border-radius: var(--pill); display: inline-flex; align-items: center; gap: 3px;
+}
+.p1 { background: #f1f1f0; color: #888; }
+.p2 { background: #E6F1FB; color: #0C447C; }
+.p3 { background: #FAEEDA; color: #633806; }
+.p4 { background: #FCEBEB; color: #a32d2d; }
+.p5 { background: #a32d2d; color: #fff; }
+
+/* ── 보고자 배지 ── */
+.reporter-badge {
+  font-size: 11px; font-weight: 500; padding: 2px 8px;
+  border-radius: var(--pill); background: var(--purple-bg); color: var(--purple-t);
+}
+
 /* ── 토스트 ── */
 .toast {
   position: fixed; bottom: 2rem; left: 50%;
@@ -304,6 +321,7 @@ body {
     </div>
     <div class="header-right">
       <span id="hUser" style="font-size:12px;color:var(--text2)"></span>
+      <button class="icon-btn" id="notifBtn" onclick="toggleNotification()" title="알림 설정">🔔 알림</button>
       <button class="icon-btn" onclick="logout()">로그아웃</button>
     </div>
   </div>
@@ -368,6 +386,20 @@ body {
         <option value="inprogress">진행 중</option>
       </select>
     </div>
+    <div class="fg">
+      <label>중요도</label>
+      <select id="iPriority">
+        <option value="3">3 — 보통</option>
+        <option value="5">5 — 매우 긴급</option>
+        <option value="4">4 — 긴급</option>
+        <option value="2">2 — 낮음</option>
+        <option value="1">1 — 매우 낮음</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label>최종보고자 <span style="color:var(--text3);font-weight:400">(선택)</span></label>
+      <select id="iReporter"><option value="">없음</option></select>
+    </div>
     <div class="modal-btns">
       <button class="btn-cancel" onclick="closeModal()">취소</button>
       <button class="btn-ok" onclick="addTask()">추가하기</button>
@@ -383,7 +415,7 @@ body {
 // ════════════════════════════════════════════
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import {
-  getFirestore, collection, doc,
+  getFirestore, collection, doc, getDoc,
   onSnapshot, addDoc, updateDoc, deleteDoc,
   serverTimestamp, query, orderBy
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
@@ -404,6 +436,24 @@ const DAY_MS   = 86400000;
 const STALE_DAYS = 14;    // N일 이상 미업데이트 시 "오래된 업무" 표시
 
 // ════════════════════════════════════════════
+// 보고자 목록 (Firestore settings/reporters 에서 로드)
+// ════════════════════════════════════════════
+let REPORTERS = [];
+
+async function loadReporters() {
+  try {
+    const snap = await getDoc(doc(db, 'settings', 'reporters'));
+    REPORTERS = snap.exists() ? (snap.data().list || []) : ['CEO', '홀딩스', '본부장'];
+  } catch {
+    REPORTERS = ['CEO', '홀딩스', '본부장'];
+  }
+  // 모달 select 채우기
+  const sel = document.getElementById('iReporter');
+  sel.innerHTML = '<option value="">없음</option>' +
+    REPORTERS.map(r => `<option value="${r}">${r}</option>`).join('');
+}
+
+// ════════════════════════════════════════════
 // 초기화 & 인증
 // ════════════════════════════════════════════
 const db = getFirestore(initializeApp(FIREBASE_CONFIG));
@@ -415,6 +465,7 @@ if (!ME.id) { location.href = 'index.html'; throw ''; }
 
 document.getElementById('hTitle').textContent = ME.displayName + '의 업무 트래커';
 document.getElementById('hUser').textContent  = ME.displayName;
+loadReporters();
 window.logout = () => { localStorage.removeItem('tt_user'); location.href = 'index.html'; };
 
 // ════════════════════════════════════════════
@@ -483,6 +534,15 @@ const isStale   = t => {
   return Date.now() - new Date(t.updated).getTime() >= STALE_DAYS * DAY_MS;
 };
 
+// 중요도 배지 HTML
+function priorityBadge(p) {
+  const n = p || 3;
+  const cls   = ['','p1','p2','p3','p4','p5'][n];
+  const label = ['','','','','','🔴'][n] || '';
+  const dots  = '●'.repeat(n) + '○'.repeat(5 - n);
+  return `<span class="priority-badge ${cls}" title="중요도 ${n}">${label} ${dots}</span>`;
+}
+
 // 상태 배지 HTML
 function statusBadge(status, id) {
   const labels = { todo: '대기 →', inprogress: '진행 중 →', done: '완료 →' };
@@ -503,6 +563,7 @@ onSnapshot(query(col(), orderBy('order', 'asc')), snap => {
   }
   render();
   setSync(false);
+  checkAndNotify(tasks);
 });
 
 // ════════════════════════════════════════════
@@ -552,6 +613,16 @@ function renderTaskList() {
     const byAssign = filterA === 'all' || t.assignee === filterA;
     return byStatus && byAssign;
   });
+  // 중요도 내림차순 → 핀 우선 → 마감일 오름차순
+  filtered.sort((a, b) => {
+    if (b.pinned !== a.pinned) return b.pinned ? 1 : -1;
+    const pa = b.priority || 3, pb = a.priority || 3;
+    if (pa !== pb) return pa - pb;
+    if (a.due && b.due) return new Date(a.due) - new Date(b.due);
+    if (a.due) return -1;
+    if (b.due) return 1;
+    return 0;
+  });
   const pinned   = filtered.filter(t => t.pinned);
   const unpinned = filtered.filter(t => !t.pinned);
   const list     = [...pinned, ...unpinned];
@@ -593,8 +664,9 @@ function renderTaskList() {
         <div class="task-body">
           <div class="task-title${t.status === 'done' ? ' done-text' : ''}">${t.title}</div>
           <div class="task-meta">
+            ${priorityBadge(t.priority)}
             ${statusBadge(t.status, t._id)}
-            ${t.assignee ? `<span class="task-assignee">${t.assignee}</span>` : ''}
+            ${t.reporter ? `<span class="reporter-badge">${t.reporter}</span>` : ''}
             ${t.due      ? `<span class="task-date${ov ? ' ov' : ''}">마감 ${fmtShort(t.due)}</span>` : ''}
             <span class="task-date">${agoText}</span>
           </div>
@@ -624,8 +696,25 @@ function renderDetail(t) {
        </div>`
     : '';
 
+  const priorityOpts = [5,4,3,2,1].map(p =>
+    `<option value="${p}" ${(t.priority||3)==p?'selected':''}>${p} — ${{5:'매우 긴급',4:'긴급',3:'보통',2:'낮음',1:'매우 낮음'}[p]}</option>`
+  ).join('');
+  const reporterOpts = ['', ...REPORTERS].map(r =>
+    `<option value="${r}" ${(t.reporter||'')==r?'selected':''}>${r||'없음'}</option>`
+  ).join('');
+
   document.getElementById('dpMeta').innerHTML = `
     ${descRow}
+    <div class="dp-row">
+      <span class="dp-lbl">중요도</span>
+      <select class="dp-edit" style="width:140px;text-align:right"
+        onchange="updatePriority('${t._id}', this.value)">${priorityOpts}</select>
+    </div>
+    <div class="dp-row">
+      <span class="dp-lbl">최종보고자</span>
+      <select class="dp-edit" style="width:140px;text-align:right"
+        onchange="updateReporter('${t._id}', this.value)">${reporterOpts}</select>
+    </div>
     <div class="dp-row">
       <span class="dp-lbl">마감일</span>
       <input class="dp-edit" type="date" value="${t.due || ''}"
@@ -760,6 +849,38 @@ window.changeTitle = async (id, val) => {
   });
 };
 
+window.updatePriority = async (id, val) => {
+  setSync(true);
+  const t = tasks.find(t => t._id === id);
+  if (!t) return;
+  const ts = now();
+  await fsUpd(id, {
+    priority: Number(val),
+    updated:  ts,
+    history:  [...(t.history || []), {
+      id: Date.now() + '', type: 'status',
+      text: `중요도 변경: ${t.priority || 3} → ${val}`,
+      date: ts
+    }]
+  });
+};
+
+window.updateReporter = async (id, val) => {
+  setSync(true);
+  const t = tasks.find(t => t._id === id);
+  if (!t) return;
+  const ts = now();
+  await fsUpd(id, {
+    reporter: val,
+    updated:  ts,
+    history:  [...(t.history || []), {
+      id: Date.now() + '', type: 'status',
+      text: `최종보고자 변경: ${t.reporter || '없음'} → ${val || '없음'}`,
+      date: ts
+    }]
+  });
+};
+
 window.updateDue = async (id, val) => {
   setSync(true);
   const t = tasks.find(t => t._id === id);
@@ -805,6 +926,8 @@ window.closeModal = () => {
   document.getElementById('overlay').classList.remove('show');
   ['iTitle', 'iDesc', 'iDue'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('iStatus').value = 'todo';
+  document.getElementById('iPriority').value = '3';
+  document.getElementById('iReporter').value = '';
 };
 
 window.addTask = async () => {
@@ -818,6 +941,8 @@ window.addTask = async () => {
     assignee: ME.id,
     due:      document.getElementById('iDue').value || '',
     status:   document.getElementById('iStatus').value,
+    priority: Number(document.getElementById('iPriority').value) || 3,
+    reporter: document.getElementById('iReporter').value || '',
     updated:  ts,
     pinned:   false,
     order:    Date.now(),
@@ -893,6 +1018,99 @@ function initDrag() {
     document.addEventListener('mouseup', onUp);
   });
 })();
+
+// ════════════════════════════════════════════
+// 푸시 알림 (Web Push + Service Worker)
+// ════════════════════════════════════════════
+const VAPID_PUBLIC_KEY = ''; // ★ 선택사항: VAPID 키 없이도 로컬 알림 작동
+
+// Service Worker 등록
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(e => console.warn('SW 등록 실패:', e));
+}
+
+// 알림 권한 상태 표시
+function updateNotifBtn() {
+  const btn = document.getElementById('notifBtn');
+  if (!btn) return;
+  if (!('Notification' in window)) { btn.style.display = 'none'; return; }
+  if (Notification.permission === 'granted') {
+    btn.textContent = '🔔 알림 ON';
+    btn.style.color = '#27500A';
+  } else if (Notification.permission === 'denied') {
+    btn.textContent = '🔕 알림 차단됨';
+    btn.style.color = 'var(--text3)';
+  } else {
+    btn.textContent = '🔔 알림';
+  }
+}
+updateNotifBtn();
+
+// 알림 권한 요청 / 해제
+window.toggleNotification = async () => {
+  if (!('Notification' in window)) { toast('이 브라우저는 알림을 지원하지 않아요'); return; }
+  if (Notification.permission === 'denied') {
+    toast('브라우저 설정에서 알림 차단을 해제해주세요');
+    return;
+  }
+  const perm = await Notification.requestPermission();
+  updateNotifBtn();
+  if (perm === 'granted') {
+    toast('알림이 활성화됐어요 ✓');
+    checkAndNotify(tasks); // 즉시 한 번 체크
+  } else {
+    toast('알림 권한이 거부됐어요');
+  }
+};
+
+// 알림 체크 — onSnapshot 업데이트마다 호출
+function checkAndNotify(taskList) {
+  if (Notification.permission !== 'granted') return;
+  if (document.visibilityState === 'visible') return; // 앱 보고 있으면 알림 안 띄움
+
+  const today    = new Date(); today.setHours(0,0,0,0);
+  const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1);
+
+  taskList.forEach(t => {
+    if (t.status === 'done') return;
+    const notifKey = `notified_${t._id}`;
+
+    // 마감 D-1 알림
+    if (t.due) {
+      const due = new Date(t.due);
+      const isDue     = due.getTime() === today.getTime();
+      const isTomorrow = due.getTime() === tomorrow.getTime();
+      if ((isDue || isTomorrow) && !localStorage.getItem(notifKey + '_due_' + t.due)) {
+        const label = isDue ? '오늘 마감' : '내일 마감';
+        showNotification(`⚠️ ${label}: ${t.title}`, `마감일이 ${isDue ? '오늘' : '내일'}이에요`);
+        localStorage.setItem(notifKey + '_due_' + t.due, '1');
+      }
+    }
+
+    // 오래된 업무 알림 (14일 이상)
+    if (isStale(t) && !localStorage.getItem(notifKey + '_stale')) {
+      showNotification(`📋 오래된 업무: ${t.title}`, '14일 이상 업데이트가 없어요');
+      localStorage.setItem(notifKey + '_stale', '1');
+    }
+  });
+}
+
+function showNotification(title, body) {
+  if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+    navigator.serviceWorker.controller.postMessage({ type: 'notify', title, body });
+  } else {
+    new Notification(title, { body, icon: '/favicon.ico' });
+  }
+}
+
+// Service Worker 메시지 → 알림 표시
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.addEventListener('message', e => {
+    if (e.data?.type === 'notify') {
+      new Notification(e.data.title, { body: e.data.body, icon: '/favicon.ico' });
+    }
+  });
+}
 </script>
 </body>
 </html>

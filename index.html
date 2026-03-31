@@ -78,7 +78,7 @@ const app = initializeApp(firebaseConfig);
 const db  = getFirestore(app);
 
 // 이미 로그인된 경우 바로 이동
-const sess = sessionStorage.getItem('tt_user');
+const sess = localStorage.getItem('tt_user');
 if (sess) { const u = JSON.parse(sess); go(u.role); }
 
 function go(role) {
@@ -113,7 +113,7 @@ window.doLogin = async () => {
 
       if (disabled)       { err.textContent = '비활성화된 계정이에요'; return; }
       if (pw !== adminPw) { err.textContent = '아이디 또는 비밀번호가 틀렸어요'; return; }
-      sessionStorage.setItem('tt_user', JSON.stringify({ id: ADMIN_ID, role: 'admin', displayName: 'admin' }));
+      localStorage.setItem('tt_user', JSON.stringify({ id: ADMIN_ID, role: 'admin', displayName: 'admin' }));
       go('admin');
       return;
     }
@@ -125,7 +125,7 @@ window.doLogin = async () => {
     if (d.password !== pw)          { err.textContent = '아이디 또는 비밀번호가 틀렸어요'; return; }
     if (d.disabled)                 { err.textContent = '비활성화된 계정이에요'; return; }
 
-    sessionStorage.setItem('tt_user', JSON.stringify({
+    localStorage.setItem('tt_user', JSON.stringify({
       id, role: d.role, displayName: d.displayName || id
     }));
     go(d.role);

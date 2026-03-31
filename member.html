@@ -145,7 +145,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
   <div class="modal">
     <h3>새 업무 추가</h3>
     <div class="fg"><label>업무명</label><input id="iTitle" placeholder="업무 내용을 입력하세요" /></div>
-    <div class="fg"><label>담당자</label><input id="iAssignee" placeholder="담당자 이름" /></div>
+    
     <div class="fg"><label>마감일 <span style="color:var(--text3);font-weight:400">(예: 20260401)</span></label><input id="iDue" type="text" placeholder="20260401" maxlength="8" oninput="this.value=this.value.replace(/[^0-9]/g,'')" /></div>
     <div class="fg"><label>상태</label><select id="iStatus"><option value="todo">대기</option><option value="inprogress">진행 중</option></select></div>
     <div class="modal-btns"><button class="btn-cancel" onclick="closeModal()">취소</button><button class="btn-ok" onclick="addTask()">추가하기</button></div>
@@ -165,14 +165,14 @@ if(!ME.id)location.href='index.html';
 document.getElementById('hTitle').textContent=ME.displayName+'의 업무 트래커';
 document.getElementById('hUser').textContent=ME.displayName;
 window.logout=()=>{localStorage.removeItem('tt_user');location.href='index.html';};
-const DAY=86400000,STALE=14,today=new Date();today.setHours(0,0,0,0);
+const DAY=86400000,STALE=14;
 let tasks=[],selId=null,filter='all',filterA='all';
 const nStr=()=>new Date().toISOString();
 const fmtD=s=>{if(!s)return'-';const d=new Date(s),o=s.length<=10;const b=d.getFullYear()+'. '+(d.getMonth()+1)+'. '+d.getDate()+'.';return o?b:b+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');};
 const fmtS=s=>{if(!s)return'';const d=new Date(s);return(d.getMonth()+1)+'/'+d.getDate();};
-const dAgo=s=>Math.floor((today-new Date(s))/DAY);
-const isOv=t=>t.due&&t.status!=='done'&&new Date(t.due)<today;
-const isSt=t=>t.status!=='done'&&dAgo(t.updated)>=STALE;
+const dAgo=s=>{const diff=Date.now()-new Date(s).getTime();const mins=Math.floor(diff/60000);if(mins<1)return'방금';if(mins<60)return mins+'분';const hrs=Math.floor(mins/60);if(hrs<24)return hrs+'시간';return Math.floor(hrs/24)+'일';};
+const isOv=t=>t.due&&t.status!=='done'&&new Date(t.due)<new Date();
+const isSt=t=>{if(t.status==='done')return false;const diff=Date.now()-new Date(t.updated).getTime();return diff>=STALE*DAY;};
 const pDue=v=>{const s=v.replace(/[^0-9]/g,'');return s.length!==8?'':s.slice(0,4)+'-'+s.slice(4,6)+'-'+s.slice(6,8);};
 const setSync=v=>document.getElementById('syncDot').classList.toggle('syncing',v);
 const toast=m=>{const el=document.getElementById('toast');el.textContent=m;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2200);};
@@ -201,7 +201,7 @@ function render(){
     if(t.pinned)cls+=' pinned';else if(ov)cls+=' overdue';else if(st)cls+=' stale';
     if(selId===t._id)cls+=' selected';
     let fl='';if(t.pinned)fl='<span class="flag flag-pinned">📌 고정됨</span>';else if(ov)fl='<span class="flag flag-overdue">기한 초과</span>';else if(st)fl='<span class="flag flag-stale">업데이트 필요</span>';
-    html+=`<div class="${cls}" draggable="true" data-id="${t._id}" onclick="selTask('${t._id}')"><div class="drag-handle" onclick="event.stopPropagation()">⠿</div><div class="task-check${t.status==='done'?' done':''}" onclick="tDone('${t._id}',event)"></div><div class="task-body"><div class="task-title${t.status==='done'?' done-text':''}">${t.title}</div><div class="task-meta">${sBadge(t.status,t._id)}${t.assignee?`<span class="task-assignee">${t.assignee}</span>`:''}${t.due?`<span class="task-date${ov?' ov':''}">마감 ${fmtS(t.due)}</span>`:''}<span class="task-date">${dAgo(t.updated)}일 전 업데이트</span></div></div><div class="card-right">${fl}<button class="pin-btn${t.pinned?' on':''}" onclick="tPin('${t._id}',event)">${t.pinned?'📌':'☆'}</button><button class="del-btn" onclick="dTask('${t._id}',event)">✕</button></div></div>`;
+    html+=`<div class="${cls}" draggable="true" data-id="${t._id}" onclick="selTask('${t._id}')"><div class="drag-handle" onclick="event.stopPropagation()">⠿</div><div class="task-check${t.status==='done'?' done':''}" onclick="tDone('${t._id}',event)"></div><div class="task-body"><div class="task-title${t.status==='done'?' done-text':''}">${t.title}</div><div class="task-meta">${sBadge(t.status,t._id)}${t.assignee?`<span class="task-assignee">${t.assignee}</span>`:''}${t.due?`<span class="task-date${ov?' ov':''}">마감 ${fmtS(t.due)}</span>`:''}<span class="task-date">${dAgo(t.updated)=='방금'?'방금 업데이트':dAgo(t.updated)+' 전 업데이트'}</span></div></div><div class="card-right">${fl}<button class="pin-btn${t.pinned?' on':''}" onclick="tPin('${t._id}',event)">${t.pinned?'📌':'☆'}</button><button class="del-btn" onclick="dTask('${t._id}',event)">✕</button></div></div>`;
   });
   el.innerHTML=html;initDrag();
 }
@@ -225,8 +225,8 @@ window.chA=async(id,val)=>{setSync(true);const t=tasks.find(t=>t._id===id);if(!t
 window.chD=async(id,val)=>{setSync(true);const t=tasks.find(t=>t._id===id);if(!t)return;const nd=pDue(val),ds=nStr();await fsU(id,{due:nd,updated:ds,history:[...(t.history||[]),{id:Date.now()+'',type:'status',text:'마감일 변경: '+(t.due?fmtD(t.due):'없음')+' → '+(nd?fmtD(nd):'없음'),date:ds}]});};
 window.dHist=async(tid,nid)=>{setSync(true);const t=tasks.find(t=>t._id===tid);if(!t)return;await fsU(tid,{history:(t.history||[]).filter(h=>h.id!==nid)});};
 window.openModal=()=>document.getElementById('overlay').classList.add('show');
-window.closeModal=()=>{document.getElementById('overlay').classList.remove('show');['iTitle','iAssignee','iDue'].forEach(id=>document.getElementById(id).value='');document.getElementById('iStatus').value='todo';};
-window.addTask=async()=>{setSync(true);const title=document.getElementById('iTitle').value.trim();if(!title)return;const ds=nStr();await fsA({title,assignee:document.getElementById('iAssignee').value.trim()||'',due:pDue(document.getElementById('iDue').value)||'',status:document.getElementById('iStatus').value,updated:ds,pinned:false,order:Date.now(),history:[{id:Date.now()+'',type:'create',text:'업무가 등록되었습니다.',date:ds}]});window.closeModal();};
+window.closeModal=()=>{document.getElementById('overlay').classList.remove('show');['iTitle','iDue'].forEach(id=>document.getElementById(id).value='');document.getElementById('iStatus').value='todo';};
+window.addTask=async()=>{setSync(true);const title=document.getElementById('iTitle').value.trim();if(!title)return;const ds=nStr();await fsA({title,assignee:ME.id,due:pDue(document.getElementById('iDue').value)||'',status:document.getElementById('iStatus').value,updated:ds,pinned:false,order:Date.now(),history:[{id:Date.now()+'',type:'create',text:'업무가 등록되었습니다.',date:ds}]});window.closeModal();};
 document.getElementById('overlay').addEventListener('click',e=>{if(e.target===e.currentTarget)window.closeModal();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')window.closeModal();});
 let dragId=null;

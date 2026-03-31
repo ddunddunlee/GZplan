@@ -156,15 +156,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 import{initializeApp}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import{getFirestore,collection,doc,onSnapshot,addDoc,updateDoc,deleteDoc,serverTimestamp,query,orderBy}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 // ★ firebaseConfig 붙여넣기
-const C={apiKey:"YOUR_API_KEY",authDomain:"YOUR_PROJECT.firebaseapp.com",projectId:"YOUR_PROJECT_ID",storageBucket:"YOUR_PROJECT.appspot.com",messagingSenderId:"YOUR_SENDER_ID",appId:"YOUR_APP_ID"};
+const C={apiKey:"AIzaSyA7KylsSyT3_0oQvhBtcrPc-gcdfVq90IQ",authDomain:"gzplan.firebaseapp.com",projectId:"gzplan",storageBucket:"gzplan.firebasestorage.app",messagingSenderId:"186255862586",appId:"1:186255862586:web:f36d21f76012ca43b8fe03"};
 const db=getFirestore(initializeApp(C));
-const sess=sessionStorage.getItem('tt_user');
+const sess=localStorage.getItem('tt_user');
 if(!sess){location.href='index.html';}
 const ME=JSON.parse(sess||'{}');
 if(!ME.id)location.href='index.html';
 document.getElementById('hTitle').textContent=ME.displayName+'의 업무 트래커';
 document.getElementById('hUser').textContent=ME.displayName;
-window.logout=()=>{sessionStorage.removeItem('tt_user');location.href='index.html';};
+window.logout=()=>{localStorage.removeItem('tt_user');location.href='index.html';};
 const DAY=86400000,STALE=14,today=new Date();today.setHours(0,0,0,0);
 let tasks=[],selId=null,filter='all',filterA='all';
 const nStr=()=>new Date().toISOString();

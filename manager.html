@@ -133,7 +133,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
   <div class="modal">
     <h3>새 업무 추가</h3>
     <div class="fg"><label>업무명</label><input id="iTitle" placeholder="업무 내용을 입력하세요"/></div>
-    <div class="fg"><label>담당자</label><input id="iAssignee" placeholder="담당자 이름"/></div>
+    
     <div class="fg"><label>마감일</label><input id="iDue" type="text" placeholder="20260401" maxlength="8" oninput="this.value=this.value.replace(/[^0-9]/g,'')"/></div>
     <div class="fg"><label>상태</label><select id="iStatus"><option value="todo">대기</option><option value="inprogress">진행 중</option></select></div>
     <div class="modal-btns"><button class="btn-cancel" onclick="closeModal()">취소</button><button class="btn-ok" onclick="addTask()">추가하기</button></div>
@@ -145,22 +145,23 @@ import{initializeApp}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-ap
 import{getFirestore,collection,doc,onSnapshot,addDoc,updateDoc,deleteDoc,serverTimestamp,query,orderBy}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 const C={apiKey:"AIzaSyA7KylsSyT3_0oQvhBtcrPc-gcdfVq90IQ",authDomain:"gzplan.firebaseapp.com",projectId:"gzplan",storageBucket:"gzplan.firebasestorage.app",messagingSenderId:"186255862586",appId:"1:186255862586:web:f36d21f76012ca43b8fe03"};
 // ★ 팀원 아이디 목록 — admin.html에서 계정 추가/삭제 시 여기도 맞춰주세요
-const MEMBER_IDS=["강신욱","김용욱","오문식","이길우","이도영","이영찬","이윤형"];
+const MEMBER_IDS=["강신욱","김용욱","오문식","이길우","이도영","이영찬","이윤형","현주용"];
 const db=getFirestore(initializeApp(C));
-const sess=localStorage.getItem('tt_user');
-if(!sess){location.href='index.html';throw 'no session';}
-const ME=JSON.parse(sess);
-if(ME.role!=='manager'&&ME.role!=='admin'){location.href='index.html';throw 'no permission';}
+const _sess=localStorage.getItem('tt_user');
+const ME=_sess?JSON.parse(_sess):null;
+if(!ME){location.href='index.html';}
+else if(ME.role!=='manager'&&ME.role!=='admin'){location.href='index.html';}
+else{
 document.getElementById('tbUser').textContent=ME.displayName;
 window.logout=()=>{localStorage.removeItem('tt_user');location.href='index.html';};
-const DAY=86400000,STALE=14,today=new Date();today.setHours(0,0,0,0);
+const DAY=86400000,STALE=14;
 let mData={},curTab='__all__',selDocId=null,selMId=null,filter='all',unsubs=[];
 const nStr=()=>new Date().toISOString();
 const fmtD=s=>{if(!s)return'-';const d=new Date(s),o=s.length<=10;const b=d.getFullYear()+'. '+(d.getMonth()+1)+'. '+d.getDate()+'.';return o?b:b+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');};
 const fmtS=s=>{if(!s)return'';const d=new Date(s);return(d.getMonth()+1)+'/'+d.getDate();};
-const dAgo=s=>Math.floor((today-new Date(s))/DAY);
-const isOv=t=>t.due&&t.status!=='done'&&new Date(t.due)<today;
-const isSt=t=>t.status!=='done'&&dAgo(t.updated)>=STALE;
+const dAgo=s=>{const diff=Date.now()-new Date(s).getTime();const mins=Math.floor(diff/60000);if(mins<1)return'방금';if(mins<60)return mins+'분';const hrs=Math.floor(mins/60);if(hrs<24)return hrs+'시간';return Math.floor(hrs/24)+'일';};
+const isOv=t=>t.due&&t.status!=='done'&&new Date(t.due)<new Date();
+const isSt=t=>{if(t.status==='done')return false;const diff=Date.now()-new Date(t.updated).getTime();return diff>=STALE*DAY;};
 const pDue=v=>{const s=v.replace(/[^0-9]/g,'');return s.length!==8?'':s.slice(0,4)+'-'+s.slice(4,6)+'-'+s.slice(6,8);};
 const setSync=v=>document.getElementById('syncDot').classList.toggle('syncing',v);
 const toast=m=>{const el=document.getElementById('toast');el.textContent=m;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2200);};
@@ -207,7 +208,7 @@ function render(){
     html+=`<div class="${cls}" onclick="selTask('${t._id}','${t._mid}')">
       <div class="task-check${t.status==='done'?' done':''}"${isAll?'':` onclick="(function(e){e.stopPropagation();cStat('${t._id}','${t._mid}',e);})(event)"`}></div>
       <div class="task-body"><div class="task-title${t.status==='done'?' done-text':''}">${t.title}</div>
-      <div class="task-meta">${badge}${isAll?`<span class="member-badge">${t._mid}</span>`:''}${t.assignee?`<span class="task-assignee">${t.assignee}</span>`:''}${t.due?`<span class="task-date${ov?' ov':''}">마감 ${fmtS(t.due)}</span>`:''}<span class="task-date">${dAgo(t.updated)}일 전 업데이트</span></div></div>
+      <div class="task-meta">${badge}${isAll?`<span class="member-badge">${t._mid}</span>`:''}${t.assignee?`<span class="task-assignee">${t.assignee}</span>`:''}${t.due?`<span class="task-date${ov?' ov':''}">마감 ${fmtS(t.due)}</span>`:''}<span class="task-date">${dAgo(t.updated)=='방금'?'방금 업데이트':dAgo(t.updated)+' 전 업데이트'}</span></div></div>
       <div class="card-right">${fl}${!isAll?`<button class="pin-btn${t.pinned?' on':''}" onclick="tPin('${t._id}','${t._mid}',event)">${t.pinned?'&#128204;':'&#9734;'}</button><button class="del-btn" onclick="dTask('${t._id}','${t._mid}',event)">&#10005;</button>`:''}</div>
     </div>`;
   });
@@ -231,11 +232,12 @@ window.chA=async(did,mid,val)=>{const t=mData[mid]?.tasks.find(t=>t._id===did);i
 window.chD=async(did,mid,val)=>{const t=mData[mid]?.tasks.find(t=>t._id===did);if(!t)return;const nd=pDue(val),ds=nStr();await fsU(mid,did,{due:nd,updated:ds,history:[...(t.history||[]),{id:Date.now()+'',type:'status',text:'마감일 변경: '+(t.due?fmtD(t.due):'없음')+' → '+(nd?fmtD(nd):'없음'),date:ds,author:'팀장'}]});};
 window.dHist=async(did,mid,nid)=>{const t=mData[mid]?.tasks.find(t=>t._id===did);if(!t)return;await fsU(mid,did,{history:(t.history||[]).filter(h=>h.id!==nid)});};
 window.openModal=()=>document.getElementById('overlay').classList.add('show');
-window.closeModal=()=>{document.getElementById('overlay').classList.remove('show');['iTitle','iAssignee','iDue'].forEach(id=>document.getElementById(id).value='');document.getElementById('iStatus').value='todo';};
-window.addTask=async()=>{if(curTab==='__all__')return;const title=document.getElementById('iTitle').value.trim();if(!title)return;const ds=nStr();await fsA(curTab,{title,assignee:document.getElementById('iAssignee').value.trim()||'',due:pDue(document.getElementById('iDue').value)||'',status:document.getElementById('iStatus').value,updated:ds,pinned:false,order:Date.now(),history:[{id:Date.now()+'',type:'create',text:'업무가 등록되었습니다. (팀장)',date:ds,author:'팀장'}]});window.closeModal();};
+window.closeModal=()=>{document.getElementById('overlay').classList.remove('show');['iTitle','iDue'].forEach(id=>document.getElementById(id).value='');document.getElementById('iStatus').value='todo';};
+window.addTask=async()=>{if(curTab==='__all__')return;const title=document.getElementById('iTitle').value.trim();if(!title)return;const ds=nStr();await fsA(curTab,{title,assignee:'',due:pDue(document.getElementById('iDue').value)||'',status:document.getElementById('iStatus').value,updated:ds,pinned:false,order:Date.now(),history:[{id:Date.now()+'',type:'create',text:'업무가 등록되었습니다. (팀장)',date:ds,author:'팀장'}]});window.closeModal();};
 document.getElementById('overlay').addEventListener('click',e=>{if(e.target===e.currentTarget)window.closeModal();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')window.closeModal();});
 (()=>{const r=document.getElementById('resizer'),p=document.getElementById('detailPanel');let sx,sw;r.addEventListener('mousedown',e=>{if(!p.classList.contains('open'))return;sx=e.clientX;sw=p.offsetWidth;document.body.style.cursor='col-resize';document.body.style.userSelect='none';const mv=e=>{p.style.width=Math.min(560,Math.max(220,sw+(sx-e.clientX)))+'px';};const up=()=>{document.body.style.cursor='';document.body.style.userSelect='';document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);};document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);});})();
+} // end auth
 </script>
 </body>
 </html>

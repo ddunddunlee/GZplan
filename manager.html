@@ -143,16 +143,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 <script type="module">
 import{initializeApp}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import{getFirestore,collection,doc,onSnapshot,addDoc,updateDoc,deleteDoc,serverTimestamp,query,orderBy}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-const C={apiKey:"YOUR_API_KEY",authDomain:"YOUR_PROJECT.firebaseapp.com",projectId:"YOUR_PROJECT_ID",storageBucket:"YOUR_PROJECT.appspot.com",messagingSenderId:"YOUR_SENDER_ID",appId:"YOUR_APP_ID"};
+const C={apiKey:"AIzaSyA7KylsSyT3_0oQvhBtcrPc-gcdfVq90IQ",authDomain:"gzplan.firebaseapp.com",projectId:"gzplan",storageBucket:"gzplan.firebasestorage.app",messagingSenderId:"186255862586",appId:"1:186255862586:web:f36d21f76012ca43b8fe03"};
 // ★ 팀원 아이디 목록 — admin.html에서 계정 추가/삭제 시 여기도 맞춰주세요
 const MEMBER_IDS=["강신욱","김용욱","오문식","이길우","이도영","이영찬","이윤형"];
 const db=getFirestore(initializeApp(C));
-const sess=sessionStorage.getItem('tt_user');
+const sess=localStorage.getItem('tt_user');
 if(!sess)location.href='index.html';
 const ME=JSON.parse(sess||'{}');
 if(ME.role!=='manager'&&ME.role!=='admin')location.href='index.html';
 document.getElementById('tbUser').textContent=ME.displayName;
-window.logout=()=>{sessionStorage.removeItem('tt_user');location.href='index.html';};
+window.logout=()=>{localStorage.removeItem('tt_user');location.href='index.html';};
 const DAY=86400000,STALE=14,today=new Date();today.setHours(0,0,0,0);
 let mData={},curTab='__all__',selDocId=null,selMId=null,filter='all',unsubs=[];
 const nStr=()=>new Date().toISOString();

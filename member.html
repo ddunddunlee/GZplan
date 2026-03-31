@@ -1,62 +1,52 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>업무 트래커</title>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>업무 트래커 — 팀장 뷰</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#fff;--bg2:#f5f5f3;--bg3:#eaeae8;--text:#1a1a1a;--text2:#6b6b6b;--text3:#a8a8a8;--border:rgba(0,0,0,.09);--border2:rgba(0,0,0,.16);--border3:rgba(0,0,0,.30);--radius:12px;--radius-sm:8px;--pill:999px}
 @media(prefers-color-scheme:dark){:root{--bg:#1c1c1e;--bg2:#2c2c2e;--bg3:#111110;--text:#f2f2f7;--text2:#aeaeb2;--text3:#636366;--border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.15);--border3:rgba(255,255,255,.30)}}
-body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-serif;background:var(--bg3);color:var(--text);min-height:100vh;padding:2rem 1rem 5rem}
-.container{max-width:980px;margin:0 auto}
-.header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:1.4rem}
-.header h1{font-size:22px;font-weight:600;letter-spacing:-.3px}
-.header p{font-size:13px;color:var(--text2);margin-top:3px}
-.header-right{display:flex;gap:7px;align-items:center}
-.icon-btn{padding:6px 13px;border-radius:var(--radius-sm);font-size:12px;font-weight:500;border:.5px solid var(--border2);background:var(--bg);color:var(--text2);cursor:pointer;transition:all .15s}
-.icon-btn:hover{border-color:var(--border3);color:var(--text)}
-.sync-dot{width:7px;height:7px;border-radius:50%;background:#639922;display:inline-block;margin-right:4px}
-.sync-dot.syncing{background:#EF9F27;animation:pulse 1s infinite}
+body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-serif;background:var(--bg3);color:var(--text);min-height:100vh}
+.topbar{background:var(--bg);border-bottom:.5px solid var(--border);padding:.85rem 1.5rem;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.topbar h1{font-size:16px;font-weight:600}.tb-badge{font-size:11px;font-weight:600;padding:2px 8px;border-radius:var(--pill);background:#E6F1FB;color:#0C447C}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:#639922;display:inline-block}.sync-dot.syncing{background:#EF9F27;animation:pulse 1s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.tb-right{margin-left:auto;display:flex;gap:8px;align-items:center}
+.icon-btn{padding:6px 14px;border-radius:var(--radius-sm);font-size:12px;font-weight:500;border:.5px solid var(--border2);background:var(--bg);color:var(--text2);cursor:pointer;transition:all .15s}
+.icon-btn:hover{border-color:var(--border3);color:var(--text)}
+.member-tabs{background:var(--bg);border-bottom:.5px solid var(--border);padding:0 1.5rem;display:flex;gap:2px;overflow-x:auto;flex-shrink:0}
+.member-tab{padding:10px 16px;font-size:13px;font-weight:500;color:var(--text2);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;transition:all .15s;display:flex;align-items:center;gap:6px}
+.member-tab:hover{color:var(--text)}.member-tab.active{color:var(--text);border-bottom-color:var(--text)}
+.member-tab .cnt{font-size:11px;padding:1px 6px;border-radius:var(--pill);background:var(--bg2);color:var(--text2);font-weight:500}
+.member-tab.active .cnt{background:var(--text);color:var(--bg)}
+.content{padding:1.5rem;max-width:1100px;margin:0 auto;width:100%}
 .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1.2rem}
-.stat-card{background:var(--bg);border-radius:var(--radius);padding:.9rem 1rem;border:.5px solid var(--border)}
-.stat-label{font-size:12px;color:var(--text2);margin-bottom:5px}
-.stat-value{font-size:26px;font-weight:600}
+.stat-card{background:var(--bg);border-radius:var(--radius);padding:.85rem 1rem;border:.5px solid var(--border)}
+.stat-label{font-size:12px;color:var(--text2);margin-bottom:4px}.stat-value{font-size:24px;font-weight:600}
 .stat-value.warn{color:#b97a15}.stat-value.danger{color:#a32d2d}
-.filter-row{display:flex;gap:7px;margin-bottom:.6rem;flex-wrap:wrap;align-items:center}
-.assignee-row{display:flex;gap:7px;margin-bottom:1.1rem;flex-wrap:wrap;align-items:center}
-.assignee-label{font-size:12px;color:var(--text3);margin-right:2px}
+.filter-row{display:flex;gap:7px;margin-bottom:1.1rem;flex-wrap:wrap;align-items:center}
 .chip{padding:5px 15px;border-radius:var(--pill);font-size:13px;border:.5px solid var(--border2);background:var(--bg);color:var(--text2);cursor:pointer;transition:all .15s}
-.chip:hover{border-color:var(--border3);color:var(--text)}
-.chip.active{background:var(--text);color:var(--bg);border-color:var(--text)}
-.add-btn{margin-left:auto;padding:6px 18px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;background:var(--text);color:var(--bg);border:none;cursor:pointer}
-.add-btn:hover{opacity:.78}
-.layout{display:flex;gap:1.25rem;align-items:flex-start}
-.main{flex:1;min-width:0}
-.task-list{display:flex;flex-direction:column;gap:8px}
+.chip:hover{border-color:var(--border3);color:var(--text)}.chip.active{background:var(--text);color:var(--bg);border-color:var(--text)}
+.add-btn{margin-left:auto;padding:6px 18px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;background:var(--text);color:var(--bg);border:none;cursor:pointer}.add-btn:hover{opacity:.78}
+.layout{display:flex;gap:1.25rem;align-items:flex-start}.main{flex:1;min-width:0}.task-list{display:flex;flex-direction:column;gap:8px}
 .task-card{background:var(--bg);border:.5px solid var(--border);border-radius:var(--radius);padding:.95rem 1.1rem;display:flex;align-items:flex-start;gap:11px;cursor:pointer;transition:border-color .15s;position:relative}
 .task-card:hover{border-color:var(--border2)}.task-card.selected{border-color:var(--border3);background:var(--bg2)}
 .task-card.pinned{border-left:3px solid #378ADD}.task-card.stale{border-left:3px solid #EF9F27}.task-card.overdue{border-left:3px solid #E24B4A}
-.task-card.dragging-card{opacity:.4}.task-card.drag-over-card{border-top:2px solid #378ADD}
-.drag-handle{width:20px;height:20px;display:flex;align-items:center;justify-content:center;cursor:grab;color:var(--text3);font-size:14px;flex-shrink:0;margin-top:1px;user-select:none}
-.drag-handle:hover{color:var(--text2)}.drag-handle:active{cursor:grabbing}
 .task-check{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--border2);flex-shrink:0;margin-top:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
 .task-check:hover{border-color:var(--border3)}.task-check.done{background:var(--text);border-color:var(--text)}
 .task-check.done::after{content:'';width:6px;height:4px;border-left:1.5px solid var(--bg);border-bottom:1.5px solid var(--bg);transform:rotate(-45deg) translateY(-1px)}
-.task-body{flex:1;min-width:0}
-.task-title{font-size:14px;font-weight:500;margin-bottom:5px}.task-title.done-text{text-decoration:line-through;color:var(--text3)}
+.task-body{flex:1;min-width:0}.task-title{font-size:14px;font-weight:500;margin-bottom:5px}.task-title.done-text{text-decoration:line-through;color:var(--text3)}
 .task-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.badge{font-size:11px;padding:2px 8px;border-radius:var(--pill);font-weight:500}
+.badge{font-size:11px;padding:2px 8px;border-radius:var(--pill);font-weight:500;cursor:pointer}.badge:hover{opacity:.75}
 .badge-todo{background:#E6F1FB;color:#0C447C}.badge-inprogress{background:#FAEEDA;color:#633806}.badge-done{background:#EAF3DE;color:#27500A}
-.badge-status{cursor:pointer;user-select:none}.badge-status:hover{opacity:.75}
-.task-date{font-size:12px;color:var(--text3)}.task-date.ov{color:#a32d2d;font-weight:500}
-.task-assignee{font-size:12px;color:var(--text2)}
+.task-date{font-size:12px;color:var(--text3)}.task-date.ov{color:#a32d2d;font-weight:500}.task-assignee{font-size:12px;color:var(--text2)}
+.member-badge{font-size:12px;font-weight:600;color:var(--text)}
 .card-right{position:absolute;top:10px;right:12px;display:flex;gap:5px;align-items:center}
 .flag{font-size:11px;padding:2px 8px;border-radius:var(--pill);font-weight:500}
 .flag-pinned{background:#E6F1FB;color:#0C447C}.flag-stale{background:#FAEEDA;color:#633806}.flag-overdue{background:#FCEBEB;color:#791F1F}
 .pin-btn,.del-btn{width:24px;height:24px;border-radius:var(--radius-sm);border:none;background:transparent;cursor:pointer;font-size:14px;color:var(--text3);display:flex;align-items:center;justify-content:center;transition:all .15s}
-.pin-btn:hover{background:var(--bg2);color:var(--text)}.pin-btn.on{color:#185FA5}
-.del-btn:hover{background:#FCEBEB;color:#a32d2d}
+.pin-btn:hover{background:var(--bg2);color:var(--text)}.pin-btn.on{color:#185FA5}.del-btn:hover{background:#FCEBEB;color:#a32d2d}
 .divider{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:8px;padding:2px 0 6px}
 .divider::before,.divider::after{content:'';flex:1;height:.5px;background:var(--border2)}
 .empty{text-align:center;padding:3rem 0;color:var(--text3);font-size:14px}
@@ -83,21 +73,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 .tl-dot.create{background:#378ADD;border-color:#378ADD}.tl-dot.status{background:#EF9F27;border-color:#EF9F27}.tl-dot.done{background:#639922;border-color:#639922}
 .tl-body{flex:1;padding-bottom:13px;min-width:0}
 .tl-row{display:flex;align-items:flex-start;justify-content:space-between;gap:6px}
-.tl-del{width:18px;height:18px;border-radius:4px;border:none;background:transparent;color:var(--text3);cursor:pointer;font-size:12px;flex-shrink:0;margin-top:1px;opacity:0;transition:all .15s;display:flex;align-items:center;justify-content:center}
-.tl-item:hover .tl-del{opacity:1}.tl-del:hover{background:#FCEBEB;color:#a32d2d}
-.tl-author{font-size:11px;font-weight:600;padding:1px 6px;border-radius:999px;background:#EEEDFE;color:#3C3489;margin-right:5px;vertical-align:middle}
 .tl-text{font-size:13px;line-height:1.45}.tl-date{font-size:11px;color:var(--text3);margin-top:2px}
+.tl-author{font-size:11px;font-weight:600;padding:1px 6px;border-radius:999px;background:#EEEDFE;color:#3C3489;margin-right:5px;vertical-align:middle}
+.tl-del{width:18px;height:18px;border-radius:4px;border:none;background:transparent;color:var(--text3);cursor:pointer;font-size:12px;flex-shrink:0;opacity:0;transition:all .15s;display:flex;align-items:center;justify-content:center}
+.tl-item:hover .tl-del{opacity:1}.tl-del:hover{background:#FCEBEB;color:#a32d2d}
 .dp-note{padding:0 1.1rem 1rem}
 .note-input{width:100%;padding:8px 10px;font-size:13px;border:.5px solid var(--border2);border-radius:var(--radius-sm);background:transparent;color:var(--text);font-family:inherit;resize:none;height:62px;margin-bottom:6px}
 .note-input:focus{outline:none;border-color:var(--border3)}
-.note-submit{width:100%;padding:7px;font-size:13px;font-weight:600;border:none;border-radius:var(--radius-sm);background:var(--text);color:var(--bg);cursor:pointer}
-.note-submit:hover{opacity:.78}
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.38);align-items:center;justify-content:center;z-index:200}
-.overlay.show{display:flex}
+.note-submit{width:100%;padding:7px;font-size:13px;font-weight:600;border:none;border-radius:var(--radius-sm);background:var(--text);color:var(--bg);cursor:pointer}.note-submit:hover{opacity:.78}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.38);align-items:center;justify-content:center;z-index:200}.overlay.show{display:flex}
 .modal{background:var(--bg);border-radius:var(--radius);border:.5px solid var(--border2);padding:1.5rem;width:100%;max-width:420px;margin:1rem}
 .modal h3{font-size:16px;font-weight:600;margin-bottom:1.25rem}
-.fg{margin-bottom:1rem}
-.fg label{font-size:12px;color:var(--text2);display:block;margin-bottom:5px}
+.fg{margin-bottom:1rem}.fg label{font-size:12px;color:var(--text2);display:block;margin-bottom:5px}
 .fg input,.fg select{width:100%;padding:8px 10px;font-size:14px;border:.5px solid var(--border2);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:inherit;outline:none}
 .fg input:focus,.fg select:focus{border-color:var(--border3)}
 .modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem}
@@ -108,45 +95,46 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 </style>
 </head>
 <body>
-<div class="container">
-  <div class="header">
-    <div>
-      <h1 id="hTitle">업무 트래커</h1>
-      <p><span class="sync-dot" id="syncDot"></span>실시간 동기화</p>
-    </div>
-    <div class="header-right">
-      <span id="hUser" style="font-size:12px;color:var(--text2)"></span>
-      <button class="icon-btn" onclick="logout()">로그아웃</button>
-    </div>
+<div style="display:flex;flex-direction:column;min-height:100vh">
+<div class="topbar">
+  <h1>업무 트래커</h1><span class="tb-badge">팀장 뷰</span>
+  <span style="font-size:12px;color:var(--text3);display:flex;align-items:center;gap:5px"><span class="sync-dot" id="syncDot"></span>실시간</span>
+  <div class="tb-right">
+    <span id="tbUser" style="font-size:12px;color:var(--text2)"></span>
+    <button class="icon-btn" onclick="location.href='memo.html'">📝 메모장</button>
+    <button class="icon-btn" onclick="logout()">로그아웃</button>
   </div>
+</div>
+<div class="member-tabs" id="memberTabs"></div>
+<div class="content">
   <div class="stats-row" id="statsRow"></div>
   <div class="filter-row">
     <button class="chip active" onclick="setFilter('all',this)">전체</button>
     <button class="chip" onclick="setFilter('todo',this)">대기</button>
     <button class="chip" onclick="setFilter('inprogress',this)">진행 중</button>
     <button class="chip" onclick="setFilter('done',this)">완료</button>
-    <button class="chip" onclick="setFilter('stale',this)">⚠ 오래된 업무</button>
-    <button class="add-btn" onclick="openModal()">+ 업무 추가</button>
+    <button class="chip" onclick="setFilter('stale',this)">&#9888; 오래된 업무</button>
+    <button class="add-btn" id="addBtn" onclick="openModal()" style="display:none">+ 업무 추가</button>
   </div>
-  <div class="assignee-row" id="assigneeRow"></div>
   <div class="layout">
     <div class="main"><div class="task-list" id="taskList"></div></div>
     <div class="resizer" id="resizer"></div>
     <div class="detail-panel" id="detailPanel">
-      <div class="dp-head"><input class="dp-title-input" id="dpTitle" onchange="changeTitle(selId,this.value)" /><button class="dp-close" onclick="closeDetail()">✕</button></div>
+      <div class="dp-head"><input class="dp-title-input" id="dpTitle" onchange="chTitle(selDocId,selMId,this.value)"/><button class="dp-close" onclick="closeDetail()">&#10005;</button></div>
       <div class="dp-meta" id="dpMeta"></div>
       <div class="dp-sec">히스토리</div>
       <div class="timeline" id="dpTimeline"></div>
-      <div class="dp-note"><textarea class="note-input" id="noteInput" placeholder="메모 또는 업데이트 내용 입력..."></textarea><button class="note-submit" onclick="addNote()">메모 추가</button></div>
+      <div class="dp-note"><textarea class="note-input" id="noteInput" placeholder="팀장 코멘트 입력..."></textarea><button class="note-submit" onclick="addNote()">메모 추가</button></div>
     </div>
   </div>
+</div>
 </div>
 <div class="overlay" id="overlay">
   <div class="modal">
     <h3>새 업무 추가</h3>
-    <div class="fg"><label>업무명</label><input id="iTitle" placeholder="업무 내용을 입력하세요" /></div>
+    <div class="fg"><label>업무명</label><input id="iTitle" placeholder="업무 내용을 입력하세요"/></div>
     
-    <div class="fg"><label>마감일 <span style="color:var(--text3);font-weight:400">(예: 20260401)</span></label><input id="iDue" type="text" placeholder="20260401" maxlength="8" oninput="this.value=this.value.replace(/[^0-9]/g,'')" /></div>
+    <div class="fg"><label>마감일</label><input id="iDue" type="text" placeholder="20260401" maxlength="8" oninput="this.value=this.value.replace(/[^0-9]/g,'')"/></div>
     <div class="fg"><label>상태</label><select id="iStatus"><option value="todo">대기</option><option value="inprogress">진행 중</option></select></div>
     <div class="modal-btns"><button class="btn-cancel" onclick="closeModal()">취소</button><button class="btn-ok" onclick="addTask()">추가하기</button></div>
   </div>
@@ -155,18 +143,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 <script type="module">
 import{initializeApp}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import{getFirestore,collection,doc,onSnapshot,addDoc,updateDoc,deleteDoc,serverTimestamp,query,orderBy}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-// ★ firebaseConfig 붙여넣기
 const C={apiKey:"AIzaSyA7KylsSyT3_0oQvhBtcrPc-gcdfVq90IQ",authDomain:"gzplan.firebaseapp.com",projectId:"gzplan",storageBucket:"gzplan.firebasestorage.app",messagingSenderId:"186255862586",appId:"1:186255862586:web:f36d21f76012ca43b8fe03"};
+// ★ 팀원 아이디 목록 — admin.html에서 계정 추가/삭제 시 여기도 맞춰주세요
+const MEMBER_IDS=["강신욱","김용욱","오문식","이길우","이도영","이영찬","이윤형","현주용"];
 const db=getFirestore(initializeApp(C));
-const sess=localStorage.getItem('tt_user');
-if(!sess){location.href='index.html';}
-const ME=JSON.parse(sess||'{}');
-if(!ME.id)location.href='index.html';
-document.getElementById('hTitle').textContent=ME.displayName+'의 업무 트래커';
-document.getElementById('hUser').textContent=ME.displayName;
+const _sess=localStorage.getItem('tt_user');
+const ME=_sess?JSON.parse(_sess):null;
+if(!ME){location.href='index.html';}
+else if(ME.role!=='manager'&&ME.role!=='admin'){location.href='index.html';}
+else{
+document.getElementById('tbUser').textContent=ME.displayName;
 window.logout=()=>{localStorage.removeItem('tt_user');location.href='index.html';};
 const DAY=86400000,STALE=14;
-let tasks=[],selId=null,filter='all',filterA='all';
+let mData={},curTab='__all__',selDocId=null,selMId=null,filter='all',unsubs=[];
 const nStr=()=>new Date().toISOString();
 const fmtD=s=>{if(!s)return'-';const d=new Date(s),o=s.length<=10;const b=d.getFullYear()+'. '+(d.getMonth()+1)+'. '+d.getDate()+'.';return o?b:b+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');};
 const fmtS=s=>{if(!s)return'';const d=new Date(s);return(d.getMonth()+1)+'/'+d.getDate();};
@@ -176,62 +165,79 @@ const isSt=t=>{if(t.status==='done')return false;const diff=Date.now()-new Date(
 const pDue=v=>{const s=v.replace(/[^0-9]/g,'');return s.length!==8?'':s.slice(0,4)+'-'+s.slice(4,6)+'-'+s.slice(6,8);};
 const setSync=v=>document.getElementById('syncDot').classList.toggle('syncing',v);
 const toast=m=>{const el=document.getElementById('toast');el.textContent=m;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2200);};
-const col=()=>collection(db,'tasks',ME.id,'items');
-const dr=id=>doc(db,'tasks',ME.id,'items',id);
-onSnapshot(query(col(),orderBy('order','asc')),snap=>{tasks=snap.docs.map(d=>({_id:d.id,...d.data()}));if(selId){const t=tasks.find(t=>t._id===selId);if(t)renderDetail(t);}render();setSync(false);});
-const fsA=d=>addDoc(col(),{...d,createdAt:serverTimestamp()});
-const fsU=(id,d)=>updateDoc(dr(id),d);
-const fsDel=id=>deleteDoc(dr(id));
-const sBadge=(s,id)=>{const t='클릭하면 상태 변경';if(s==='todo')return`<span class="badge badge-todo badge-status" onclick="cStat('${id}',event)" title="${t}">대기 →</span>`;if(s==='inprogress')return`<span class="badge badge-inprogress badge-status" onclick="cStat('${id}',event)" title="${t}">진행 중 →</span>`;return`<span class="badge badge-done badge-status" onclick="cStat('${id}',event)" title="${t}">완료 →</span>`;};
+const col=id=>collection(db,'tasks',id,'items');
+const dr=(mid,did)=>doc(db,'tasks',mid,'items',did);
+const fsU=(mid,did,d)=>{setSync(true);return updateDoc(dr(mid,did),d);};
+const fsA=(mid,d)=>{setSync(true);return addDoc(col(mid),{...d,createdAt:serverTimestamp()});};
+const fsDel=(mid,did)=>{setSync(true);return deleteDoc(dr(mid,did));};
+function subscribe(){
+  unsubs.forEach(u=>u());unsubs=[];
+  MEMBER_IDS.forEach(id=>{
+    mData[id]={name:id,tasks:[]};
+    const u=onSnapshot(query(col(id),orderBy('order','asc')),snap=>{mData[id].tasks=snap.docs.map(d=>({_id:d.id,_mid:id,...d.data()}));if(selMId===id&&selDocId){const t=mData[id].tasks.find(t=>t._id===selDocId);if(t)renderDetail(t);}render();setSync(false);});
+    unsubs.push(u);
+  });
+}
+subscribe();
+function getTasks(){return curTab==='__all__'?Object.values(mData).flatMap(m=>m.tasks):mData[curTab]?.tasks||[];}
+function renderTabs(){
+  const all=Object.values(mData).reduce((s,m)=>s+m.tasks.length,0);
+  let h=`<div class="member-tab${curTab==='__all__'?' active':''}" onclick="switchTab('__all__')">전체 <span class="cnt">${all}</span></div>`;
+  MEMBER_IDS.forEach(id=>{const cnt=(mData[id]?.tasks||[]).length;h+=`<div class="member-tab${curTab===id?' active':''}" onclick="switchTab('${id}')">${id} <span class="cnt">${cnt}</span></div>`;});
+  document.getElementById('memberTabs').innerHTML=h;
+}
+window.switchTab=id=>{curTab=id;selDocId=null;selMId=null;filter='all';document.getElementById('detailPanel').classList.remove('open');document.getElementById('noteInput').value='';document.querySelectorAll('.chip').forEach((c,i)=>c.classList.toggle('active',i===0));document.getElementById('addBtn').style.display=id==='__all__'?'none':'';render();};
+window.setFilter=(f,el)=>{filter=f;document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');render();};
 function render(){
-  const f=tasks.filter(t=>(filter==='all'?true:filter==='stale'?isSt(t):t.status===filter)&&(filterA==='all'||t.assignee===filterA));
-  const p=f.filter(t=>t.pinned),r=f.filter(t=>!t.pinned),list=[...p,...r];
-  const hp=list.some(t=>t.pinned),hu=list.some(t=>!t.pinned);
-  const aa=[...new Set(tasks.map(t=>t.assignee).filter(Boolean))];
-  const aR=document.getElementById('assigneeRow');
-  if(aa.length){let h='<span class="assignee-label">담당자</span>';h+=`<button class="chip achip${filterA==='all'?' active':''}" data-a="all">전체</button>`;aa.forEach(a=>{h+=`<button class="chip achip${filterA===a?' active':''}" data-a="${a}">${a}</button>`;});aR.innerHTML=h;aR.querySelectorAll('.achip').forEach(b=>b.addEventListener('click',function(){filterA=this.dataset.a;aR.querySelectorAll('.achip').forEach(c=>c.classList.remove('active'));this.classList.add('active');render();}));}else aR.innerHTML='';
-  const tot=tasks.length,inp=tasks.filter(t=>t.status==='inprogress').length,st=tasks.filter(isSt).length,ov=tasks.filter(isOv).length;
-  document.getElementById('statsRow').innerHTML=`<div class="stat-card"><div class="stat-label">전체 업무</div><div class="stat-value">${tot}</div></div><div class="stat-card"><div class="stat-label">진행 중</div><div class="stat-value">${inp}</div></div><div class="stat-card"><div class="stat-label">오래된 업무</div><div class="stat-value warn">${st}</div></div><div class="stat-card"><div class="stat-label">기한 초과</div><div class="stat-value danger">${ov}</div></div>`;
+  renderTabs();
+  const all=getTasks(),f=all.filter(t=>filter==='all'?true:filter==='stale'?isSt(t):t.status===filter);
+  const list=[...f.filter(t=>t.pinned),...f.filter(t=>!t.pinned)];
+  const total=all.length,inp=all.filter(t=>t.status==='inprogress').length,st=all.filter(isSt).length,ov=all.filter(isOv).length;
+  document.getElementById('statsRow').innerHTML=`<div class="stat-card"><div class="stat-label">전체 업무</div><div class="stat-value">${total}</div></div><div class="stat-card"><div class="stat-label">진행 중</div><div class="stat-value">${inp}</div></div><div class="stat-card"><div class="stat-label">오래된 업무</div><div class="stat-value warn">${st}</div></div><div class="stat-card"><div class="stat-label">기한 초과</div><div class="stat-value danger">${ov}</div></div>`;
   const el=document.getElementById('taskList');
-  if(!list.length){el.innerHTML='<div class="empty">해당하는 업무가 없습니다</div>';return;}
-  let html='',ds=false;
+  if(!list.length){el.innerHTML='<div class="empty">업무가 없습니다</div>';return;}
+  const isAll=curTab==='__all__';
+  let html='';
   list.forEach(t=>{
-    if(hp&&hu&&!t.pinned&&!ds){html+='<div class="divider">고정되지 않은 업무 · 등록 순</div>';ds=true;}
     const st=isSt(t),ov=isOv(t);let cls='task-card';
     if(t.pinned)cls+=' pinned';else if(ov)cls+=' overdue';else if(st)cls+=' stale';
-    if(selId===t._id)cls+=' selected';
-    let fl='';if(t.pinned)fl='<span class="flag flag-pinned">📌 고정됨</span>';else if(ov)fl='<span class="flag flag-overdue">기한 초과</span>';else if(st)fl='<span class="flag flag-stale">업데이트 필요</span>';
-    html+=`<div class="${cls}" draggable="true" data-id="${t._id}" onclick="selTask('${t._id}')"><div class="drag-handle" onclick="event.stopPropagation()">⠿</div><div class="task-check${t.status==='done'?' done':''}" onclick="tDone('${t._id}',event)"></div><div class="task-body"><div class="task-title${t.status==='done'?' done-text':''}">${t.title}</div><div class="task-meta">${sBadge(t.status,t._id)}${t.assignee?`<span class="task-assignee">${t.assignee}</span>`:''}${t.due?`<span class="task-date${ov?' ov':''}">마감 ${fmtS(t.due)}</span>`:''}<span class="task-date">${dAgo(t.updated)=='방금'?'방금 업데이트':dAgo(t.updated)+' 전 업데이트'}</span></div></div><div class="card-right">${fl}<button class="pin-btn${t.pinned?' on':''}" onclick="tPin('${t._id}',event)">${t.pinned?'📌':'☆'}</button><button class="del-btn" onclick="dTask('${t._id}',event)">✕</button></div></div>`;
+    if(selDocId===t._id)cls+=' selected';
+    let fl='';if(t.pinned)fl='<span class="flag flag-pinned">&#128204; 고정됨</span>';else if(ov)fl='<span class="flag flag-overdue">기한 초과</span>';else if(st)fl='<span class="flag flag-stale">업데이트 필요</span>';
+    const sm={todo:'대기',inprogress:'진행 중',done:'완료'},sc={todo:'badge-todo',inprogress:'badge-inprogress',done:'badge-done'};
+    const badge=isAll?`<span class="badge ${sc[t.status]||'badge-todo'}">${sm[t.status]||t.status}</span>`:`<span class="badge ${sc[t.status]||'badge-todo'}" onclick="cStat('${t._id}','${t._mid}',event)">${sm[t.status]||t.status} &#8594;</span>`;
+    html+=`<div class="${cls}" onclick="selTask('${t._id}','${t._mid}')">
+      <div class="task-check${t.status==='done'?' done':''}"${isAll?'':` onclick="(function(e){e.stopPropagation();cStat('${t._id}','${t._mid}',e);})(event)"`}></div>
+      <div class="task-body"><div class="task-title${t.status==='done'?' done-text':''}">${t.title}</div>
+      <div class="task-meta">${badge}${isAll?`<span class="member-badge">${t._mid}</span>`:''}${t.assignee?`<span class="task-assignee">${t.assignee}</span>`:''}${t.due?`<span class="task-date${ov?' ov':''}">마감 ${fmtS(t.due)}</span>`:''}<span class="task-date">${dAgo(t.updated)=='방금'?'방금 업데이트':dAgo(t.updated)+' 전 업데이트'}</span></div></div>
+      <div class="card-right">${fl}${!isAll?`<button class="pin-btn${t.pinned?' on':''}" onclick="tPin('${t._id}','${t._mid}',event)">${t.pinned?'&#128204;':'&#9734;'}</button><button class="del-btn" onclick="dTask('${t._id}','${t._mid}',event)">&#10005;</button>`:''}</div>
+    </div>`;
   });
-  el.innerHTML=html;initDrag();
+  el.innerHTML=html;
 }
 function renderDetail(t){
   document.getElementById('dpTitle').value=t.title;
-  const sm={todo:'대기',inprogress:'진행 중',done:'완료'};
-  document.getElementById('dpMeta').innerHTML=`<div class="dp-row"><span class="dp-lbl">담당자</span><input class="dp-edit" value="${t.assignee||''}" placeholder="담당자" onchange="chA('${t._id}',this.value)" /></div><div class="dp-row"><span class="dp-lbl">마감일</span><input class="dp-edit" value="${t.due?t.due.replace(/-/g,''):''}" placeholder="20260401" maxlength="8" oninput="this.value=this.value.replace(/[^0-9]/g,'')" onchange="chD('${t._id}',this.value)" /></div><div class="dp-row"><span class="dp-lbl">상태</span><span class="dp-val">${sm[t.status]||'-'}</span></div><div class="dp-row"><span class="dp-lbl">마지막 업데이트</span><span class="dp-val">${fmtD(t.updated)}</span></div>`;
+  const sm={todo:'대기',inprogress:'진행 중',done:'완료'};const isAll=curTab==='__all__';
+  document.getElementById('dpMeta').innerHTML=`<div class="dp-row"><span class="dp-lbl">팀원</span><span class="dp-val">${t._mid}</span></div><div class="dp-row"><span class="dp-lbl">담당자</span>${isAll?`<span class="dp-val">${t.assignee||'-'}</span>`:`<input class="dp-edit" value="${t.assignee||''}" placeholder="담당자" onchange="chA('${t._id}','${t._mid}',this.value)"/>`}</div><div class="dp-row"><span class="dp-lbl">마감일</span>${isAll?`<span class="dp-val">${t.due?fmtD(t.due):'-'}</span>`:`<input class="dp-edit" value="${t.due?t.due.replace(/-/g,''):''}" placeholder="20260401" maxlength="8" oninput="this.value=this.value.replace(/[^0-9]/g,'')" onchange="chD('${t._id}','${t._mid}',this.value)"/>`}</div><div class="dp-row"><span class="dp-lbl">상태</span><span class="dp-val">${sm[t.status]||'-'}</span></div><div class="dp-row"><span class="dp-lbl">마지막 업데이트</span><span class="dp-val">${fmtD(t.updated)}</span></div>`;
   const hist=[...(t.history||[])].sort((a,b)=>new Date(a.date)-new Date(b.date));
-  document.getElementById('dpTimeline').innerHTML=hist.map((h,i)=>`<div class="tl-item"><div class="tl-dot ${h.type}"></div>${i<hist.length-1?'<div class="tl-line"></div>':''}<div class="tl-body"><div class="tl-row"><div class="tl-text">${h.author?`<span class='tl-author'>${h.author}</span>`:''}${h.text}</div><button class="tl-del" onclick="dHist('${t._id}','${h.id}')">✕</button></div><div class="tl-date">${fmtD(h.date)}</div></div></div>`).join('');
+  document.getElementById('dpTimeline').innerHTML=hist.map((h,i)=>`<div class="tl-item"><div class="tl-dot ${h.type}"></div>${i<hist.length-1?'<div class="tl-line"></div>':''}<div class="tl-body"><div class="tl-row"><div class="tl-text">${h.author?`<span class='tl-author'>${h.author}</span>`:''}${h.text}</div>${!isAll?`<button class="tl-del" onclick="dHist('${t._id}','${t._mid}','${h.id}')">&#10005;</button>`:''}</div><div class="tl-date">${fmtD(h.date)}</div></div></div>`).join('');
 }
-window.setFilter=(f,el)=>{filter=f;document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');render();};
-window.selTask=id=>{selId=id;const t=tasks.find(t=>t._id===id);if(!t)return;document.getElementById('detailPanel').classList.add('open');renderDetail(t);render();};
-window.closeDetail=()=>{selId=null;document.getElementById('detailPanel').classList.remove('open');render();};
-window.tPin=async(id,e)=>{e.stopPropagation();setSync(true);const t=tasks.find(t=>t._id===id);if(t)await fsU(id,{pinned:!t.pinned});};
-window.tDone=async(id,e)=>{e.stopPropagation();setSync(true);const t=tasks.find(t=>t._id===id);if(!t)return;const ds=nStr(),ns=t.status==='done'?'todo':'done';await fsU(id,{status:ns,updated:ds,history:[...(t.history||[]),(ns==='done'?{id:Date.now()+'',type:'done',text:'업무 완료 처리되었습니다.',date:ds}:{id:Date.now()+'',type:'status',text:'완료 취소 처리되었습니다.',date:ds})]});};
-window.cStat=async(id,e)=>{e.stopPropagation();setSync(true);const t=tasks.find(t=>t._id===id);if(!t)return;const c={todo:'inprogress',inprogress:'done',done:'todo'},l={todo:'대기',inprogress:'진행 중',done:'완료'},ds=nStr(),ns=c[t.status];await fsU(id,{status:ns,updated:ds,history:[...(t.history||[]),{id:Date.now()+'',type:'status',text:'상태 변경: '+l[t.status]+' → '+l[ns],date:ds}]});};
-window.dTask=async(id,e)=>{e.stopPropagation();if(!confirm('이 업무를 삭제할까요?'))return;setSync(true);if(selId===id){selId=null;document.getElementById('detailPanel').classList.remove('open');}await fsDel(id);toast('업무를 삭제했어요');};
-window.addNote=async()=>{const inp=document.getElementById('noteInput'),text=inp.value.trim();if(!text||!selId)return;setSync(true);const t=tasks.find(t=>t._id===selId);if(!t)return;const ds=nStr();inp.value='';await fsU(selId,{updated:ds,history:[...(t.history||[]),{id:Date.now()+'',type:'comment',text,date:ds}]});};
-window.changeTitle=async(id,val)=>{if(!val.trim())return;setSync(true);const t=tasks.find(t=>t._id===id);if(!t)return;const ds=nStr();await fsU(id,{title:val.trim(),updated:ds,history:[...(t.history||[]),{id:Date.now()+'',type:'status',text:'업무명 변경: '+t.title+' → '+val.trim(),date:ds}]});};
-window.chA=async(id,val)=>{setSync(true);const t=tasks.find(t=>t._id===id);if(!t)return;const ds=nStr();await fsU(id,{assignee:val.trim(),updated:ds,history:[...(t.history||[]),{id:Date.now()+'',type:'status',text:'담당자 변경: '+(t.assignee||'없음')+' → '+(val.trim()||'없음'),date:ds}]});};
-window.chD=async(id,val)=>{setSync(true);const t=tasks.find(t=>t._id===id);if(!t)return;const nd=pDue(val),ds=nStr();await fsU(id,{due:nd,updated:ds,history:[...(t.history||[]),{id:Date.now()+'',type:'status',text:'마감일 변경: '+(t.due?fmtD(t.due):'없음')+' → '+(nd?fmtD(nd):'없음'),date:ds}]});};
-window.dHist=async(tid,nid)=>{setSync(true);const t=tasks.find(t=>t._id===tid);if(!t)return;await fsU(tid,{history:(t.history||[]).filter(h=>h.id!==nid)});};
+window.selTask=(did,mid)=>{selDocId=did;selMId=mid;const t=mData[mid]?.tasks.find(t=>t._id===did);if(!t)return;document.getElementById('detailPanel').classList.add('open');renderDetail(t);render();};
+window.closeDetail=()=>{selDocId=null;selMId=null;document.getElementById('detailPanel').classList.remove('open');render();};
+window.tPin=async(did,mid,e)=>{e.stopPropagation();const t=mData[mid]?.tasks.find(t=>t._id===did);if(t)await fsU(mid,did,{pinned:!t.pinned});};
+window.cStat=async(did,mid,e)=>{e.stopPropagation();const t=mData[mid]?.tasks.find(t=>t._id===did);if(!t)return;const c={todo:'inprogress',inprogress:'done',done:'todo'},l={todo:'대기',inprogress:'진행 중',done:'완료'},ds=nStr(),ns=c[t.status];await fsU(mid,did,{status:ns,updated:ds,history:[...(t.history||[]),{id:Date.now()+'',type:'status',text:'상태 변경: '+l[t.status]+' → '+l[ns]+' (팀장)',date:ds,author:'팀장'}]});};
+window.dTask=async(did,mid,e)=>{e.stopPropagation();if(!confirm('이 업무를 삭제할까요?'))return;if(selDocId===did){selDocId=null;selMId=null;document.getElementById('detailPanel').classList.remove('open');}await fsDel(mid,did);toast('업무를 삭제했어요');};
+window.addNote=async()=>{const inp=document.getElementById('noteInput'),text=inp.value.trim();if(!text||!selDocId||!selMId)return;const t=mData[selMId]?.tasks.find(t=>t._id===selDocId);if(!t)return;const ds=nStr();inp.value='';await fsU(selMId,selDocId,{updated:ds,history:[...(t.history||[]),{id:Date.now()+'',type:'comment',text,date:ds,author:ME.displayName+'(팀장)'}]});};
+window.chTitle=async(did,mid,val)=>{if(!val.trim()||!did||!mid)return;const t=mData[mid]?.tasks.find(t=>t._id===did);if(!t)return;const ds=nStr();await fsU(mid,did,{title:val.trim(),updated:ds,history:[...(t.history||[]),{id:Date.now()+'',type:'status',text:'업무명 변경: '+t.title+' → '+val.trim(),date:ds,author:'팀장'}]});};
+window.chA=async(did,mid,val)=>{const t=mData[mid]?.tasks.find(t=>t._id===did);if(!t)return;const ds=nStr();await fsU(mid,did,{assignee:val.trim(),updated:ds,history:[...(t.history||[]),{id:Date.now()+'',type:'status',text:'담당자 변경: '+(t.assignee||'없음')+' → '+(val.trim()||'없음'),date:ds,author:'팀장'}]});};
+window.chD=async(did,mid,val)=>{const t=mData[mid]?.tasks.find(t=>t._id===did);if(!t)return;const nd=pDue(val),ds=nStr();await fsU(mid,did,{due:nd,updated:ds,history:[...(t.history||[]),{id:Date.now()+'',type:'status',text:'마감일 변경: '+(t.due?fmtD(t.due):'없음')+' → '+(nd?fmtD(nd):'없음'),date:ds,author:'팀장'}]});};
+window.dHist=async(did,mid,nid)=>{const t=mData[mid]?.tasks.find(t=>t._id===did);if(!t)return;await fsU(mid,did,{history:(t.history||[]).filter(h=>h.id!==nid)});};
 window.openModal=()=>document.getElementById('overlay').classList.add('show');
 window.closeModal=()=>{document.getElementById('overlay').classList.remove('show');['iTitle','iDue'].forEach(id=>document.getElementById(id).value='');document.getElementById('iStatus').value='todo';};
-window.addTask=async()=>{setSync(true);const title=document.getElementById('iTitle').value.trim();if(!title)return;const ds=nStr();await fsA({title,assignee:ME.id,due:pDue(document.getElementById('iDue').value)||'',status:document.getElementById('iStatus').value,updated:ds,pinned:false,order:Date.now(),history:[{id:Date.now()+'',type:'create',text:'업무가 등록되었습니다.',date:ds}]});window.closeModal();};
+window.addTask=async()=>{if(curTab==='__all__')return;const title=document.getElementById('iTitle').value.trim();if(!title)return;const ds=nStr();await fsA(curTab,{title,assignee:'',due:pDue(document.getElementById('iDue').value)||'',status:document.getElementById('iStatus').value,updated:ds,pinned:false,order:Date.now(),history:[{id:Date.now()+'',type:'create',text:'업무가 등록되었습니다. (팀장)',date:ds,author:'팀장'}]});window.closeModal();};
 document.getElementById('overlay').addEventListener('click',e=>{if(e.target===e.currentTarget)window.closeModal();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')window.closeModal();});
-let dragId=null;
-function initDrag(){const el=document.getElementById('taskList');el.querySelectorAll('.task-card[draggable]').forEach(card=>{card.addEventListener('dragstart',()=>{dragId=card.dataset.id;setTimeout(()=>card.classList.add('dragging-card'),0);});card.addEventListener('dragend',()=>{card.classList.remove('dragging-card');el.querySelectorAll('.drag-over-card').forEach(c=>c.classList.remove('drag-over-card'));});card.addEventListener('dragover',e=>{e.preventDefault();el.querySelectorAll('.drag-over-card').forEach(c=>c.classList.remove('drag-over-card'));card.classList.add('drag-over-card');});card.addEventListener('drop',async e=>{e.preventDefault();card.classList.remove('drag-over-card');const dId=card.dataset.id;if(dragId===dId)return;setSync(true);const from=tasks.find(t=>t._id===dragId),to=tasks.find(t=>t._id===dId);if(!from||!to)return;await fsU(dragId,{order:(to.order||0)-1});});});}
 (()=>{const r=document.getElementById('resizer'),p=document.getElementById('detailPanel');let sx,sw;r.addEventListener('mousedown',e=>{if(!p.classList.contains('open'))return;sx=e.clientX;sw=p.offsetWidth;document.body.style.cursor='col-resize';document.body.style.userSelect='none';const mv=e=>{p.style.width=Math.min(560,Math.max(220,sw+(sx-e.clientX)))+'px';};const up=()=>{document.body.style.cursor='';document.body.style.userSelect='';document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);};document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);});})();
+} // end auth
 </script>
 </body>
 </html>

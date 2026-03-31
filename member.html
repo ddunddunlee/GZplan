@@ -147,7 +147,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
     <div class="fg"><label>업무명</label><input id="iTitle" placeholder="업무 내용을 입력하세요" /></div>
     <div class="fg"><label>설명 <span style="color:var(--text3);font-weight:400">(선택)</span></label><input id="iDesc" placeholder="상세 설명을 입력하세요" /></div>
     
-    <div class="fg"><label>마감일 <span style="color:var(--text3);font-weight:400">(예: 20260401)</span></label><input id="iDue" type="text" placeholder="20260401" maxlength="8" oninput="this.value=this.value.replace(/[^0-9]/g,'')" /></div>
+    <div class="fg"><label>마감일</label><input id="iDue" type="date" /></div>
     <div class="fg"><label>상태</label><select id="iStatus"><option value="todo">대기</option><option value="inprogress">진행 중</option></select></div>
     <div class="modal-btns"><button class="btn-cancel" onclick="closeModal()">취소</button><button class="btn-ok" onclick="addTask()">추가하기</button></div>
   </div>
@@ -209,7 +209,7 @@ function render(){
 function renderDetail(t){
   document.getElementById('dpTitle').value=t.title;
   const sm={todo:'대기',inprogress:'진행 중',done:'완료'};
-  document.getElementById('dpMeta').innerHTML=`${t.desc?`<div class="dp-row" style="align-items:flex-start;gap:8px"><span class="dp-lbl" style="flex-shrink:0">설명</span><span class="dp-val" style="text-align:right;word-break:break-all;line-height:1.5">${t.desc}</span></div>`:``}<div class="dp-row"><span class="dp-lbl">마감일</span><input class="dp-edit" value="${t.due?t.due.replace(/-/g,''):''}" placeholder="20260401" maxlength="8" oninput="this.value=this.value.replace(/[^0-9]/g,'')" onchange="chD('${t._id}',this.value)" /></div><div class="dp-row"><span class="dp-lbl">상태</span><span class="dp-val">${sm[t.status]||'-'}</span></div><div class="dp-row"><span class="dp-lbl">마지막 업데이트</span><span class="dp-val">${fmtD(t.updated)}</span></div>`;
+  document.getElementById('dpMeta').innerHTML=`${t.desc?`<div class="dp-row" style="align-items:flex-start;gap:8px"><span class="dp-lbl" style="flex-shrink:0">설명</span><span class="dp-val" style="text-align:right;word-break:break-all;line-height:1.5">${t.desc}</span></div>`:``}<div class="dp-row"><span class="dp-lbl">마감일</span><input class="dp-edit" type="date" value="${t.due||''}" onchange="chD('${t._id}',this.value)" style="width:140px;text-align:right" /></div><div class="dp-row"><span class="dp-lbl">상태</span><span class="dp-val">${sm[t.status]||'-'}</span></div><div class="dp-row"><span class="dp-lbl">마지막 업데이트</span><span class="dp-val">${fmtD(t.updated)}</span></div>`;
   const hist=[...(t.history||[])].sort((a,b)=>new Date(a.date)-new Date(b.date));
   document.getElementById('dpTimeline').innerHTML=hist.map((h,i)=>`<div class="tl-item"><div class="tl-dot ${h.type}"></div>${i<hist.length-1?'<div class="tl-line"></div>':''}<div class="tl-body"><div class="tl-row"><div class="tl-text">${h.author?`<span class='tl-author'>${h.author}</span>`:''}${h.text}</div><button class="tl-del" onclick="dHist('${t._id}','${h.id}')">✕</button></div><div class="tl-date">${fmtD(h.date)}</div></div></div>`).join('');
 }
@@ -223,11 +223,11 @@ window.dTask=async(id,e)=>{e.stopPropagation();if(!confirm('이 업무를 삭제
 window.addNote=async()=>{const inp=document.getElementById('noteInput'),text=inp.value.trim();if(!text||!selId)return;setSync(true);const t=tasks.find(t=>t._id===selId);if(!t)return;const ds=nStr();inp.value='';await fsU(selId,{updated:ds,history:[...(t.history||[]),{id:Date.now()+'',type:'comment',text,date:ds}]});};
 window.changeTitle=async(id,val)=>{if(!val.trim())return;setSync(true);const t=tasks.find(t=>t._id===id);if(!t)return;const ds=nStr();await fsU(id,{title:val.trim(),updated:ds,history:[...(t.history||[]),{id:Date.now()+'',type:'status',text:'업무명 변경: '+t.title+' → '+val.trim(),date:ds}]});};
 window.chA=async(id,val)=>{setSync(true);const t=tasks.find(t=>t._id===id);if(!t)return;const ds=nStr();await fsU(id,{assignee:val.trim(),updated:ds,history:[...(t.history||[]),{id:Date.now()+'',type:'status',text:'담당자 변경: '+(t.assignee||'없음')+' → '+(val.trim()||'없음'),date:ds}]});};
-window.chD=async(id,val)=>{setSync(true);const t=tasks.find(t=>t._id===id);if(!t)return;const nd=pDue(val),ds=nStr();await fsU(id,{due:nd,updated:ds,history:[...(t.history||[]),{id:Date.now()+'',type:'status',text:'마감일 변경: '+(t.due?fmtD(t.due):'없음')+' → '+(nd?fmtD(nd):'없음'),date:ds}]});};
+window.chD=async(id,val)=>{setSync(true);const t=tasks.find(t=>t._id===id);if(!t)return;const nd=val,ds=nStr();await fsU(id,{due:nd,updated:ds,history:[...(t.history||[]),{id:Date.now()+'',type:'status',text:'마감일 변경: '+(t.due?fmtD(t.due):'없음')+' → '+(nd?fmtD(nd):'없음'),date:ds}]});};
 window.dHist=async(tid,nid)=>{setSync(true);const t=tasks.find(t=>t._id===tid);if(!t)return;await fsU(tid,{history:(t.history||[]).filter(h=>h.id!==nid)});};
 window.openModal=()=>document.getElementById('overlay').classList.add('show');
 window.closeModal=()=>{document.getElementById('overlay').classList.remove('show');['iTitle','iDesc','iDue'].forEach(id=>document.getElementById(id).value='');document.getElementById('iStatus').value='todo';};
-window.addTask=async()=>{setSync(true);const title=document.getElementById('iTitle').value.trim();if(!title)return;const ds=nStr();await fsA({title,assignee:ME.id,due:pDue(document.getElementById('iDue').value)||'',status:document.getElementById('iStatus').value,updated:ds,pinned:false,order:Date.now(),history:[{id:Date.now()+'',type:'create',text:'업무가 등록되었습니다.',date:ds}]});window.closeModal();};
+window.addTask=async()=>{setSync(true);const title=document.getElementById('iTitle').value.trim();if(!title)return;const ds=nStr();await fsA({title,assignee:ME.id,due:document.getElementById('iDue').value||'',status:document.getElementById('iStatus').value,updated:ds,pinned:false,order:Date.now(),history:[{id:Date.now()+'',type:'create',text:'업무가 등록되었습니다.',date:ds}]});window.closeModal();};
 document.getElementById('overlay').addEventListener('click',e=>{if(e.target===e.currentTarget)window.closeModal();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')window.closeModal();});
 let dragId=null;

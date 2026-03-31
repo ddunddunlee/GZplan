@@ -227,7 +227,7 @@ window.chD=async(id,val)=>{setSync(true);const t=tasks.find(t=>t._id===id);if(!t
 window.dHist=async(tid,nid)=>{setSync(true);const t=tasks.find(t=>t._id===tid);if(!t)return;await fsU(tid,{history:(t.history||[]).filter(h=>h.id!==nid)});};
 window.openModal=()=>document.getElementById('overlay').classList.add('show');
 window.closeModal=()=>{document.getElementById('overlay').classList.remove('show');['iTitle','iDesc','iDue'].forEach(id=>document.getElementById(id).value='');document.getElementById('iStatus').value='todo';};
-window.addTask=async()=>{setSync(true);const title=document.getElementById('iTitle').value.trim();if(!title)return;const ds=nStr();await fsA({title,assignee:ME.id,due:document.getElementById('iDue').value||'',status:document.getElementById('iStatus').value,updated:ds,pinned:false,order:Date.now(),history:[{id:Date.now()+'',type:'create',text:'업무가 등록되었습니다.',date:ds}]});window.closeModal();};
+window.addTask=async()=>{setSync(true);const title=document.getElementById('iTitle').value.trim();if(!title)return;const ds=nStr();await fsA({title,desc:document.getElementById('iDesc').value.trim(),assignee:ME.id,due:document.getElementById('iDue').value||'',status:document.getElementById('iStatus').value,updated:ds,pinned:false,order:Date.now(),history:[{id:Date.now()+'',type:'create',text:'업무가 등록되었습니다.',date:ds}]});window.closeModal();};
 document.getElementById('overlay').addEventListener('click',e=>{if(e.target===e.currentTarget)window.closeModal();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')window.closeModal();});
 let dragId=null;

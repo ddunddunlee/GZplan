@@ -352,8 +352,8 @@ else {
     document.getElementById('gate').style.display = 'none';
     document.getElementById('app').style.display  = 'block';
     document.getElementById('topUser').textContent = u.id;
-    loadAccounts();
-    loadReporters();
+    // 병렬 로드
+    Promise.all([loadAccounts(), loadReporters()]);
   }
 }
 

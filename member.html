@@ -312,6 +312,53 @@ body {
 .progress-bar-fill.done-bar { background: #639922; }
 .progress-bar-fill.over-bar  { background: var(--red); }
 
+
+/* ── 모바일 닫기 버튼 ── */
+@media (max-width: 768px) {
+  .dp-close {
+    width: 36px !important;
+    height: 36px !important;
+    font-size: 20px !important;
+    background: var(--bg2) !important;
+    border-radius: var(--radius-sm) !important;
+  }
+  .dp-title-input {
+    font-size: 16px !important;
+  }
+}
+
+/* ── 모바일 상세 패널 → 모달 방식 ── */
+@media (max-width: 768px) {
+  .resizer { display: none; }
+  .detail-panel {
+    display: none;
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 100% !important;
+    height: 100% !important;
+    border-radius: 0 !important;
+    border: none !important;
+    z-index: 250;
+    overflow-y: auto;
+    background: var(--bg) !important;
+  }
+  .detail-panel.open {
+    display: flex !important;
+    flex-direction: column;
+  }
+  .dp-head {
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 1;
+    padding: 1rem 1.1rem;
+  }
+  .dp-note { padding-bottom: 3rem; }
+  .layout { display: block; }
+}
+
 /* ── 토스트 ── */
 .toast {
   position: fixed; bottom: 2rem; left: 50%;
@@ -745,7 +792,8 @@ function renderDetail(t) {
     ${descRow}
     <div class="dp-row">
       <span class="dp-lbl">중요도</span>
-      <select class="dp-edit" style="width:140px;text-align:right"
+      <span>${priorityBadge(t.priority)}</span>
+      <select class="dp-edit" style="width:100px;text-align:right;margin-left:4px"
         onchange="updatePriority('${t._id}', this.value)">${priorityOpts}</select>
     </div>
     <div class="dp-row">
@@ -765,12 +813,15 @@ function renderDetail(t) {
     ${progressBar ? `<div style="padding:4px 0">${progressBar}</div>` : ''}
     <div class="dp-row">
       <span class="dp-lbl">상태</span>
-      <span class="dp-val">${statusLabel[t.status] || '-'}</span>
+      <span class="badge ${t.status === 'todo' ? 'badge-todo' : t.status === 'inprogress' ? 'badge-inprogress' : 'badge-done'}">${statusLabel[t.status] || '-'}</span>
     </div>
     <div class="dp-row">
       <span class="dp-lbl">최종보고자</span>
-      <select class="dp-edit" style="width:140px;text-align:right"
-        onchange="updateReporter('${t._id}', this.value)">${reporterOpts}</select>
+      <div style="display:flex;align-items:center;gap:5px">
+        ${t.reporter ? `<span class="reporter-badge">${t.reporter}</span>` : ''}
+        <select class="dp-edit" style="width:100px;text-align:right"
+          onchange="updateReporter('${t._id}', this.value)">${reporterOpts}</select>
+      </div>
     </div>`;
 
   // 타임라인(히스토리)

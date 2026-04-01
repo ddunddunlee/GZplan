@@ -595,6 +595,29 @@ const isStale   = t => {
   return Date.now() - new Date(t.updated).getTime() >= STALE_DAYS * DAY_MS;
 };
 
+// 중요도 배지 클래스
+function priorityCls(p) {
+  const n = p || 3;
+  return 'priority-badge ' + ['','p1','p2','p3','p4','p5'][n];
+}
+
+// 상세패널 토글
+window.togglePriorityEdit = id => {
+  document.getElementById('dp-priority-row-' + id).style.display =
+    document.getElementById('dp-priority-row-' + id).style.display === 'none' ? '' : 'none';
+  const edit = document.getElementById('dp-priority-edit-' + id);
+  edit.style.display = edit.style.display === 'none' ? '' : 'none';
+  if (edit.style.display !== 'none') edit.querySelector('select').focus();
+};
+
+window.toggleReporterEdit = id => {
+  document.getElementById('dp-reporter-row-' + id).style.display =
+    document.getElementById('dp-reporter-row-' + id).style.display === 'none' ? '' : 'none';
+  const edit = document.getElementById('dp-reporter-edit-' + id);
+  edit.style.display = edit.style.display === 'none' ? '' : 'none';
+  if (edit.style.display !== 'none') edit.querySelector('select').focus();
+};
+
 // 중요도 배지 HTML
 function priorityBadge(p) {
   const n = p || 3;

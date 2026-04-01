@@ -213,12 +213,62 @@ body {
 .progress-bar-fill.done-bar { background: #639922; }
 .progress-bar-fill.over-bar  { background: var(--red); }
 
+
+/* ── 모바일 닫기 버튼 ── */
+@media (max-width: 768px) {
+  .dp-close {
+    width: 36px !important;
+    height: 36px !important;
+    font-size: 20px !important;
+    background: var(--bg2) !important;
+    border-radius: var(--radius-sm) !important;
+  }
+  .dp-title-input {
+    font-size: 16px !important;
+  }
+}
+
+/* ── 모바일 상세 패널 → 모달 방식 ── */
+@media (max-width: 768px) {
+  .resizer { display: none; }
+  .detail-panel {
+    display: none;
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 100% !important;
+    height: 100% !important;
+    border-radius: 0 !important;
+    border: none !important;
+    z-index: 250;
+    overflow-y: auto;
+    background: var(--bg) !important;
+  }
+  .detail-panel.open {
+    display: flex !important;
+    flex-direction: column;
+  }
+  .dp-head {
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 1;
+    padding: 1rem 1.1rem;
+  }
+  .dp-note { padding-bottom: 3rem; }
+  .layout { display: block; }
+}
+
 /* ── 토스트 ── */
 .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(10px); background: var(--text); color: var(--bg); font-size: 13px; font-weight: 500; padding: 9px 20px; border-radius: var(--pill); opacity: 0; transition: all .25s; pointer-events: none; z-index: 300; }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 </style>
 </head>
 <body>
+
+<!-- 모바일 디버그 (오류 확인용, 확인 후 제거) -->
+<div id="debugBox" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#1a1a1a;color:#ff6b6b;font-size:11px;padding:8px;z-index:9999;max-height:40vh;overflow-y:auto;font-family:monospace;white-space:pre-wrap"></div>
 
 <!-- 탑바 -->
 <div class="topbar">
@@ -319,6 +369,15 @@ body {
 // ════════════════════════════════════════════
 // Firebase 설정
 // ════════════════════════════════════════════
+window.onerror = (msg, src, line, col, err) => {
+  const box = document.getElementById('debugBox');
+  if (box) {
+    box.style.display = 'block';
+    box.textContent += `오류: ${msg}\n라인: ${line}\n${err?.stack || ''}\n\n`;
+  }
+  return false;
+};
+
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import {
   getFirestore, collection, doc, getDoc,
@@ -637,9 +696,12 @@ function renderDetail(t) {
     <div class="dp-row">
       <span class="dp-lbl">중요도</span>
       ${isAll
-        ? `<span class="dp-val">${t.priority || 3}</span>`
-        : `<select class="dp-edit" style="width:140px;text-align:right"
-             onchange="updatePriority('${t._id}','${t._mid}',this.value)">${priorityOpts}</select>`}
+        ? priorityBadge(t.priority)
+        : `<div style="display:flex;align-items:center;gap:5px">
+            ${priorityBadge(t.priority)}
+            <select class="dp-edit" style="width:100px;text-align:right"
+              onchange="updatePriority('${t._id}','${t._mid}',this.value)">${priorityOpts}</select>
+           </div>`}
     </div>
     <div class="dp-row">
       <span class="dp-lbl">시작일</span>
@@ -664,14 +726,17 @@ function renderDetail(t) {
     ${progressBar ? `<div style="padding:4px 0">${progressBar}</div>` : ''}
     <div class="dp-row">
       <span class="dp-lbl">상태</span>
-      <span class="dp-val">${statusLabel[t.status] || '-'}</span>
+      <span class="badge ${t.status === 'todo' ? 'badge-todo' : t.status === 'inprogress' ? 'badge-inprogress' : 'badge-done'}">${statusLabel[t.status] || '-'}</span>
     </div>
     <div class="dp-row">
       <span class="dp-lbl">최종보고자</span>
       ${isAll
-        ? `<span class="dp-val">${t.reporter || '-'}</span>`
-        : `<select class="dp-edit" style="width:140px;text-align:right"
-             onchange="updateReporter('${t._id}','${t._mid}',this.value)">${reporterOpts}</select>`}
+        ? `<span class="reporter-badge">${t.reporter || '-'}</span>`
+        : `<div style="display:flex;align-items:center;gap:5px">
+            ${t.reporter ? `<span class="reporter-badge">${t.reporter}</span>` : ''}
+            <select class="dp-edit" style="width:100px;text-align:right"
+              onchange="updateReporter('${t._id}','${t._mid}',this.value)">${reporterOpts}</select>
+           </div>`}
     </div>
     <div class="dp-row">
       <span class="dp-lbl">팀원</span>

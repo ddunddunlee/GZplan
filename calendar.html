@@ -622,8 +622,10 @@ loadCategories();
 let events      = [];   // Firestore에서 로드된 원본 이벤트
 let curYear     = new Date().getFullYear();
 let curMonth    = new Date().getMonth();  // 0-indexed
-let editingId   = null;  // 수정 중인 이벤트 ID
-let pendingRepeatAction = null;  // 반복 수정/삭제 대기
+let editingId        = null;   // 수정 중인 이벤트 ID
+let editScope        = null;   // 'this' | 'future' | 'all'
+let editInstanceDate = null;   // 반복 인스턴스 날짜
+let pendingRepeatAction = null;
 let pendingDelId = null;
 
 // ════════════════════════════════════════════
@@ -693,10 +695,12 @@ function getRepeatDatesForMonth(event, year, month) {
     results.push(toDateStr(new Date(year, month, repeat.date)));
   }
 
-  // 반복 종료일 체크
+  // 반복 종료일 + 예외 날짜 체크
+  const exceptions = event.exceptions || [];
   return results.filter(dateStr => {
     if (repeat.endDate && dateStr > repeat.endDate) return false;
     if (event.startDate && dateStr < event.startDate) return false;
+    if (exceptions.includes(dateStr)) return false;  // 예외 날짜 제외
     return true;
   });
 }
@@ -949,8 +953,41 @@ window.submitEvent = async () => {
     };
 
     if (editingId) {
-      await updateDoc(doc(db, 'schedules', editingId), data);
-      toast('일정을 수정했어요 ✓');
+      if (editScope === 'this') {
+        // ── 이 일정만: 원본에 예외 추가 + 새 단건 일정 생성 ──
+        const origEv = events.find(e => e.id === editingId);
+        const exceptions = origEv?.exceptions || [];
+        exceptions.push(editInstanceDate);
+        await updateDoc(doc(db, 'schedules', editingId), { exceptions });
+        // 새 단건 일정 (반복 없음)
+        await addDoc(col(), {
+          ...data,
+          repeat:      { type: 'none' },
+          isException: true,
+          seriesId:    origEv?.seriesId || editingId,
+          createdAt:   new Date().toISOString(),
+        });
+        toast('이 일정만 수정했어요 ✓');
+
+      } else if (editScope === 'future') {
+        // ── 이후 모두: 원본 반복 종료일을 인스턴스 하루 전으로 설정 + 새 반복 시리즈 생성 ──
+        const origEv = events.find(e => e.id === editingId);
+        const prevDay = toDateStr(new Date(parseDate(editInstanceDate).getTime() - 86400000));
+        const origRepeat = { ...(origEv?.repeat || {}), endDate: prevDay };
+        await updateDoc(doc(db, 'schedules', editingId), { repeat: origRepeat });
+        // 새 시리즈 생성
+        await addDoc(col(), {
+          ...data,
+          seriesId:  Date.now() + '_' + ME.id,
+          createdAt: new Date().toISOString(),
+        });
+        toast('이후 일정을 수정했어요 ✓');
+
+      } else {
+        // ── 전체: 원본 그대로 업데이트 ──
+        await updateDoc(doc(db, 'schedules', editingId), data);
+        toast('모든 반복 일정을 수정했어요 ✓');
+      }
     } else {
       data.createdAt = new Date().toISOString();
       if (repeat.type !== 'none') data.seriesId = Date.now() + '_' + ME.id;
@@ -1044,7 +1081,9 @@ window.confirmRepeatEdit = () => {
 };
 
 function fillEditModal(ev, instanceDate = null, scope = null) {
-  editingId = ev.id;
+  editingId        = ev.id;
+  editScope        = scope;
+  editInstanceDate = instanceDate;
   document.getElementById('addModalTitle').textContent = '일정 수정';
   document.getElementById('addSubmitBtn').textContent  = '저장하기';
   document.getElementById('eTitle').value     = ev.title;

@@ -392,7 +392,7 @@ body {
 
   <!-- 필터 -->
   <div class="filter-row">
-    <button class="chip active" onclick="setFilter('all',this)">전체</button>
+    <button class="chip active" onclick="setFilter('active',this)">전체</button>
     <button class="chip" onclick="setFilter('todo',this)">대기</button>
     <button class="chip" onclick="setFilter('inprogress',this)">진행 중</button>
     <button class="chip" onclick="setFilter('done',this)">완료</button>
@@ -527,6 +527,7 @@ if (ME.role !== 'member') { location.href = 'index.html'; throw ''; }
 document.getElementById('hTitle').textContent = ME.displayName + '의 업무 트래커';
 document.getElementById('hUser').textContent  = ME.displayName;
 loadReporters();
+
 window.logout = () => { localStorage.removeItem('tt_user'); location.href = 'index.html'; };
 
 // ════════════════════════════════════════════
@@ -543,8 +544,9 @@ const fsDel = id     => deleteDoc(dr(id));
 // ════════════════════════════════════════════
 let tasks   = [];
 let selId   = null;
-let filter  = 'all';
+let filter  = 'active';  // 기본값: 대기+진행중
 let filterA = 'all';
+
 let dragId  = null;
 
 // ════════════════════════════════════════════
@@ -693,7 +695,7 @@ function renderAssigneeFilter() {
 
 function renderTaskList() {
   const filtered = tasks.filter(t => {
-    const byStatus = filter === 'all' ? true : filter === 'stale' ? isStale(t) : t.status === filter;
+    const byStatus = filter === 'active' ? t.status !== 'done' : filter === 'all' ? true : filter === 'stale' ? isStale(t) : t.status === filter;
     const byAssign = filterA === 'all' || t.assignee === filterA;
     return byStatus && byAssign;
   });

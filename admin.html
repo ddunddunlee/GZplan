@@ -342,24 +342,27 @@ const INIT_MEMBERS = [
 // ════════════════════════════════════════════
 const db = getFirestore(initializeApp(FIREBASE_CONFIG));
 
+// 상태 변수 선언 (인증 전에 먼저)
+let accounts    = [];
+let currentUser = null;
+let editingId   = null;
+
+// 인증 체크
 const sess = localStorage.getItem('tt_user');
-if (!sess) { location.href = 'index.html'; }
-else {
+if (!sess) {
+  location.href = 'index.html';
+} else {
   const u = JSON.parse(sess);
-  if (u.role !== 'admin') { location.href = 'index.html'; }
-  else {
+  if (u.role !== 'admin') {
+    location.href = 'index.html';
+  } else {
     currentUser = u;
     document.getElementById('gate').style.display = 'none';
     document.getElementById('app').style.display  = 'block';
     document.getElementById('topUser').textContent = u.id;
-    // 병렬 로드
     Promise.all([loadAccounts(), loadReporters()]);
   }
 }
-
-let accounts    = [];
-let currentUser = null;
-let editingId   = null;
 
 window.logout = () => { localStorage.removeItem('tt_user'); location.href = 'index.html'; };
 

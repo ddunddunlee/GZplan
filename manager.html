@@ -437,6 +437,13 @@ const isStale   = t => {
   return Date.now() - new Date(t.updated).getTime() >= STALE_DAYS * DAY_MS;
 };
 
+function priorityBadge(p) {
+  const n = p || 3;
+  const cls  = ['','p1','p2','p3','p4','p5'][n];
+  const dots = '●'.repeat(n) + '○'.repeat(5 - n);
+  return `<span class="priority-badge ${cls}" title="중요도 ${n}">${dots}</span>`;
+}
+
 function statusBadge(status, docId, memberId, isReadOnly) {
   const labels  = { todo: '대기 →', inprogress: '진행 중 →', done: '완료 →' };
   const classes = { todo: 'badge-todo', inprogress: 'badge-inprogress', done: 'badge-done' };

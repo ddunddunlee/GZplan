@@ -468,8 +468,9 @@ const sess = localStorage.getItem('tt_user');
 if (!sess) { location.href = 'index.html'; throw ''; }
 const ME = JSON.parse(sess);
 if (!ME.id) { location.href = 'index.html'; throw ''; }
-// role 체크 — manager/admin은 manager.html로 이동
+// role 체크
 if (ME.role === 'manager' || ME.role === 'admin') { location.href = 'manager.html'; throw ''; }
+if (ME.role !== 'member') { location.href = 'index.html'; throw ''; }
 
 document.getElementById('hTitle').textContent = ME.displayName + '의 업무 트래커';
 document.getElementById('hUser').textContent  = ME.displayName;

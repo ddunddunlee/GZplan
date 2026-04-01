@@ -360,11 +360,15 @@ if (!sess) {
     document.getElementById('gate').style.display = 'none';
     document.getElementById('app').style.display  = 'block';
     document.getElementById('topUser').textContent = u.id;
-    Promise.all([loadAccounts(), loadReporters()]);
+    init();
   }
 }
 
 window.logout = () => { localStorage.removeItem('tt_user'); location.href = 'index.html'; };
+
+async function init() {
+  await Promise.all([loadAccounts(), loadReporters()]);
+}
 
 // ════════════════════════════════════════════
 // 계정 데이터 로드

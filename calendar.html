@@ -164,6 +164,25 @@ body {
 .repeat-opt:hover { border-color: var(--border3); background: var(--bg2); }
 .repeat-opt input[type=radio] { width: auto; }
 
+/* ── 탭 ── */
+.tab-row    { display: flex; gap: 2px; border-bottom: .5px solid var(--border); background: var(--bg); padding: 0 1.5rem; flex-shrink: 0; }
+.tab-btn    { padding: 10px 16px; font-size: 13px; font-weight: 500; color: var(--text2); border: none; border-bottom: 2px solid transparent; background: transparent; cursor: pointer; white-space: nowrap; }
+.tab-btn:hover  { color: var(--text); }
+.tab-btn.active { color: var(--text); border-bottom-color: var(--text); }
+
+/* ── 카테고리 관리 ── */
+.cat-manage  { padding: 1.5rem; max-width: 600px; margin: 0 auto; }
+.cat-list    { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1.5rem; }
+.cat-row     { display: flex; align-items: center; gap: 10px; background: var(--bg); border: .5px solid var(--border); border-radius: var(--radius); padding: .75rem 1rem; }
+.cat-color   { width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0; cursor: pointer; border: .5px solid var(--border2); }
+.cat-name    { flex: 1; font-size: 14px; font-weight: 500; }
+.cat-actions { display: flex; gap: 6px; }
+.cat-del-btn { padding: 4px 10px; font-size: 12px; border: .5px solid var(--border2); border-radius: var(--radius-sm); background: transparent; color: var(--text2); cursor: pointer; }
+.cat-del-btn:hover { background: var(--red-bg); color: var(--red); border-color: rgba(163,45,45,.35); }
+.cat-add-row { display: flex; gap: 8px; align-items: center; }
+.cat-add-row input { flex: 1; padding: 8px 10px; font-size: 14px; border: .5px solid var(--border2); border-radius: var(--radius-sm); background: var(--bg2); color: var(--text); font-family: inherit; outline: none; }
+.cat-add-row input:focus { border-color: var(--blue); }
+
 /* ── 토스트 ── */
 .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(10px); background: var(--text); color: var(--bg); font-size: 13px; font-weight: 500; padding: 9px 20px; border-radius: var(--pill); opacity: 0; transition: all .25s; pointer-events: none; z-index: 300; }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -190,8 +209,14 @@ body {
   </div>
 </div>
 
+<!-- 탭 -->
+<div class="tab-row">
+  <button class="tab-btn active" id="tab-cal" onclick="switchTab('cal')">📅 캘린더</button>
+  <button class="tab-btn" id="tab-cat" onclick="switchTab('cat')">🏷 카테고리 관리</button>
+</div>
+
 <!-- 캘린더 본문 -->
-<div class="cal-wrap">
+<div class="cal-wrap" id="view-cal">
   <!-- 헤더 -->
   <div class="cal-header">
     <div class="cal-nav">
@@ -204,14 +229,7 @@ body {
   </div>
 
   <!-- 범례 -->
-  <div class="legend">
-    <div class="legend-item"><div class="legend-dot" style="background:var(--cat-meeting)"></div>회의</div>
-    <div class="legend-item"><div class="legend-dot" style="background:var(--cat-report)"></div>보고</div>
-    <div class="legend-item"><div class="legend-dot" style="background:var(--cat-trip)"></div>출장</div>
-    <div class="legend-item"><div class="legend-dot" style="background:var(--cat-event)"></div>행사</div>
-    <div class="legend-item"><div class="legend-dot" style="background:var(--cat-etc)"></div>기타</div>
-    <div class="legend-item"><div style="font-size:12px">🔁</div>반복 일정</div>
-  </div>
+  <div class="legend" id="legend"></div>
 
   <!-- 달력 -->
   <div class="cal-grid">
@@ -226,6 +244,20 @@ body {
     </div>
     <div class="cal-days" id="calDays"></div>
   </div>
+</div>
+
+</div><!-- /cal-wrap -->
+
+<!-- 카테고리 관리 뷰 -->
+<div class="cat-manage" id="view-cat" style="display:none">
+  <h2 style="font-size:16px;font-weight:700;margin-bottom:1.25rem">카테고리 관리</h2>
+  <div class="cat-list" id="catList"></div>
+  <div class="cat-add-row">
+    <input id="newCatName" placeholder="카테고리 이름" />
+    <input id="newCatColor" type="color" value="#378ADD" style="width:44px;height:36px;padding:2px;border:.5px solid var(--border2);border-radius:var(--radius-sm);cursor:pointer;background:var(--bg2)" />
+    <button class="btn-ok" onclick="addCategory()" style="padding:8px 18px;white-space:nowrap">추가</button>
+  </div>
+  <p style="font-size:12px;color:var(--text3);margin-top:10px">카테고리는 일정 추가 시 선택할 수 있어요. 기본 카테고리는 삭제할 수 없어요.</p>
 </div>
 
 <!-- 일정 추가/수정 모달 -->
@@ -386,7 +418,7 @@ body {
 // ════════════════════════════════════════════
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import {
-  getFirestore, collection, doc,
+  getFirestore, collection, doc, getDoc, setDoc,
   onSnapshot, addDoc, updateDoc, deleteDoc,
   query, orderBy, where, writeBatch, getDocs,
   serverTimestamp
@@ -404,8 +436,29 @@ const FIREBASE_CONFIG = {
 // ════════════════════════════════════════════
 // 상수 & 유틸
 // ════════════════════════════════════════════
-const CAT_LABELS = { meeting: '회의', report: '보고', trip: '출장', event: '행사', etc: '기타' };
-const CAT_COLORS = { meeting: 'var(--cat-meeting)', report: 'var(--cat-report)', trip: 'var(--cat-trip)', event: 'var(--cat-event)', etc: 'var(--cat-etc)' };
+// 기본 카테고리 (삭제 불가)
+const DEFAULT_CATS = [
+  { id: 'meeting', label: '회의',  color: '#378ADD' },
+  { id: 'report',  label: '보고',  color: '#7F77DD' },
+  { id: 'trip',    label: '출장',  color: '#EF9F27' },
+  { id: 'event',   label: '행사',  color: '#639922' },
+  { id: 'etc',     label: '기타',  color: '#888888' },
+];
+
+// 동적 카테고리 (Firestore settings/calCategories 에서 로드)
+let CAT_LIST   = [...DEFAULT_CATS];
+let CAT_LABELS = {};
+let CAT_COLORS = {};
+
+function rebuildCatMaps() {
+  CAT_LABELS = {};
+  CAT_COLORS = {};
+  CAT_LIST.forEach(c => {
+    CAT_LABELS[c.id] = c.label;
+    CAT_COLORS[c.id] = c.color;
+  });
+}
+rebuildCatMaps();
 const WEEKDAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'];
 
 const toDateStr = d => d.toISOString().split('T')[0];  // YYYY-MM-DD
@@ -433,6 +486,88 @@ if (!ME.id) { location.href = 'index.html'; throw ''; }
 document.getElementById('tbUser').textContent = ME.displayName;
 window.logout  = () => { localStorage.removeItem('tt_user'); location.href = 'index.html'; };
 window.goBack  = () => { location.href = ME.role === 'member' ? 'member.html' : 'manager.html'; };
+
+// 카테고리 로드
+async function loadCategories() {
+  try {
+    const snap = await getDoc(doc(db, 'settings', 'calCategories'));
+    if (snap.exists() && snap.data().list) {
+      const custom = snap.data().list;
+      CAT_LIST = [...DEFAULT_CATS, ...custom.filter(c => !DEFAULT_CATS.find(d => d.id === c.id))];
+      rebuildCatMaps();
+    }
+  } catch (e) { console.warn('카테고리 로드 실패', e); }
+  renderCategorySelect();
+  renderCatList();
+}
+
+async function saveCategories() {
+  const custom = CAT_LIST.filter(c => !DEFAULT_CATS.find(d => d.id === c.id));
+  await setDoc(doc(db, 'settings', 'calCategories'), { list: custom });
+}
+
+function renderCategorySelect() {
+  const sel = document.getElementById('eCategory');
+  if (!sel) return;
+  sel.innerHTML = CAT_LIST.map(c =>
+    `<option value="${c.id}">${c.label}</option>`
+  ).join('');
+}
+
+function renderCatList() {
+  const el = document.getElementById('catList');
+  if (!el) return;
+  el.innerHTML = CAT_LIST.map(cat => {
+    const isDefault = DEFAULT_CATS.find(d => d.id === cat.id);
+    return `<div class="cat-row">
+      <div class="cat-color" style="background:${cat.color}"
+        title="${isDefault ? '기본 카테고리' : '클릭하여 색상 변경'}"></div>
+      <span class="cat-name">${cat.label}</span>
+      ${isDefault
+        ? `<span style="font-size:11px;color:var(--text3);padding:4px 8px">기본</span>`
+        : `<div class="cat-actions"><button class="cat-del-btn" onclick="deleteCategory('${cat.id}')">삭제</button></div>`}
+    </div>`;
+  }).join('');
+}
+
+window.addCategory = async () => {
+  const name  = document.getElementById('newCatName').value.trim();
+  const color = document.getElementById('newCatColor').value;
+  if (!name) { toast('카테고리 이름을 입력해주세요'); return; }
+  const id = 'cat_' + Date.now();
+  CAT_LIST.push({ id, label: name, color });
+  await saveCategories();
+  rebuildCatMaps();
+  renderCategorySelect();
+  renderCatList();
+  renderLegend();
+  document.getElementById('newCatName').value = '';
+  toast(`"${name}" 카테고리를 추가했어요 ✓`);
+};
+
+window.deleteCategory = async (id) => {
+  const cat = CAT_LIST.find(c => c.id === id);
+  if (!cat) return;
+  if (!confirm(`"${cat.label}" 카테고리를 삭제할까요?\n이 카테고리의 일정은 "기타"로 변경돼요.`)) return;
+  CAT_LIST = CAT_LIST.filter(c => c.id !== id);
+  await saveCategories();
+  rebuildCatMaps();
+  renderCategorySelect();
+  renderCatList();
+  renderLegend();
+  renderCalendar();
+  toast(`카테고리를 삭제했어요`);
+};
+
+function renderLegend() {
+  const el = document.getElementById('legend');
+  if (!el) return;
+  el.innerHTML = CAT_LIST.map(c =>
+    `<div class="legend-item"><div class="legend-dot" style="background:${c.color}"></div>${c.label}</div>`
+  ).join('') + `<div class="legend-item"><div style="font-size:12px">🔁</div>반복 일정</div>`;
+}
+
+loadCategories();
 
 // ════════════════════════════════════════════
 // 상태
@@ -956,6 +1091,14 @@ document.querySelectorAll('.overlay').forEach(o =>
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') document.querySelectorAll('.overlay.show').forEach(o => o.classList.remove('show'));
 });
+
+// ── 탭 전환 ──
+window.switchTab = tab => {
+  document.getElementById('view-cal').style.display = tab === 'cal' ? '' : 'none';
+  document.getElementById('view-cat').style.display = tab === 'cat' ? '' : 'none';
+  document.getElementById('tab-cal').classList.toggle('active', tab === 'cal');
+  document.getElementById('tab-cat').classList.toggle('active', tab === 'cat');
+};
 
 // 초기 렌더
 renderCalendar();

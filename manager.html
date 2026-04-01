@@ -620,7 +620,13 @@ function renderDetail(t) {
 
   document.getElementById('dpMeta').innerHTML = `
     ${descRow}
-    ${progressBar ? `<div style="padding-bottom:4px">${progressBar}</div>` : ''}
+    <div class="dp-row">
+      <span class="dp-lbl">중요도</span>
+      ${isAll
+        ? `<span class="dp-val">${t.priority || 3}</span>`
+        : `<select class="dp-edit" style="width:140px;text-align:right"
+             onchange="updatePriority('${t._id}','${t._mid}',this.value)">${priorityOpts}</select>`}
+    </div>
     <div class="dp-row">
       <span class="dp-lbl">시작일</span>
       ${isAll
@@ -630,11 +636,21 @@ function renderDetail(t) {
              style="width:140px;text-align:right" />`}
     </div>
     <div class="dp-row">
-      <span class="dp-lbl">중요도</span>
+      <span class="dp-lbl">마감일</span>
       ${isAll
-        ? `<span class="dp-val">${t.priority || 3}</span>`
-        : `<select class="dp-edit" style="width:140px;text-align:right"
-             onchange="updatePriority('${t._id}','${t._mid}',this.value)">${priorityOpts}</select>`}
+        ? `<span class="dp-val">${t.due ? fmtDate(t.due) : '-'}</span>`
+        : `<input class="dp-edit" type="date" value="${t.due || ''}"
+             onchange="updateDue('${t._id}','${t._mid}',this.value)"
+             style="width:140px;text-align:right" />`}
+    </div>
+    <div class="dp-row">
+      <span class="dp-lbl">마지막 업데이트</span>
+      <span class="dp-val">${fmtDate(t.updated)}</span>
+    </div>
+    ${progressBar ? `<div style="padding:4px 0">${progressBar}</div>` : ''}
+    <div class="dp-row">
+      <span class="dp-lbl">상태</span>
+      <span class="dp-val">${statusLabel[t.status] || '-'}</span>
     </div>
     <div class="dp-row">
       <span class="dp-lbl">최종보고자</span>
@@ -646,22 +662,6 @@ function renderDetail(t) {
     <div class="dp-row">
       <span class="dp-lbl">팀원</span>
       <span class="dp-val">${t._mid}</span>
-    </div>
-    <div class="dp-row">
-      <span class="dp-lbl">마감일</span>
-      ${isAll
-        ? `<span class="dp-val">${t.due ? fmtDate(t.due) : '-'}</span>`
-        : `<input class="dp-edit" type="date" value="${t.due || ''}"
-             onchange="updateDue('${t._id}','${t._mid}',this.value)"
-             style="width:140px;text-align:right" />`}
-    </div>
-    <div class="dp-row">
-      <span class="dp-lbl">상태</span>
-      <span class="dp-val">${statusLabel[t.status] || '-'}</span>
-    </div>
-    <div class="dp-row">
-      <span class="dp-lbl">마지막 업데이트</span>
-      <span class="dp-val">${fmtDate(t.updated)}</span>
     </div>`;
 
   const history = [...(t.history || [])].sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -870,7 +870,6 @@ window.openModal = () => {
 window.closeModal = () => {
   document.getElementById('overlay').classList.remove('show');
   ['iTitle', 'iDesc', 'iStart', 'iDue'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('iStatus').value = 'todo';
   document.getElementById('iPriority').value = '3';
   document.getElementById('iReporter').value = '';
 };
@@ -890,7 +889,7 @@ window.addTask = async () => {
       assignee: '',
       startDate: document.getElementById('iStart').value || '',
     due:      document.getElementById('iDue').value || '',
-      status:   document.getElementById('iStatus').value,
+      status:   'todo',
       updated:  ts,
       pinned:   false,
       order:    Date.now(),

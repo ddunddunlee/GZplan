@@ -59,12 +59,7 @@ body {
 .icon-btn:hover { border-color: var(--border3); color: var(--text); }
 
 /* ── 팀원 탭 ── */
-.member-tabs { background: var(--bg); border-bottom: .5px solid var(--border); padding: 0 1.5rem; display: flex; gap: 2px; overflow-x: auto; flex-shrink: 0; }
-.member-tab  { padding: 10px 16px; font-size: 13px; font-weight: 500; color: var(--text2); border-bottom: 2px solid transparent; cursor: pointer; white-space: nowrap; transition: all .15s; display: flex; align-items: center; gap: 6px; }
-.member-tab:hover { color: var(--text); }
-.member-tab.active { color: var(--text); border-bottom-color: var(--text); }
-.member-tab .cnt   { font-size: 11px; padding: 1px 6px; border-radius: var(--pill); background: var(--bg2); color: var(--text2); font-weight: 500; }
-.member-tab.active .cnt { background: var(--text); color: var(--bg); }
+
 
 /* ── 콘텐츠 ── */
 .content { padding: 1.5rem; max-width: 1100px; margin: 0 auto; width: 100%; }
@@ -283,12 +278,13 @@ body {
   <div class="tb-right">
     <span id="tbUser" style="font-size:12px;color:var(--text2)"></span>
     <button class="icon-btn" onclick="location.href='memo.html'">📝 메모장</button>
+    <button class="icon-btn" onclick="location.href='calendar.html'">📅 캘린더</button>
     <button class="icon-btn" onclick="logout()">로그아웃</button>
   </div>
 </div>
 
 <!-- 팀원 탭 -->
-<div class="member-tabs" id="memberTabs"></div>
+
 
 <!-- 콘텐츠 -->
 <div class="content">
@@ -503,6 +499,31 @@ const isStale   = t => {
   return Date.now() - new Date(t.updated).getTime() >= STALE_DAYS * DAY_MS;
 };
 
+window.priorityCls = function(p) {
+  const n = p || 3;
+  return 'priority-badge ' + ['','p1','p2','p3','p4','p5'][n];
+};
+
+window.togglePriorityEdit = id => {
+  const row  = document.getElementById('dp-priority-row-' + id);
+  const edit = document.getElementById('dp-priority-edit-' + id);
+  if (!row || !edit) return;
+  const hide = row.style.display === 'none';
+  row.style.display  = hide ? '' : 'none';
+  edit.style.display = hide ? 'none' : '';
+  if (!hide) edit.querySelector('select')?.focus();
+};
+
+window.toggleReporterEdit = id => {
+  const row  = document.getElementById('dp-reporter-row-' + id);
+  const edit = document.getElementById('dp-reporter-edit-' + id);
+  if (!row || !edit) return;
+  const hide = row.style.display === 'none';
+  row.style.display  = hide ? '' : 'none';
+  edit.style.display = hide ? 'none' : '';
+  if (!hide) edit.querySelector('select')?.focus();
+};
+
 function priorityBadge(p) {
   const n = p || 3;
   const cls  = ['','p1','p2','p3','p4','p5'][n];
@@ -553,7 +574,6 @@ function getAllTasks() {
 }
 
 function render() {
-  renderTabs();
   renderMemberFilter();
   renderStats();
   renderTaskList();
@@ -580,17 +600,6 @@ function renderMemberFilter() {
   });
 }
 
-function renderTabs() {
-  const total = Object.values(mData).reduce((s, m) => s + m.tasks.length, 0);
-  let html = `<div class="member-tab${curTab === '__all__' ? ' active' : ''}" onclick="switchTab('__all__')">
-    전체 <span class="cnt">${total}</span></div>`;
-  MEMBER_IDS.forEach(id => {
-    const cnt = (mData[id]?.tasks || []).length;
-    html += `<div class="member-tab${curTab === id ? ' active' : ''}" onclick="switchTab('${id}')">
-      ${id} <span class="cnt">${cnt}</span></div>`;
-  });
-  document.getElementById('memberTabs').innerHTML = html;
-}
 
 function renderStats() {
   const all     = getAllTasks();

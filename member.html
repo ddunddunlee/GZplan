@@ -390,21 +390,6 @@ body {
       <input id="iDesc" placeholder="상세 설명을 입력하세요" />
     </div>
     <div class="fg">
-      <label>시작일</label>
-      <input id="iStart" type="date" />
-    </div>
-    <div class="fg">
-      <label>마감일</label>
-      <input id="iDue" type="date" />
-    </div>
-    <div class="fg">
-      <label>상태</label>
-      <select id="iStatus">
-        <option value="todo">대기</option>
-        <option value="inprogress">진행 중</option>
-      </select>
-    </div>
-    <div class="fg">
       <label>중요도</label>
       <select id="iPriority">
         <option value="3">3 — 보통</option>
@@ -413,6 +398,14 @@ body {
         <option value="2">2 — 낮음</option>
         <option value="1">1 — 매우 낮음</option>
       </select>
+    </div>
+    <div class="fg">
+      <label>시작일</label>
+      <input id="iStart" type="date" />
+    </div>
+    <div class="fg">
+      <label>마감일</label>
+      <input id="iDue" type="date" />
     </div>
     <div class="fg">
       <label>최종보고자 <span style="color:var(--text3);font-weight:400">(선택)</span></label>
@@ -750,21 +743,15 @@ function renderDetail(t) {
 
   document.getElementById('dpMeta').innerHTML = `
     ${descRow}
-    ${progressBar ? `<div style="padding-bottom:4px">${progressBar}</div>` : ''}
-    <div class="dp-row">
-      <span class="dp-lbl">시작일</span>
-      <input class="dp-edit" type="date" value="${t.startDate || ''}"
-        onchange="updateStartDate('${t._id}', this.value)" style="width:140px;text-align:right" />
-    </div>
     <div class="dp-row">
       <span class="dp-lbl">중요도</span>
       <select class="dp-edit" style="width:140px;text-align:right"
         onchange="updatePriority('${t._id}', this.value)">${priorityOpts}</select>
     </div>
     <div class="dp-row">
-      <span class="dp-lbl">최종보고자</span>
-      <select class="dp-edit" style="width:140px;text-align:right"
-        onchange="updateReporter('${t._id}', this.value)">${reporterOpts}</select>
+      <span class="dp-lbl">시작일</span>
+      <input class="dp-edit" type="date" value="${t.startDate || ''}"
+        onchange="updateStartDate('${t._id}', this.value)" style="width:140px;text-align:right" />
     </div>
     <div class="dp-row">
       <span class="dp-lbl">마감일</span>
@@ -772,12 +759,18 @@ function renderDetail(t) {
         onchange="updateDue('${t._id}', this.value)" style="width:140px;text-align:right" />
     </div>
     <div class="dp-row">
+      <span class="dp-lbl">마지막 업데이트</span>
+      <span class="dp-val">${fmtDate(t.updated)}</span>
+    </div>
+    ${progressBar ? `<div style="padding:4px 0">${progressBar}</div>` : ''}
+    <div class="dp-row">
       <span class="dp-lbl">상태</span>
       <span class="dp-val">${statusLabel[t.status] || '-'}</span>
     </div>
     <div class="dp-row">
-      <span class="dp-lbl">마지막 업데이트</span>
-      <span class="dp-val">${fmtDate(t.updated)}</span>
+      <span class="dp-lbl">최종보고자</span>
+      <select class="dp-edit" style="width:140px;text-align:right"
+        onchange="updateReporter('${t._id}', this.value)">${reporterOpts}</select>
     </div>`;
 
   // 타임라인(히스토리)
@@ -991,7 +984,6 @@ window.openModal  = () => document.getElementById('overlay').classList.add('show
 window.closeModal = () => {
   document.getElementById('overlay').classList.remove('show');
   ['iTitle', 'iDesc', 'iStart', 'iDue'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('iStatus').value = 'todo';
   document.getElementById('iPriority').value = '3';
   document.getElementById('iReporter').value = '';
 };
@@ -1007,7 +999,7 @@ window.addTask = async () => {
     assignee: ME.id,
     startDate: document.getElementById('iStart').value || '',
     due:      document.getElementById('iDue').value || '',
-    status:   document.getElementById('iStatus').value,
+    status:   'todo',
     priority: Number(document.getElementById('iPriority').value) || 3,
     reporter: document.getElementById('iReporter').value || '',
     updated:  ts,

@@ -566,7 +566,7 @@ function renderMemberFilter() {
   let html = `<span style="font-size:12px;color:var(--text3);margin-right:4px">팀원</span>`;
   html += `<button class="chip achip${filterMember==='all'?' active':''}" data-m="all">전체</button>`;
   MEMBER_IDS.forEach(id => {
-    const cnt = (mData[id]?.tasks||[]).filter(t => hideComplete ? t.status!=='done' : true).length;
+    const cnt = (mData[id]?.tasks||[]).filter(t => t.status !== 'done').length;
     html += `<button class="chip achip${filterMember===id?' active':''}" data-m="${id}">${id} <span style="font-size:10px">${cnt}</span></button>`;
   });
   el.innerHTML = html;

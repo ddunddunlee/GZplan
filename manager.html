@@ -2,6 +2,12 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8" />
+<link rel="manifest" href="./manifest.json" />
+<link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="GZ기획팀" />
+<meta name="theme-color" content="#185FA5" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>업무 트래커 — 팀장 뷰</title>
 <style>
@@ -198,6 +204,14 @@ body {
 .p4 { background: #FCEBEB; color: #a32d2d; }
 .p5 { background: #a32d2d; color: #fff; }
 .reporter-badge { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: var(--pill); background: var(--purple-bg); color: var(--purple-t); }
+
+/* ── 진행 바 ── */
+.progress-wrap { margin-top: 4px; }
+.progress-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; display: flex; justify-content: space-between; }
+.progress-bar-bg { height: 6px; background: var(--bg3); border-radius: 999px; overflow: hidden; }
+.progress-bar-fill { height: 100%; border-radius: 999px; background: var(--blue); transition: width .3s; }
+.progress-bar-fill.done-bar { background: #639922; }
+.progress-bar-fill.over-bar  { background: var(--red); }
 
 /* ── 토스트 ── */
 .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(10px); background: var(--text); color: var(--bg); font-size: 13px; font-weight: 500; padding: 9px 20px; border-radius: var(--pill); opacity: 0; transition: all .25s; pointer-events: none; z-index: 300; }
@@ -580,8 +594,41 @@ function renderDetail(t) {
     `<option value="${r}" ${(t.reporter||'')==r?'selected':''}>${r||'없음'}</option>`
   ).join('');
 
+  // 진행 바 계산
+  const progressBar = (() => {
+    if (!t.startDate || !t.due) return '';
+    const start   = new Date(t.startDate);
+    const end     = new Date(t.due);
+    const today   = new Date(); today.setHours(0,0,0,0);
+    const total   = Math.ceil((end - start) / 86400000);
+    const elapsed = Math.ceil((today - start) / 86400000);
+    if (total <= 0) return '';
+    const pct     = Math.min(100, Math.max(0, Math.round(elapsed / total * 100)));
+    const isDone  = t.status === 'done';
+    const isOver  = elapsed > total && !isDone;
+    const fillCls = isDone ? 'done-bar' : isOver ? 'over-bar' : '';
+    const label   = isDone ? '완료' : isOver
+      ? `기한 초과 +${elapsed - total}일`
+      : `${Math.max(0, elapsed)}일 / ${total}일 (${pct}%)`;
+    return `<div class="progress-wrap">
+      <div class="progress-label"><span>진행</span><span>${label}</span></div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill ${fillCls}" style="width:${pct}%"></div>
+      </div>
+    </div>`;
+  })();
+
   document.getElementById('dpMeta').innerHTML = `
     ${descRow}
+    ${progressBar ? `<div style="padding-bottom:4px">${progressBar}</div>` : ''}
+    <div class="dp-row">
+      <span class="dp-lbl">시작일</span>
+      ${isAll
+        ? `<span class="dp-val">${t.startDate ? fmtDate(t.startDate) : '-'}</span>`
+        : `<input class="dp-edit" type="date" value="${t.startDate || ''}"
+             onchange="updateStartDate('${t._id}','${t._mid}',this.value)"
+             style="width:140px;text-align:right" />`}
+    </div>
     <div class="dp-row">
       <span class="dp-lbl">중요도</span>
       ${isAll
@@ -761,6 +808,20 @@ window.updateReporter = async (docId, memberId, val) => {
   });
 };
 
+window.updateStartDate = async (docId, memberId, val) => {
+  const t = mData[memberId]?.tasks.find(t => t._id === docId);
+  if (!t) return;
+  const ts = now();
+  await fsUpd(memberId, docId, {
+    startDate: val, updated: ts,
+    history: [...(t.history || []), {
+      id: Date.now() + '', type: 'status',
+      text: `시작일 변경: ${t.startDate ? fmtDate(t.startDate) : '없음'} → ${val ? fmtDate(val) : '없음'}`,
+      date: ts, author: '팀장'
+    }]
+  });
+};
+
 window.updateDue = async (docId, memberId, val) => {
   const t = mData[memberId]?.tasks.find(t => t._id === docId);
   if (!t) return;
@@ -808,7 +869,7 @@ window.openModal = () => {
 };
 window.closeModal = () => {
   document.getElementById('overlay').classList.remove('show');
-  ['iTitle', 'iDesc', 'iDue'].forEach(id => document.getElementById(id).value = '');
+  ['iTitle', 'iDesc', 'iStart', 'iDue'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('iStatus').value = 'todo';
   document.getElementById('iPriority').value = '3';
   document.getElementById('iReporter').value = '';
@@ -827,7 +888,8 @@ window.addTask = async () => {
       title,
       desc:     document.getElementById('iDesc').value.trim(),
       assignee: '',
-      due:      document.getElementById('iDue').value || '',
+      startDate: document.getElementById('iStart').value || '',
+    due:      document.getElementById('iDue').value || '',
       status:   document.getElementById('iStatus').value,
       updated:  ts,
       pinned:   false,

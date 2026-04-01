@@ -293,8 +293,9 @@ body {
 <!-- 콘텐츠 -->
 <div class="content">
   <div class="stats-row" id="statsRow"></div>
+  <div class="filter-row" id="memberFilterRow" style="margin-bottom:.5rem;flex-wrap:wrap"></div>
   <div class="filter-row">
-    <button class="chip active" onclick="setFilter('all', this)">전체</button>
+    <button class="chip active" onclick="setFilter('active', this)">전체</button>
     <button class="chip" onclick="setFilter('todo', this)">대기</button>
     <button class="chip" onclick="setFilter('inprogress', this)">진행 중</button>
     <button class="chip" onclick="setFilter('done', this)">완료</button>
@@ -434,6 +435,7 @@ if (ME.role !== 'manager' && ME.role !== 'admin') { location.href = 'index.html'
 
 document.getElementById('tbUser').textContent = ME.displayName;
 loadReporters();
+
 window.logout = () => { localStorage.removeItem('tt_user'); location.href = 'index.html'; };
 
 // ════════════════════════════════════════════
@@ -448,12 +450,14 @@ const fsDel = (memberId, docId)       => { setSync(true); return deleteDoc(dr(me
 // ════════════════════════════════════════════
 // 상태
 // ════════════════════════════════════════════
-let mData     = {};  // { [memberId]: { tasks: [] } }
-let curTab    = '__all__';
-let selDocId  = null;
-let selMId    = null;
-let filter    = 'all';
-let unsubs    = [];
+let mData       = {};
+let curTab      = '__all__';
+let selDocId    = null;
+let selMId      = null;
+let filter      = 'active';  // 기본값: 대기+진행중
+let filterMember = 'all';  // 전체탭 팀원 필터
+
+let unsubs      = [];
 
 // ════════════════════════════════════════════
 // 유틸 함수
@@ -543,15 +547,37 @@ subscribe();
 // 렌더링
 // ════════════════════════════════════════════
 function getAllTasks() {
-  return curTab === '__all__'
-    ? Object.values(mData).flatMap(m => m.tasks)
-    : mData[curTab]?.tasks || [];
+  if (curTab !== '__all__') return mData[curTab]?.tasks || [];
+  const all = Object.values(mData).flatMap(m => m.tasks);
+  return filterMember === 'all' ? all : all.filter(t => t._mid === filterMember);
 }
 
 function render() {
   renderTabs();
+  renderMemberFilter();
   renderStats();
   renderTaskList();
+}
+
+function renderMemberFilter() {
+  const el = document.getElementById('memberFilterRow');
+  if (!el) return;
+  if (curTab !== '__all__') { el.innerHTML = ''; return; }
+  let html = `<span style="font-size:12px;color:var(--text3);margin-right:4px">팀원</span>`;
+  html += `<button class="chip achip${filterMember==='all'?' active':''}" data-m="all">전체</button>`;
+  MEMBER_IDS.forEach(id => {
+    const cnt = (mData[id]?.tasks||[]).filter(t => hideComplete ? t.status!=='done' : true).length;
+    html += `<button class="chip achip${filterMember===id?' active':''}" data-m="${id}">${id} <span style="font-size:10px">${cnt}</span></button>`;
+  });
+  el.innerHTML = html;
+  el.querySelectorAll('.achip').forEach(btn => {
+    btn.addEventListener('click', function() {
+      filterMember = this.dataset.m;
+      el.querySelectorAll('.achip').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      render();
+    });
+  });
 }
 
 function renderTabs() {
@@ -581,9 +607,10 @@ function renderStats() {
 
 function renderTaskList() {
   const all      = getAllTasks();
-  const filtered = all.filter(t =>
-    filter === 'all' ? true : filter === 'stale' ? isStale(t) : t.status === filter
-  );
+  const filtered = all.filter(t => {
+    const byStatus = filter === 'active' ? t.status !== 'done' : filter === 'all' ? true : filter === 'stale' ? isStale(t) : t.status === filter;
+    return byStatus;
+  });
   filtered.sort((a, b) => {
     if (b.pinned !== a.pinned) return b.pinned ? 1 : -1;
     const pa = b.priority || 3, pb = a.priority || 3;
@@ -773,7 +800,8 @@ window.switchTab = id => {
   curTab = id;
   selDocId = null;
   selMId   = null;
-  filter   = 'all';
+  filter   = 'active';
+  filterMember = 'all';
   document.getElementById('detailPanel').classList.remove('open');
   document.getElementById('noteInput').value = '';
   document.querySelectorAll('.chip').forEach((c, i) => c.classList.toggle('active', i === 0));

@@ -549,8 +549,7 @@ function renderTaskList() {
 
     html += `
       <div class="${cls}" onclick="selTask('${t._id}', '${t._mid}')">
-        <div class="task-check${t.status === 'done' ? ' done' : ''}"
-          ${!isAll ? `onclick="(e=>{e.stopPropagation();cycleStat('${t._id}','${t._mid}',e)})(event)"` : ''}></div>
+        <div class="task-check${t.status === 'done' ? ' done' : ''}" data-id="${t._id}" data-mid="${t._mid}" data-isall="${isAll}"></div>
         <div class="task-body">
           <div class="task-title${t.status === 'done' ? ' done-text' : ''}">${t.title}</div>
           <div class="task-meta">
@@ -573,6 +572,14 @@ function renderTaskList() {
       </div>`;
   });
   el.innerHTML = html;
+  // task-check 클릭 이벤트 위임
+  el.querySelectorAll('.task-check').forEach(chk => {
+    chk.addEventListener('click', e => {
+      e.stopPropagation();
+      const isAll = chk.dataset.isall === 'true';
+      if (!isAll) cycleStat(chk.dataset.id, chk.dataset.mid, e);
+    });
+  });
 }
 
 function renderDetail(t) {

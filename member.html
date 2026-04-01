@@ -813,11 +813,16 @@ function renderDetail(t) {
 
   document.getElementById('dpMeta').innerHTML = `
     ${descRow}
-    <div class="dp-row">
+    <div class="dp-row" id="dp-priority-row-${t._id}">
       <span class="dp-lbl">중요도</span>
-      <span>${priorityBadge(t.priority)}</span>
-      <select class="dp-edit" style="width:100px;text-align:right;margin-left:4px"
-        onchange="updatePriority('${t._id}', this.value)">${priorityOpts}</select>
+      <span class="${priorityCls(t.priority)}" onclick="togglePriorityEdit('${t._id}')">
+        ${{5:'매우 긴급',4:'긴급',3:'보통',2:'낮음',1:'매우 낮음'}[t.priority||3]} ✎
+      </span>
+    </div>
+    <div class="dp-row" id="dp-priority-edit-${t._id}" style="display:none">
+      <span class="dp-lbl">중요도</span>
+      <select class="dp-edit" style="width:160px;text-align:right"
+        onchange="updatePriority('${t._id}',this.value);togglePriorityEdit('${t._id}')">${priorityOpts}</select>
     </div>
     <div class="dp-row">
       <span class="dp-lbl">시작일</span>
@@ -836,15 +841,18 @@ function renderDetail(t) {
     ${progressBar ? `<div style="padding:4px 0">${progressBar}</div>` : ''}
     <div class="dp-row">
       <span class="dp-lbl">상태</span>
-      <span class="badge ${t.status === 'todo' ? 'badge-todo' : t.status === 'inprogress' ? 'badge-inprogress' : 'badge-done'}">${statusLabel[t.status] || '-'}</span>
+      <span class="badge ${t.status==='todo'?'badge-todo':t.status==='inprogress'?'badge-inprogress':'badge-done'}">${statusLabel[t.status]||'-'}</span>
     </div>
-    <div class="dp-row">
+    <div class="dp-row" id="dp-reporter-row-${t._id}">
       <span class="dp-lbl">최종보고자</span>
-      <div style="display:flex;align-items:center;gap:5px">
-        ${t.reporter ? `<span class="reporter-badge">${t.reporter}</span>` : ''}
-        <select class="dp-edit" style="width:100px;text-align:right"
-          onchange="updateReporter('${t._id}', this.value)">${reporterOpts}</select>
-      </div>
+      <span class="reporter-badge" onclick="toggleReporterEdit('${t._id}')">
+        ${t.reporter || '없음'} ✎
+      </span>
+    </div>
+    <div class="dp-row" id="dp-reporter-edit-${t._id}" style="display:none">
+      <span class="dp-lbl">최종보고자</span>
+      <select class="dp-edit" style="width:160px;text-align:right"
+        onchange="updateReporter('${t._id}',this.value);toggleReporterEdit('${t._id}')">${reporterOpts}</select>
     </div>`;
 
   // 타임라인(히스토리)

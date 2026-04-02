@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<link rel="manifest" href="./manifest.json" />
+<link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="GZ기획팀" />
+<meta name="theme-color" content="#185FA5" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>회의록 — GZ 경영기획팀</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#fff;--bg2:#f5f5f3;--bg3:#eaeae8;
+  --text:#1a1a1a;--text2:#6b6b6b;--text3:#a8a8a8;
+  --border:rgba(0,0,0,.09);--border2:rgba(0,0,0,.16);--border3:rgba(0,0,0,.30);
+  --radius:12px;--radius-sm:8px;--pill:999px;
+  --blue:#378ADD;--blue-bg:#E6F1FB;--blue-t:#0C447C;
+  --red:#a32d2d;--red-bg:#FCEBEB;
+  --green:#639922;--green-bg:#EAF3DE;--green-t:#27500A;
+  --purple-bg:#EEEDFE;--purple-t:#3C3489;
+}
+@media(prefers-color-scheme:dark){:root{--bg:#1c1c1e;--bg2:#2c2c2e;--bg3:#111110;--text:#f2f2f7;--text2:#aeaeb2;--text3:#636366;--border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.15);--border3:rgba(255,255,255,.30)}}
+body{font-family:-apple-system,BlinkMacSystemFont,"Pretendard","Segoe UI",sans-serif;background:var(--bg3);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+.topbar{background:var(--bg);border-bottom:.5px solid var(--border);padding:.85rem 1.5rem;display:flex;align-items:center;gap:12px;flex-wrap:wrap;flex-shrink:0}
+.topbar h1{font-size:16px;font-weight:600}
+.tb-badge{font-size:11px;font-weight:600;padding:2px 8px;border-radius:var(--pill);background:var(--blue-bg);color:var(--blue-t)}
+.tb-right{margin-left:auto;display:flex;gap:8px;align-items:center}
+.icon-btn{padding:6px 14px;border-radius:var(--radius-sm);font-size:12px;font-weight:500;border:.5px solid var(--border2);background:var(--bg);color:var(--text2);cursor:pointer;transition:all .15s}
+.icon-btn:hover{border-color:var(--border3);color:var(--text)}
+.layout{display:flex;flex:1;min-height:0}
+.sidebar{width:280px;flex-shrink:0;border-right:.5px solid var(--border);background:var(--bg);display:flex;flex-direction:column;overflow:hidden}
+.sb-head{padding:1rem 1.25rem;border-bottom:.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.sb-head-title{font-size:14px;font-weight:600}
+.sb-new{padding:5px 12px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;background:var(--text);color:var(--bg);border:none;cursor:pointer}
+.sb-new:hover{opacity:.78}
+.sb-list{flex:1;overflow-y:auto}
+.sb-item{padding:.85rem 1.25rem;border-bottom:.5px solid var(--border);cursor:pointer;transition:background .15s}
+.sb-item:hover{background:var(--bg2)}
+.sb-item.active{background:var(--bg2);border-left:3px solid var(--text)}
+.sb-item-title{font-size:13px;font-weight:500;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-item-meta{font-size:11px;color:var(--text3)}
+.sb-empty{padding:2rem;text-align:center;color:var(--text3);font-size:13px;line-height:1.6}
+.main{flex:1;padding:1.5rem;overflow-y:auto}
+.main-inner{max-width:780px;margin:0 auto}
+.card{background:var(--bg);border:.5px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1.25rem}
+.card-title{font-size:14px;font-weight:700;margin-bottom:1rem;display:flex;align-items:center;gap:6px}
+.info-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem}
+.fg label{font-size:12px;color:var(--text2);display:block;margin-bottom:5px}
+.fg input,.fg textarea{width:100%;padding:8px 10px;font-size:14px;border:.5px solid var(--border2);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:inherit;outline:none}
+.fg input:focus,.fg textarea:focus{border-color:var(--blue)}
+.attendee-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;min-height:28px}
+.attendee-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:var(--pill);font-size:12px;font-weight:500;background:var(--blue-bg);color:var(--blue-t)}
+.attendee-chip button{background:none;border:none;cursor:pointer;color:inherit;font-size:11px;opacity:.6;padding:0;line-height:1;margin-left:2px}
+.attendee-chip button:hover{opacity:1}
+.member-btn-row{display:flex;flex-wrap:wrap;gap:5px}
+.member-btn{padding:3px 10px;border-radius:var(--pill);font-size:12px;border:.5px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;transition:all .15s}
+.member-btn:hover{border-color:var(--border3);color:var(--text)}
+.member-btn.on{background:var(--text);color:var(--bg);border-color:var(--text)}
+.rec-area{display:flex;flex-direction:column;align-items:center;gap:14px;padding:1rem 0}
+.rec-btn{width:68px;height:68px;border-radius:50%;border:none;cursor:pointer;font-size:26px;display:flex;align-items:center;justify-content:center;transition:all .2s;background:var(--bg2);border:2px solid var(--border2)}
+.rec-btn:hover{transform:scale(1.05)}
+.rec-btn.recording{background:var(--red);border-color:var(--red);animation:pulse 1.2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(163,45,45,.4)}50%{box-shadow:0 0 0 10px rgba(163,45,45,0)}}
+.rec-status{font-size:13px;color:var(--text2);text-align:center}
+.rec-status.active{color:var(--red);font-weight:500}
+.rec-timer{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:.05em}
+.transcript-area{width:100%;min-height:120px;padding:10px 12px;font-size:14px;line-height:1.7;border:.5px solid var(--border2);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:inherit;outline:none;resize:vertical}
+.transcript-area:focus{border-color:var(--blue)}
+.transcript-hint{font-size:12px;color:var(--text3);margin-top:6px}
+.summary-area{width:100%;min-height:200px;padding:10px 12px;font-size:14px;line-height:1.8;border:.5px solid var(--border2);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:inherit;outline:none;resize:vertical}
+.summary-area:focus{border-color:var(--blue)}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn-primary{padding:9px 22px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;background:var(--text);color:var(--bg);border:none;cursor:pointer}
+.btn-primary:hover{opacity:.78}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed}
+.btn-secondary{padding:8px 18px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;border:.5px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer}
+.btn-secondary:hover{border-color:var(--border3);color:var(--text)}
+.btn-danger{padding:8px 18px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;border:none;background:var(--red);color:#fff;cursor:pointer}
+.btn-danger:hover{opacity:.82}
+.ai-loading{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text2);padding:8px 0}
+.ai-spin{width:18px;height:18px;border:2px solid var(--border2);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.badge{font-size:11px;font-weight:600;padding:2px 8px;border-radius:var(--pill)}
+.badge-saved{background:var(--green-bg);color:var(--green-t)}
+.cal-note{font-size:12px;color:var(--text3);margin-top:6px;display:flex;align-items:center;gap:4px}
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(10px);background:var(--text);color:var(--bg);font-size:13px;font-weight:500;padding:9px 20px;border-radius:var(--pill);opacity:0;transition:all .25s;pointer-events:none;z-index:300;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);align-items:center;justify-content:center;z-index:200;padding:1rem}
+.overlay.show{display:flex}
+.modal{background:var(--bg);border-radius:var(--radius);border:.5px solid var(--border2);padding:1.5rem;width:100%;max-width:380px}
+.modal h3{font-size:15px;font-weight:600;margin-bottom:.75rem}
+.modal p{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:1.25rem}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end}
+.no-support{background:var(--bg);border:.5px solid var(--border);border-radius:var(--radius);padding:3rem;text-align:center;color:var(--text2)}
+@media(max-width:768px){.sidebar{display:none}.main{padding:1rem}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>회의록</h1>
+  <span class="tb-badge">GZ 경영기획팀</span>
+  <div class="tb-right">
+    <span id="tbUser" style="font-size:12px;color:var(--text2)"></span>
+    <button class="icon-btn" onclick="goBack()">← 업무 트래커</button>
+    <button class="icon-btn" onclick="logout()">로그아웃</button>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- 사이드바: 회의록 목록 -->
+  <div class="sidebar">
+    <div class="sb-head">
+      <span class="sb-head-title">회의록 목록</span>
+      <button class="sb-new" onclick="newMeeting()">+ 새 회의</button>
+    </div>
+    <div class="sb-list" id="sbList">
+      <div class="sb-empty">저장된 회의록이 없어요<br>새 회의를 시작해주세요</div>
+    </div>
+  </div>
+
+  <!-- 메인 -->
+  <div class="main">
+    <div class="main-inner" id="mainInner">
+
+      <!-- 회의 정보 -->
+      <div class="card">
+        <div class="card-title"><span>📋</span> 회의 정보</div>
+        <div class="info-row">
+          <div class="fg">
+            <label>회의 제목</label>
+            <input id="meetTitle" placeholder="예: 4월 주간 팀 회의" />
+          </div>
+          <div class="fg">
+            <label>일시</label>
+            <input id="meetDate" type="datetime-local" />
+          </div>
+        </div>
+        <div class="fg" style="margin-bottom:.75rem">
+          <label>참석자</label>
+          <div class="attendee-wrap" id="attendeeWrap"></div>
+          <div class="member-btn-row" id="memberBtnRow"></div>
+        </div>
+      </div>
+
+      <!-- 녹음 -->
+      <div class="card" id="recCard">
+        <div class="card-title"><span>🎙</span> 실시간 녹음</div>
+        <div id="recContent">
+          <div class="rec-area">
+            <div class="rec-timer" id="recTimer">00:00</div>
+            <button class="rec-btn" id="recBtn" onclick="toggleRec()">🎙</button>
+            <div class="rec-status" id="recStatus">버튼을 눌러 녹음을 시작하세요</div>
+          </div>
+          <div class="transcript-hint">💡 녹음 중 실시간으로 텍스트가 변환돼요. 아래에서 직접 수정도 가능해요.</div>
+        </div>
+      </div>
+
+      <!-- 전사 텍스트 -->
+      <div class="card">
+        <div class="card-title"><span>📝</span> 전사 텍스트
+          <span style="font-size:11px;color:var(--text3);font-weight:400;margin-left:4px">직접 입력하거나 수정할 수 있어요</span>
+        </div>
+        <textarea class="transcript-area" id="transcriptArea" placeholder="녹음을 시작하거나 회의 내용을 직접 붙여넣으세요..."></textarea>
+        <div class="btn-row" style="margin-top:10px">
+          <button class="btn-primary" id="summarizeBtn" onclick="summarize()">✨ AI 요약 생성</button>
+          <button class="btn-secondary" onclick="clearTranscript()">전사 초기화</button>
+        </div>
+      </div>
+
+      <!-- AI 요약 -->
+      <div class="card">
+        <div class="card-title"><span>✅</span> 회의록 요약
+          <span id="savedBadge" style="display:none" class="badge badge-saved">저장됨</span>
+        </div>
+        <div id="aiLoading" style="display:none" class="ai-loading">
+          <div class="ai-spin"></div>
+          Claude AI가 회의록을 요약하고 있어요...
+        </div>
+        <textarea class="summary-area" id="summaryArea" placeholder="AI 요약 결과가 여기에 표시돼요. 직접 수정도 가능해요."></textarea>
+        <div class="btn-row" style="margin-top:10px">
+          <button class="btn-primary" onclick="saveMeeting()">💾 회의록 저장</button>
+          <button class="btn-secondary" onclick="copySummary()">📋 복사</button>
+          <button class="btn-danger" id="deleteBtn" style="display:none" onclick="deleteMeeting()">삭제</button>
+        </div>
+        <div class="cal-note" id="calNote" style="display:none">
+          📅 캘린더에도 자동으로 등록됐어요
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- 삭제 확인 모달 -->
+<div class="overlay" id="delOverlay">
+  <div class="modal">
+    <h3>회의록 삭제</h3>
+    <p>이 회의록을 삭제할까요? 캘린더에 등록된 일정도 함께 삭제돼요.</p>
+    <div class="modal-btns">
+      <button class="btn-secondary" onclick="closeOverlay()">취소</button>
+      <button class="btn-danger" onclick="confirmDelete()">삭제</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import{getFirestore,collection,doc,onSnapshot,addDoc,updateDoc,deleteDoc,query,orderBy}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// ════════════════════════════════════════════
+// Firebase & 상수
+// ════════════════════════════════════════════
+const FC={apiKey:"AIzaSyA7KylsSyT3_0oQvhBtcrPc-gcdfVq90IQ",authDomain:"gzplan.firebaseapp.com",projectId:"gzplan",storageBucket:"gzplan.firebasestorage.app",messagingSenderId:"186255862586",appId:"1:186255862586:web:f36d21f76012ca43b8fe03"};
+const MEMBER_IDS=["강신욱","김용욱","오문식","이길우","이도영","이영찬","이윤형"];
+const db=getFirestore(initializeApp(FC));
+
+// ════════════════════════════════════════════
+// 인증
+// ════════════════════════════════════════════
+const sess=localStorage.getItem("tt_user");
+if(!sess){location.href="index.html";throw""}
+const ME=JSON.parse(sess);
+if(!ME.id){location.href="index.html";throw""}
+document.getElementById("tbUser").textContent=ME.displayName;
+window.logout=()=>{localStorage.removeItem("tt_user");location.href="index.html"};
+window.goBack=()=>{location.href=ME.role==="member"?"member.html":"manager.html"};
+
+// ════════════════════════════════════════════
+// 상태
+// ════════════════════════════════════════════
+let meetings=[];
+let curId=null;         // 현재 보고 있는 회의록 ID
+let attendees=[];       // 현재 참석자 목록
+let isRecording=false;
+let recognition=null;
+let recInterval=null;
+let recSeconds=0;
+let transcript="";
+let pendingDeleteId=null;
+
+// ════════════════════════════════════════════
+// 유틸
+// ════════════════════════════════════════════
+function toast(msg){
+  const el=document.getElementById("toast");
+  el.textContent=msg;el.classList.add("show");
+  clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("show"),2400);
+}
+function toDatetimeLocal(d=new Date()){
+  const pad=n=>String(n).padStart(2,"0");
+  return`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+function fmtDate(s){
+  if(!s)return"-";
+  const d=new Date(s);
+  return`${d.getFullYear()}. ${d.getMonth()+1}. ${d.getDate()}. ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
+}
+
+// ════════════════════════════════════════════
+// Firestore 구독
+// ════════════════════════════════════════════
+onSnapshot(query(collection(db,"meetings"),orderBy("date","desc")),snap=>{
+  meetings=snap.docs.map(d=>({id:d.id,...d.data()}));
+  renderSidebar();
+  if(curId){
+    const m=meetings.find(x=>x.id===curId);
+    if(m)highlightSidebar(curId);
+  }
+});
+
+// ════════════════════════════════════════════
+// 사이드바 렌더
+// ════════════════════════════════════════════
+function renderSidebar(){
+  const el=document.getElementById("sbList");
+  if(!meetings.length){
+    el.innerHTML=`<div class="sb-empty">저장된 회의록이 없어요<br>새 회의를 시작해주세요</div>`;
+    return;
+  }
+  el.innerHTML=meetings.map(m=>`
+    <div class="sb-item${curId===m.id?" active":""}" onclick="loadMeeting('${m.id}')">
+      <div class="sb-item-title">${m.title||"(제목 없음)"}</div>
+      <div class="sb-item-meta">${fmtDate(m.date)} · ${(m.attendees||[]).join(", ")||"참석자 없음"}</div>
+    </div>`).join("");
+}
+
+function highlightSidebar(id){
+  document.querySelectorAll(".sb-item").forEach(el=>{
+    el.classList.toggle("active",el.getAttribute("onclick")===`loadMeeting('${id}')`);
+  });
+}
+
+// ════════════════════════════════════════════
+// 참석자 UI
+// ════════════════════════════════════════════
+function renderAttendees(){
+  // 선택된 참석자 칩
+  document.getElementById("attendeeWrap").innerHTML=attendees.map(a=>`
+    <span class="attendee-chip">${a}
+      <button onclick="removeAttendee('${a}')">✕</button>
+    </span>`).join("");
+  // 팀원 버튼
+  document.getElementById("memberBtnRow").innerHTML=MEMBER_IDS.map(id=>`
+    <button class="member-btn${attendees.includes(id)?" on":""}" onclick="toggleAttendee('${id}')">${id}</button>`
+  ).join("");
+}
+
+window.toggleAttendee=id=>{
+  attendees=attendees.includes(id)?attendees.filter(a=>a!==id):[...attendees,id];
+  renderAttendees();
+};
+window.removeAttendee=id=>{attendees=attendees.filter(a=>a!==id);renderAttendees()};
+
+// ════════════════════════════════════════════
+// 새 회의 / 불러오기
+// ════════════════════════════════════════════
+window.newMeeting=()=>{
+  curId=null;
+  attendees=[];
+  transcript="";
+  document.getElementById("meetTitle").value="";
+  document.getElementById("meetDate").value=toDatetimeLocal();
+  document.getElementById("transcriptArea").value="";
+  document.getElementById("summaryArea").value="";
+  document.getElementById("savedBadge").style.display="none";
+  document.getElementById("deleteBtn").style.display="none";
+  document.getElementById("calNote").style.display="none";
+  renderAttendees();
+  renderSidebar();
+  stopRec();
+};
+
+window.loadMeeting=id=>{
+  const m=meetings.find(x=>x.id===id);
+  if(!m)return;
+  curId=id;
+  attendees=m.attendees||[];
+  transcript=m.transcript||"";
+  document.getElementById("meetTitle").value=m.title||"";
+  document.getElementById("meetDate").value=m.date?toDatetimeLocal(new Date(m.date)):"";
+  document.getElementById("transcriptArea").value=m.transcript||"";
+  document.getElementById("summaryArea").value=m.summary||"";
+  document.getElementById("savedBadge").style.display="";
+  document.getElementById("deleteBtn").style.display="";
+  document.getElementById("calNote").style.display=m.calendarId?"":"none";
+  renderAttendees();
+  highlightSidebar(id);
+  stopRec();
+};
+
+// ════════════════════════════════════════════
+// 녹음 (Web Speech API)
+// ════════════════════════════════════════════
+function initSpeechRecognition(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){
+    document.getElementById("recCard").innerHTML=`
+      <div class="no-support">
+        <p style="font-size:14px;font-weight:500;margin-bottom:8px">🚫 녹음 기능 미지원</p>
+        <p style="font-size:13px">이 브라우저는 Web Speech API를 지원하지 않아요.<br>Chrome 또는 Edge를 사용해주세요.</p>
+      </div>`;
+    return false;
+  }
+  recognition=new SR();
+  recognition.lang="ko-KR";
+  recognition.continuous=true;
+  recognition.interimResults=true;
+  recognition.onresult=e=>{
+    let interim="",final="";
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal)final+=e.results[i][0].transcript;
+      else interim+=e.results[i][0].transcript;
+    }
+    if(final){
+      transcript+=final+" ";
+      document.getElementById("transcriptArea").value=transcript+interim;
+    }else{
+      document.getElementById("transcriptArea").value=transcript+interim;
+    }
+  };
+  recognition.onerror=e=>{
+    if(e.error==="no-speech")return;
+    toast("녹음 오류: "+e.error);
+    stopRec();
+  };
+  recognition.onend=()=>{if(isRecording)recognition.start()};
+  return true;
+}
+
+window.toggleRec=()=>{isRecording?stopRec():startRec()};
+
+function startRec(){
+  if(!recognition&&!initSpeechRecognition())return;
+  isRecording=true;
+  recSeconds=0;
+  recognition.start();
+  const btn=document.getElementById("recBtn");
+  btn.textContent="⏹";btn.classList.add("recording");
+  document.getElementById("recStatus").textContent="녹음 중...";
+  document.getElementById("recStatus").className="rec-status active";
+  recInterval=setInterval(()=>{
+    recSeconds++;
+    const m=Math.floor(recSeconds/60),s=recSeconds%60;
+    document.getElementById("recTimer").textContent=`${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+  },1000);
+}
+
+function stopRec(){
+  if(!isRecording)return;
+  isRecording=false;
+  clearInterval(recInterval);
+  if(recognition)try{recognition.stop()}catch(e){}
+  const btn=document.getElementById("recBtn");
+  if(btn){btn.textContent="🎙";btn.classList.remove("recording")}
+  const st=document.getElementById("recStatus");
+  if(st){st.textContent="녹음이 중지됐어요";st.className="rec-status"}
+}
+
+window.clearTranscript=()=>{
+  if(!confirm("전사 텍스트를 초기화할까요?"))return;
+  transcript="";
+  document.getElementById("transcriptArea").value="";
+};
+
+// ════════════════════════════════════════════
+// Claude AI 요약
+// ════════════════════════════════════════════
+window.summarize=async()=>{
+  const text=document.getElementById("transcriptArea").value.trim();
+  if(!text){toast("전사 텍스트를 먼저 입력해주세요");return}
+  const btn=document.getElementById("summarizeBtn");
+  btn.disabled=true;
+  document.getElementById("aiLoading").style.display="flex";
+  document.getElementById("summaryArea").value="";
+
+  const title=document.getElementById("meetTitle").value.trim()||"회의";
+  const date=document.getElementById("meetDate").value;
+  const atts=attendees.join(", ")||"미기록";
+  const prompt=`다음은 "${title}" 회의의 전사 텍스트입니다.
+일시: ${date?new Date(date).toLocaleString("ko-KR"):"미기록"}
+참석자: ${atts}
+
+[전사 텍스트]
+${text}
+
+위 내용을 바탕으로 아래 형식으로 회의록을 작성해주세요. 각 항목이 없으면 "없음"으로 표시하세요.
+
+📅 일시: (회의 일시)
+👥 참석자: (참석자 목록)
+
+📝 주요 안건
+• (안건 1)
+• (안건 2)
+
+✅ 결정 사항
+• (결정된 내용)
+
+💬 기타 논의 사항
+• (기타 내용)`;
+
+  try{
+    const res=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        model:"claude-sonnet-4-20250514",
+        max_tokens:1500,
+        messages:[{role:"user",content:prompt}]
+      })
+    });
+    const data=await res.json();
+    const summary=data.content?.[0]?.text||"요약 생성에 실패했어요";
+    document.getElementById("summaryArea").value=summary;
+    toast("요약이 완료됐어요 ✓");
+  }catch(e){
+    toast("오류: "+e.message);
+  }finally{
+    btn.disabled=false;
+    document.getElementById("aiLoading").style.display="none";
+  }
+};
+
+// ════════════════════════════════════════════
+// 저장
+// ════════════════════════════════════════════
+window.saveMeeting=async()=>{
+  const title=document.getElementById("meetTitle").value.trim();
+  const date=document.getElementById("meetDate").value;
+  const transcript=document.getElementById("transcriptArea").value.trim();
+  const summary=document.getElementById("summaryArea").value.trim();
+  if(!title){toast("회의 제목을 입력해주세요");return}
+  if(!summary){toast("요약 내용이 없어요. AI 요약을 먼저 생성해주세요");return}
+
+  const data={title,date,attendees,transcript,summary,authorId:ME.id,author:ME.displayName,updatedAt:new Date().toISOString()};
+
+  try{
+    if(curId){
+      await updateDoc(doc(db,"meetings",curId),data);
+      toast("회의록이 수정됐어요 ✓");
+    }else{
+      data.createdAt=new Date().toISOString();
+      // 캘린더 자동 등록
+      const calData={
+        title:"📋 "+title,
+        category:"meeting",
+        startDate:date?date.split("T")[0]:new Date().toISOString().split("T")[0],
+        endDate:date?date.split("T")[0]:new Date().toISOString().split("T")[0],
+        memo:`참석자: ${attendees.join(", ")||"미기록"}`,
+        type:"personal",
+        author:ME.displayName,
+        authorId:ME.id,
+        repeat:{type:"none"},
+        createdAt:new Date().toISOString(),
+        updatedAt:new Date().toISOString(),
+      };
+      const calRef=await addDoc(collection(db,"schedules"),calData);
+      data.calendarId=calRef.id;
+      const ref=await addDoc(collection(db,"meetings"),data);
+      curId=ref.id;
+      document.getElementById("deleteBtn").style.display="";
+      document.getElementById("calNote").style.display="";
+      toast("회의록이 저장됐어요 ✓ 캘린더에도 등록됐어요");
+    }
+    document.getElementById("savedBadge").style.display="";
+  }catch(e){
+    toast("저장 오류: "+e.message);
+  }
+};
+
+// ════════════════════════════════════════════
+// 복사
+// ════════════════════════════════════════════
+window.copySummary=()=>{
+  const text=document.getElementById("summaryArea").value.trim();
+  if(!text){toast("요약 내용이 없어요");return}
+  const title=document.getElementById("meetTitle").value.trim();
+  const full=title?`[${title}]
+
+${text}`:text;
+  navigator.clipboard.writeText(full).then(()=>toast("클립보드에 복사됐어요 ✓")).catch(()=>{
+    // 폴백
+    const ta=document.createElement("textarea");
+    ta.value=full;document.body.appendChild(ta);ta.select();document.execCommand("copy");document.body.removeChild(ta);
+    toast("클립보드에 복사됐어요 ✓");
+  });
+};
+
+// ════════════════════════════════════════════
+// 삭제
+// ════════════════════════════════════════════
+window.deleteMeeting=()=>{
+  if(!curId)return;
+  pendingDeleteId=curId;
+  document.getElementById("delOverlay").classList.add("show");
+};
+
+window.confirmDelete=async()=>{
+  const m=meetings.find(x=>x.id===pendingDeleteId);
+  if(m?.calendarId){
+    try{await deleteDoc(doc(db,"schedules",m.calendarId))}catch(e){}
+  }
+  await deleteDoc(doc(db,"meetings",pendingDeleteId));
+  closeOverlay();
+  newMeeting();
+  toast("회의록을 삭제했어요");
+};
+
+window.closeOverlay=()=>document.getElementById("delOverlay").classList.remove("show");
+document.getElementById("delOverlay").addEventListener("click",e=>{if(e.target===e.currentTarget)closeOverlay()});
+
+// ════════════════════════════════════════════
+// 초기화
+// ════════════════════════════════════════════
+window.newMeeting();
+initSpeechRecognition();
+</script>
+</body>
+</html>

@@ -444,21 +444,7 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
   <!-- 계정 관리 섹션 -->
   <div id="tabAccounts" style="padding:1.5rem 24px 6rem;max-width:900px;margin:0 auto">
     <div class="stats" id="statsRow" style="margin-bottom:1.25rem"></div>
-    <div class="init-box" id="initBox">
-      <div class="init-box-text" id="initText"><strong>초기 계정 미등록</strong><br>팀원 7명의 계정을 등록해주세요.</div>
-      <button class="init-btn" id="initBtn">팀원 계정 일괄 등록</button>
-    </div>
-    <!-- admin 비번 변경 -->
-    <div class="card-sec" style="margin-bottom:1.25rem">
-      <div class="card-sec-title">🔐 admin 비밀번호 변경</div>
-      <div class="pw-fields">
-        <div class="fg"><label>현재 비밀번호</label><input id="curPw" type="password" placeholder="현재 비밀번호"/></div>
-        <div class="fg"><label>새 비밀번호</label><input id="newAdminPw" type="password" placeholder="새 비밀번호"/></div>
-        <div class="fg"><label>확인</label><input id="confirmAdminPw" type="password" placeholder="한 번 더 입력"/></div>
-        <button class="btn-ok" id="changePwBtn" onclick="if(window._changePw)window._changePw()" style="margin-bottom:.9rem;padding:9px 16px;align-self:flex-end;touch-action:manipulation">변경</button>
-      </div>
-      <div class="err-line" id="adminPwErr"></div>
-    </div>
+    
     <!-- 계정 목록 -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
       <div style="font-size:15px;font-weight:700;color:var(--text)">계정 목록</div>
@@ -481,7 +467,7 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
     </div>
   </div>
 
-</div
+</div>
 
 <div class="overlay" id="addAccountOverlay">
   <div class="modal">
@@ -492,7 +478,7 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
     <div class="fg"><label>비밀번호</label><div class="pw-row"><input id="aPw" type="password" placeholder="초기 비밀번호"/><button class="pw-show" id="aPwShowBtn">보기</button></div></div>
     <div class="fg"><label>역할</label><select id="aRole"><option value="member">팀원</option><option value="manager">팀장</option><option value="admin">어드민</option></select></div>
     <div class="err-line" id="addErr"></div>
-    <div class="modal-btns"><button class="btn-cancel" id="addAccountCancelBtn">취소</button><button class="btn-ok" id="addAccountOkBtn">추가하기</button></div>
+    <div class="modal-btns"><button class="btn-cancel" id="addAccountCancelBtn" onclick="closeOverlay('addAccountOverlay')" style="touch-action:manipulation">취소</button><button class="btn-ok" id="addAccountOkBtn">추가하기</button></div>
   </div>
 </div>
 <div class="overlay" id="pwOverlay">
@@ -500,7 +486,7 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
     <h3>비밀번호 변경</h3>
     <div class="modal-note" id="pwTargetLabel"></div>
     <div class="fg"><label>새 비밀번호</label><div class="pw-row"><input id="newPw" type="password" placeholder="새 비밀번호"/><button class="pw-show" id="newPwShowBtn">보기</button></div></div>
-    <div class="modal-btns"><button class="btn-cancel" id="pwCancelBtn">취소</button><button class="btn-ok" id="pwOkBtn">변경하기</button></div>
+    <div class="modal-btns"><button class="btn-cancel" id="pwCancelBtn" onclick="closeOverlay('pwOverlay')" style="touch-action:manipulation">취소</button><button class="btn-ok" id="pwOkBtn">변경하기</button></div>
   </div>
 </div>
 <div class="overlay" id="roleOverlay">
@@ -508,14 +494,14 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
     <h3>역할 변경</h3>
     <div class="modal-note" id="roleTargetLabel"></div>
     <div class="fg"><label>역할</label><select id="newRole"><option value="member">팀원</option><option value="manager">팀장</option><option value="admin">어드민</option></select></div>
-    <div class="modal-btns"><button class="btn-cancel" id="roleCancelBtn">취소</button><button class="btn-ok" id="roleOkBtn">변경하기</button></div>
+    <div class="modal-btns"><button class="btn-cancel" id="roleCancelBtn" onclick="closeOverlay('roleOverlay')" style="touch-action:manipulation">취소</button><button class="btn-ok" id="roleOkBtn">변경하기</button></div>
   </div>
 </div>
 <div class="overlay" id="reporterOverlay">
   <div class="modal">
     <h3>보고자 추가</h3>
     <div class="fg"><label>보고자 이름</label><input id="rName" placeholder="예: CEO, 홀딩스, 본부장"/></div>
-    <div class="modal-btns"><button class="btn-cancel" id="reporterCancelBtn">취소</button><button class="btn-ok" id="reporterOkBtn">추가하기</button></div>
+    <div class="modal-btns"><button class="btn-cancel" id="reporterCancelBtn" onclick="closeOverlay('reporterOverlay')" style="touch-action:manipulation">취소</button><button class="btn-ok" id="reporterOkBtn">추가하기</button></div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -579,7 +565,7 @@ document.getElementById('logoutBtn').addEventListener('click',()=>{localStorage.
 document.querySelectorAll('[data-nav]').forEach(el=>el.addEventListener('click',()=>location.href=el.dataset.nav));
 
 function toast(m){const e=document.getElementById('toast');e.textContent=m;e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),2400)}
-function closeOverlay(id){document.getElementById(id).classList.remove('show')}
+function closeOverlay(id){var el=document.getElementById(id);if(el)el.classList.remove('show');}
 document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===e.currentTarget)e.target.classList.remove('show')}));
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.overlay.show').forEach(o=>o.classList.remove('show'))});
 
@@ -773,5 +759,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+</div>
+</div>
 </body>
 </html>

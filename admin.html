@@ -561,7 +561,7 @@ document.getElementById('sbUserRole').textContent='어드민';
 document.getElementById('sbUserRole').style.color='var(--purple-t)';
 document.getElementById('sbAvatar').style.background='var(--purple-t)';
 
-document.getElementById('logoutBtn').addEventListener('click',()=>{localStorage.removeItem('tt_user'); sessionStorage.clear(); location.href = 'index.html';});
+document.getElementById('logoutBtn')?.addEventListener('click',()=>{localStorage.removeItem('tt_user'); sessionStorage.clear(); location.href = 'index.html';});
 document.querySelectorAll('[data-nav]').forEach(el=>el.addEventListener('click',()=>location.href=el.dataset.nav));
 
 function toast(m){const e=document.getElementById('toast');e.textContent=m;e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),2400)}
@@ -665,8 +665,8 @@ window._openAddAccount = () => {
   setTimeout(()=>document.getElementById('aName').focus(),80);
 };
 document.getElementById('openAddAccountBtn')?.addEventListener('click', window._openAddAccount);
-document.getElementById('addAccountCancelBtn').addEventListener('click',()=>closeOverlay('addAccountOverlay'));
-document.getElementById('addAccountOkBtn').addEventListener('click',async()=>{
+document.getElementById('addAccountCancelBtn')?.addEventListener('click',()=>closeOverlay('addAccountOverlay'));
+document.getElementById('addAccountOkBtn')?.addEventListener('click',async()=>{
   const name=document.getElementById('aName').value.trim(),id=document.getElementById('aId').value.trim(),pw=document.getElementById('aPw').value,role=document.getElementById('aRole').value,err=document.getElementById('addErr');
   err.textContent='';
   if(!name||!id||!pw){err.textContent='모든 항목을 입력해주세요';return}
@@ -676,22 +676,22 @@ document.getElementById('addAccountOkBtn').addEventListener('click',async()=>{
   await setDoc(doc(db,'accounts',id),{displayName:name,password:pw,role,disabled:false,createdAt:new Date().toISOString()});
   closeOverlay('addAccountOverlay');toast(`${name} 계정을 추가했어요 ✓`);loadAccounts();
 });
-document.getElementById('aPwShowBtn').addEventListener('click',()=>{const e=document.getElementById('aPw');e.type=e.type==='password'?'text':'password';});
+document.getElementById('aPwShowBtn')?.addEventListener('click',()=>{const e=document.getElementById('aPw');e.type=e.type==='password'?'text':'password';});
 
 // 비번 변경
-document.getElementById('pwCancelBtn').addEventListener('click',()=>closeOverlay('pwOverlay'));
-document.getElementById('pwOkBtn').addEventListener('click',async()=>{
+document.getElementById('pwCancelBtn')?.addEventListener('click',()=>closeOverlay('pwOverlay'));
+document.getElementById('pwOkBtn')?.addEventListener('click',async()=>{
   const pw=document.getElementById('newPw').value;
   if(!pw){toast('새 비밀번호를 입력해주세요');return}
   if(pw.length<4){toast('4자 이상 입력해주세요');return}
   await updateDoc(doc(db,'accounts',editingId),{password:pw});
   closeOverlay('pwOverlay');toast('비밀번호를 변경했어요 ✓');
 });
-document.getElementById('newPwShowBtn').addEventListener('click',()=>{const e=document.getElementById('newPw');e.type=e.type==='password'?'text':'password';});
+document.getElementById('newPwShowBtn')?.addEventListener('click',()=>{const e=document.getElementById('newPw');e.type=e.type==='password'?'text':'password';});
 
 // 역할 변경
-document.getElementById('roleCancelBtn').addEventListener('click',()=>closeOverlay('roleOverlay'));
-document.getElementById('roleOkBtn').addEventListener('click',async()=>{
+document.getElementById('roleCancelBtn')?.addEventListener('click',()=>closeOverlay('roleOverlay'));
+document.getElementById('roleOkBtn')?.addEventListener('click',async()=>{
   await updateDoc(doc(db,'accounts',editingId),{role:document.getElementById('newRole').value});
   closeOverlay('roleOverlay');toast('역할을 변경했어요 ✓');loadAccounts();
 });
@@ -722,8 +722,8 @@ document.getElementById('reporterList')?.addEventListener('click',async e=>{
 });
 window._openAddReporter = () => {document.getElementById('rName').value='';document.getElementById('reporterOverlay').classList.add('show');setTimeout(()=>document.getElementById('rName').focus(),80);};
 document.getElementById('openAddReporterBtn')?.addEventListener('click', window._openAddReporter);
-document.getElementById('reporterCancelBtn').addEventListener('click',()=>closeOverlay('reporterOverlay'));
-document.getElementById('reporterOkBtn').addEventListener('click',async()=>{
+document.getElementById('reporterCancelBtn')?.addEventListener('click',()=>closeOverlay('reporterOverlay'));
+document.getElementById('reporterOkBtn')?.addEventListener('click',async()=>{
   const name=document.getElementById('rName').value.trim();
   if(!name){toast('이름을 입력해주세요');return}
   if(reporters.includes(name)){toast('이미 있는 보고자예요');return}

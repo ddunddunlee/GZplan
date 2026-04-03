@@ -262,7 +262,7 @@ button, [onclick], [data-nav], .sb-item, .task-card, .chip {
         <div class="dp-head">
           <div style="flex:1;min-width:0">
             <div class="dp-member" id="dpMember"></div>
-            <input class="dp-title-input" id="dpTitle"/>
+            <input class="dp-title-input" id="dpTitle" onblur="if(window.updateTitle&&this.dataset.id)window.updateTitle(this.dataset.id,this.dataset.mid,this.value)"/>
           </div>
           <button class="dp-close" id="closeDetailBtn" onclick="if(window.closeDetail)window.closeDetail()" style="touch-action:manipulation">✕</button>
         </div>
@@ -869,9 +869,7 @@ function renderDetail(t) {
   const dpTitleEl = document.getElementById('dpTitle');
   dpTitleEl.dataset.id = t._id;
   dpTitleEl.dataset.mid = t._mid;
-  dpTitleEl.onblur = function() {
-    if(window.changeTitle) window.changeTitle(this.dataset.id, this.dataset.mid, this.value);
-  };
+  dpTitleEl.onblur = function() { if(window.updateTitle) window.updateTitle(dpTitleEl.dataset.id, dpTitleEl.dataset.mid, this.value); };
 
   const isAll = false; // 팀장은 항상 편집 가능
   const statusLabel = { todo: '대기', inprogress: '진행 중', done: '완료' };
@@ -1122,6 +1120,17 @@ window.updateReporter = async (docId, memberId, val) => {
       text: `최종보고자 변경: ${t.reporter || '없음'} → ${val || '없음'}`,
       date: ts, author: '팀장'
     }]
+  });
+};
+
+window.updateTitle = async (id, mid, val) => {
+  if (!val.trim()) return;
+  const ts = new Date().toISOString();
+  const t = (mData[mid]?.tasks||[]).find(t=>t._id===id);
+  if (!t) return;
+  await fsUpd(mid, id, {
+    title: val.trim(), updated: ts,
+    history: [...(t.history||[]), {id:Date.now()+'', type:'status', text:'제목 변경: '+val.trim(), date:ts}]
   });
 };
 

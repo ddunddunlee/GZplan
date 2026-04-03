@@ -297,7 +297,12 @@ button, [onclick], [data-nav], .sb-item, .task-card, .chip {
 </div>
 <div class="overlay" id="overlay">
   <div class="modal">
-    <h3>새 업무 추가 — <span id="modalMemberName" style="color:var(--text2);font-weight:400"></span></h3>
+    <h3>새 업무 추가</h3>
+    <div class="fg" id="iMemberRow">
+      <label>담당 팀원</label>
+      <select id="iMember">
+        <option value="">-- 담당자 선택 --</option><option value="강신욱">강신욱</option><option value="김용욱">김용욱</option><option value="오문식">오문식</option><option value="이길우">이길우</option><option value="이도영">이도영</option><option value="이영찬">이영찬</option><option value="이윤형">이윤형</option>      </select>
+    </div>
     <div class="fg"><label>업무명</label><input id="iTitle" placeholder="업무 내용을 입력하세요"/></div>
     <div class="fg"><label>설명 (선택)</label><input id="iDesc" placeholder="상세 설명"/></div>
     <div class="fg"><label>중요도</label>
@@ -683,6 +688,10 @@ window.closePoolModal = () => { document.getElementById('poolOverlay').classList
 window.addPoolTask = async () => {
   const title = document.getElementById('pTitle').value.trim();
   if (!title) { toast('업무명을 입력해주세요'); return; }
+  const assignee = curTab === '__all__'
+    ? (document.getElementById('iMember')?.value || '')
+    : curTab;
+  if (!assignee) { toast('담당 팀원을 선택해주세요'); return; }
   const data = {
     title, desc: document.getElementById('pDesc').value.trim(),
     priority: Number(document.getElementById('pPriority').value)||3,
@@ -1197,9 +1206,20 @@ window.deleteHistory = async (docId, memberId, histId) => {
 // 모달 — 업무 추가 (팀원 탭에서)
 // ════════════════════════════════════════════
 window.openModal = () => {
-  document.getElementById('modalMemberName').textContent = curTab;
+  const memberRow = document.getElementById('iMemberRow');
+  const memberSel = document.getElementById('iMember');
+  if (curTab === '__all__') {
+    if (memberRow) memberRow.style.display = '';
+    if (memberSel) memberSel.value = '';
+  } else {
+    if (memberRow) memberRow.style.display = 'none';
+    if (memberSel) memberSel.value = curTab;
+  }
+  // 타이틀
+  const h3 = document.querySelector('#overlay h3');
+  if (h3) h3.textContent = curTab === '__all__' ? '새 업무 추가' : `새 업무 추가 — ${curTab}`;
   document.getElementById('overlay').classList.add('show');
-  setTimeout(() => document.getElementById('iTitle').focus(), 80);
+  setTimeout(() => document.getElementById('iTitle')?.focus(), 80);
 };
 window.closeModal = () => {
   document.getElementById('overlay').classList.remove('show');
@@ -1212,6 +1232,10 @@ window.addTask = async () => {
   if (curTab === '__all__') return;
   const title = document.getElementById('iTitle').value.trim();
   if (!title) { toast('업무명을 입력해주세요'); return; }
+  const assignee = curTab === '__all__'
+    ? (document.getElementById('iMember')?.value || '')
+    : curTab;
+  if (!assignee) { toast('담당 팀원을 선택해주세요'); return; }
   const btn = document.querySelector('#overlay .btn-ok');
   btn.disabled = true;
   btn.textContent = '추가 중...';
@@ -1220,7 +1244,9 @@ window.addTask = async () => {
     await fsAdd(curTab, {
       title,
       desc:        document.getElementById('iDesc').value.trim(),
-      assignee:    curTab,
+      assignee: curTab === '__all__'
+      ? (document.getElementById('iMember')?.value || '')
+      : curTab,
       occurredDate: document.getElementById('iOccurred')?.value || '',
       startDate:   document.getElementById('iStart').value || '',
       due:         document.getElementById('iDue').value || '',

@@ -9,11 +9,30 @@
 <meta name="theme-color" content="#ffffff"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>GZ Plan — 팀 업무</title>
-<style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#fff;--bg2:#f7f7f5;--bg3:#f0f0ee;--text:#1a1a1a;--text2:#6b6b6b;--text3:#a8a8a8;--border:#e5e5e3;--border2:#d0d0cc;--radius:10px;--radius-sm:6px;--pill:999px;--blue:#378ADD;--blue-bg:#E6F1FB;--blue-t:#0C447C;--amber-bg:#FAEEDA;--amber-t:#633806;--green:#639922;--green-bg:#EAF3DE;--green-t:#27500A;--red:#A32D2D;--red-bg:#FCEBEB;--red-t:#791F1F;--orange:#EF9F27;--purple-bg:#EEEDFE;--purple-t:#3C3489;--sw:220px}
+<style>
+/* ── Reset & 변수 ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#fff;--bg2:#f7f7f5;--bg3:#f0f0ee;
+  --text:#1a1a1a;--text2:#6b6b6b;--text3:#a8a8a8;
+  --border:#e5e5e3;--border2:#d0d0cc;
+  --radius:10px;--radius-sm:6px;--pill:999px;
+  --blue:#378ADD;--blue-bg:#E6F1FB;--blue-t:#0C447C;
+  --amber-bg:#FAEEDA;--amber-t:#633806;
+  --green:#639922;--green-bg:#EAF3DE;--green-t:#27500A;
+  --red:#A32D2D;--red-bg:#FCEBEB;--red-t:#791F1F;
+  --orange:#EF9F27;
+  --purple-bg:#EEEDFE;--purple-t:#3C3489;
+  --sw:220px;
+}
+
+/* ── 앱 레이아웃 ── */
+html,body{height:100%}
 body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-serif;background:var(--bg2);color:var(--text);min-height:100vh}
 .app{display:flex;min-height:100vh}
-.sidebar{width:var(--sw);flex-shrink:0;background:var(--bg);border-right:0.5px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100}
+
+/* ── 사이드바 ── */
+.sidebar{width:var(--sw);flex-shrink:0;background:var(--bg);border-right:0.5px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:300;transition:transform .25s ease}
 .sb-brand{padding:20px 16px 16px;border-bottom:0.5px solid var(--bg3)}
 .sb-brand-name{font-size:15px;font-weight:600;color:var(--text);letter-spacing:-.3px}
 .sb-brand-sub{font-size:11px;color:var(--text3);margin-top:2px}
@@ -24,7 +43,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 .sb-nav{flex:1;padding:8px 0;overflow-y:auto}
 .sb-sec{padding:4px 16px;font-size:10px;font-weight:600;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-top:10px}
 .sb-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;margin:1px 8px;border-radius:var(--radius-sm);transition:background .12s}
-.sb-item:hover{background:var(--bg2)}.sb-item.active{background:var(--bg3)}
+.sb-item:hover{background:var(--bg2)}
+.sb-item.active{background:var(--bg3)}
 .sb-item.active .sb-label,.sb-item.active .sb-icon{color:var(--text);font-weight:500}
 .sb-icon{font-size:14px;width:20px;text-align:center;color:var(--text2);flex-shrink:0}
 .sb-label{font-size:13px;color:var(--text2);flex:1}
@@ -34,26 +54,63 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 .sync-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0}
 .sync-dot.syncing{background:var(--orange);animation:blink .8s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ── 메인 ── */
 .main-wrap{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;min-height:100vh}
+
+/* ── 탑바 ── */
 .topbar{background:var(--bg);border-bottom:0.5px solid var(--border);padding:0 24px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;flex-shrink:0}
 .page-title{font-size:15px;font-weight:600;color:var(--text)}
 .topbar-right{display:flex;gap:8px;align-items:center}
-.btn-ghost{padding:6px 14px;border-radius:var(--radius-sm);font-size:12px;border:0.5px solid var(--border);background:transparent;color:var(--text2);cursor:pointer}
+
+/* ── 햄버거 버튼 (모바일) ── */
+.hamburger{display:none;width:36px;height:36px;border:none;background:transparent;cursor:pointer;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:4px;border-radius:var(--radius-sm);flex-shrink:0}
+.hamburger span{display:block;width:20px;height:2px;background:var(--text);border-radius:2px;transition:all .2s}
+.hamburger:hover{background:var(--bg2)}
+
+/* ── 모바일 딤 ── */
+.sidebar-dim{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:290}
+.sidebar-dim.show{display:block}
+
+/* ── 공통 버튼 ── */
+.btn-ghost{padding:6px 14px;border-radius:var(--radius-sm);font-size:12px;border:0.5px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;transition:all .12s}
 .btn-ghost:hover{border-color:var(--border2);color:var(--text)}
 .btn-solid{padding:6px 16px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;border:none;background:var(--text);color:var(--bg);cursor:pointer}
 .btn-solid:hover{opacity:.82}
+
+/* ── 모달/오버레이 ── */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);align-items:center;justify-content:center;z-index:400;padding:1rem}
+.overlay.show{display:flex}
+.modal{background:var(--bg);border-radius:var(--radius);border:0.5px solid var(--border);padding:1.5rem;width:100%;max-width:440px;max-height:90vh;overflow-y:auto}
+.modal h3{font-size:15px;font-weight:600;margin-bottom:1.25rem}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem}
+.btn-cancel{padding:7px 16px;font-size:12px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--text2);cursor:pointer}
+.btn-ok{padding:7px 18px;font-size:12px;font-weight:600;border:none;border-radius:var(--radius-sm);background:var(--text);color:var(--bg);cursor:pointer}
+.btn-danger{padding:7px 16px;font-size:12px;border:none;border-radius:var(--radius-sm);background:var(--red);color:#fff;cursor:pointer;margin-right:auto}
+.fg{margin-bottom:1rem}
+.fg label{font-size:11px;color:var(--text3);display:block;margin-bottom:5px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.fg input,.fg select,.fg textarea{width:100%;padding:8px 10px;font-size:13px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:inherit;outline:none}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--border2)}
+
+/* ── 토스트 ── */
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(10px);background:var(--text);color:var(--bg);font-size:12px;font-weight:500;padding:8px 18px;border-radius:var(--pill);opacity:0;transition:all .25s;pointer-events:none;z-index:500;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── 통계 ── */
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
 .stat{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px 16px}
 .stat-label{font-size:11px;color:var(--text3);margin-bottom:6px}
 .stat-value{font-size:24px;font-weight:600;color:var(--text);line-height:1}
 .stat-value.warn{color:#BA7517}.stat-value.danger{color:var(--red)}
+
+/* ── 필터 ── */
 .filter-row{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;align-items:center}
-.chip{padding:5px 14px;border-radius:var(--pill);font-size:12px;border:0.5px solid var(--border);background:var(--bg);color:var(--text2);cursor:pointer}
+.chip{padding:5px 14px;border-radius:var(--pill);font-size:12px;border:0.5px solid var(--border);background:var(--bg);color:var(--text2);cursor:pointer;transition:all .12s}
 .chip:hover{border-color:var(--border2);color:var(--text)}.chip.active{background:var(--text);color:var(--bg);border-color:var(--text)}
+
+/* ── 업무 카드 ── */
 .task-list{display:flex;flex-direction:column;gap:6px}
 .empty{text-align:center;padding:3rem;color:var(--text3);font-size:13px}
-.divider{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:8px;padding:4px 0 6px}
-.divider::before,.divider::after{content:'';flex:1;height:0.5px;background:var(--border)}
 .task-card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:border-color .12s;position:relative}
 .task-card:hover{border-color:var(--border2)}.task-card.selected{border-color:var(--text)}
 .task-card.pinned{border-left:3px solid var(--blue)}.task-card.overdue{border-left:3px solid var(--red)}.task-card.stale{border-left:3px solid var(--orange)}
@@ -76,10 +133,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 .card-right{position:absolute;top:10px;right:12px;display:flex;gap:4px;align-items:center}
 .pin-btn,.del-btn{width:24px;height:24px;border-radius:var(--radius-sm);border:none;background:transparent;cursor:pointer;font-size:13px;color:var(--text3);display:flex;align-items:center;justify-content:center}
 .pin-btn:hover{background:var(--bg3);color:var(--text)}.pin-btn.on{color:var(--blue)}.del-btn:hover{background:var(--red-bg);color:var(--red)}
+.priority-badge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:var(--pill);cursor:pointer;display:inline-block}
+.priority-badge.p1{background:#f0f0ee;color:#888}.priority-badge.p2{background:var(--blue-bg);color:var(--blue-t)}
+.priority-badge.p3{background:var(--amber-bg);color:var(--amber-t)}.priority-badge.p4{background:var(--red-bg);color:var(--red)}.priority-badge.p5{background:var(--red);color:#fff}
+.reporter-badge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:var(--pill);cursor:pointer;display:inline-block;background:var(--purple-bg);color:var(--purple-t)}
+
+/* ── 상세 패널 ── */
 .resizer{width:12px;flex-shrink:0;cursor:col-resize;display:flex;align-items:center;justify-content:center}
 .resizer::after{content:'';width:3px;height:30px;background:var(--border);border-radius:var(--pill)}
 .resizer:hover::after{background:var(--border2);height:46px}
-.detail-panel{width:300px;min-width:240px;max-width:480px;flex-shrink:0;background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);display:none;position:sticky;top:72px;max-height:calc(100vh - 90px);overflow-y:auto}
+.detail-panel{width:300px;min-width:240px;flex-shrink:0;background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);display:none;position:sticky;top:72px;max-height:calc(100vh - 90px);overflow-y:auto}
 .detail-panel.open{display:block}
 .dp-head{padding:14px 16px;border-bottom:0.5px solid var(--bg3);display:flex;align-items:flex-start;justify-content:space-between;gap:8px;position:sticky;top:0;background:var(--bg);z-index:1}
 .dp-member{font-size:11px;color:var(--blue);font-weight:600;margin-bottom:3px}
@@ -87,7 +150,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 .dp-title-input:hover{border-color:var(--border);background:var(--bg2)}.dp-title-input:focus{border-color:var(--border2);background:var(--bg2)}
 .dp-close{width:24px;height:24px;border-radius:var(--radius-sm);border:none;background:transparent;color:var(--text3);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center}
 .dp-close:hover{background:var(--bg2);color:var(--text)}
-.dp-meta{padding:10px 16px;border-bottom:0.5px solid var(--bg3);display:flex;flex-direction:column}
+.dp-meta{padding:10px 16px;display:flex;flex-direction:column}
 .dp-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:0.5px solid var(--bg3)}
 .dp-row:last-child{border-bottom:none}
 .dp-lbl{font-size:11px;color:var(--text3)}.dp-val{font-size:12px;font-weight:500;color:var(--text)}
@@ -115,67 +178,32 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 .note-input:focus{outline:none;border-color:var(--border2)}
 .note-submit{width:100%;margin-top:6px;padding:7px;font-size:12px;font-weight:600;border:none;border-radius:var(--radius-sm);background:var(--text);color:var(--bg);cursor:pointer}
 .note-submit:hover{opacity:.82}
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);align-items:center;justify-content:center;z-index:200}
-.overlay.show{display:flex}
-.modal{background:var(--bg);border-radius:var(--radius);border:0.5px solid var(--border);padding:1.5rem;width:100%;max-width:420px;margin:1rem;max-height:90vh;overflow-y:auto}
-.modal h3{font-size:15px;font-weight:600;margin-bottom:1.25rem}
-.fg{margin-bottom:1rem}
-.fg label{font-size:11px;color:var(--text3);display:block;margin-bottom:5px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
-.fg input,.fg select{width:100%;padding:8px 10px;font-size:13px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:inherit;outline:none}
-.fg input:focus,.fg select:focus{border-color:var(--border2)}
-.modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem}
-.btn-cancel{padding:7px 16px;font-size:12px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--text2);cursor:pointer}
-.btn-ok{padding:7px 18px;font-size:12px;font-weight:600;border:none;border-radius:var(--radius-sm);background:var(--text);color:var(--bg);cursor:pointer}
-.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(10px);background:var(--text);color:var(--bg);font-size:12px;font-weight:500;padding:8px 18px;border-radius:var(--pill);opacity:0;transition:all .25s;pointer-events:none;z-index:300;white-space:nowrap}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-@media(max-width:768px){.sidebar{display:none}.main-wrap{margin-left:0}.stats{grid-template-columns:repeat(2,1fr)}.detail-panel{position:fixed;inset:0;width:100%;max-width:100%;border-radius:0;z-index:150;max-height:100vh}.resizer{display:none}}
-.member-tabs{display:flex;border-bottom:0.5px solid var(--border);background:var(--bg);padding:0 24px;overflow-x:auto;flex-shrink:0}
-.member-tab{padding:10px 14px;font-size:12px;color:var(--text3);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:5px}
-.member-tab:hover{color:var(--text2)}.member-tab.active{color:var(--text);border-bottom-color:var(--text);font-weight:500}
-.member-tab .cnt{font-size:10px;padding:1px 5px;border-radius:var(--pill);background:var(--bg3);color:var(--text3)}
-.member-tab.active .cnt{background:var(--text);color:var(--bg)}
-.chip.member-chip{border-left-width:3px}
+.divider{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:8px;padding:4px 0 6px}
+.divider::before,.divider::after{content:'';flex:1;height:0.5px;background:var(--border)}
 
-/* ── 핵심 레이아웃 ── */
-html,body{height:100%}
-body{margin:0;padding:0}
-.app{display:flex;min-height:100vh;width:100%}
-.sidebar{width:220px;flex-shrink:0;background:#fff;border-right:0.5px solid #e5e5e3;display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100}
-.main-wrap{margin-left:220px;flex:1;display:flex;flex-direction:column;min-height:100vh;width:calc(100% - 220px)}
-.sb-brand{padding:20px 16px 16px;border-bottom:0.5px solid #f0f0ee}
-.sb-brand-name{font-size:15px;font-weight:600;color:#1a1a1a;letter-spacing:-.3px}
-.sb-brand-sub{font-size:11px;color:#a8a8a8;margin-top:2px}
-.sb-user{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:0.5px solid #f0f0ee}
-.sb-avatar{width:30px;height:30px;border-radius:50%;background:#1a1a1a;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;flex-shrink:0}
-.sb-user-name{font-size:13px;font-weight:500;color:#1a1a1a}
-.sb-user-role{font-size:11px;color:#a8a8a8}
-.sb-nav{flex:1;padding:8px 0;overflow-y:auto}
-.sb-sec{padding:4px 16px;font-size:10px;font-weight:600;color:#c0c0bc;letter-spacing:.08em;text-transform:uppercase;margin-top:10px}
-.sb-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;margin:1px 8px;border-radius:6px;transition:background .12s;user-select:none}
-.sb-item:hover{background:#f7f7f5}
-.sb-item.active{background:#f0f0ee}
-.sb-item.active .sb-label,.sb-item.active .sb-icon{color:#1a1a1a;font-weight:500}
-.sb-icon{font-size:14px;width:20px;text-align:center;color:#888;flex-shrink:0}
-.sb-label{font-size:13px;color:#6b6b6b;flex:1}
-.sb-badge{font-size:10px;font-weight:600;padding:1px 6px;border-radius:999px;background:#FCEBEB;color:#A32D2D}
-.sb-bottom{padding:12px 16px;border-top:0.5px solid #f0f0ee;display:flex;flex-direction:column;gap:8px}
-.sb-sync{display:flex;align-items:center;gap:6px;font-size:11px;color:#a8a8a8}
-.sync-dot{width:6px;height:6px;border-radius:50%;background:#639922;flex-shrink:0}
-.sync-dot.syncing{background:#EF9F27;animation:blink .8s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-.topbar{background:#fff;border-bottom:0.5px solid #e5e5e3;padding:0 24px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;flex-shrink:0;box-sizing:border-box}
-.page-title{font-size:15px;font-weight:600;color:#1a1a1a}
-.btn-ghost{padding:6px 14px;border-radius:6px;font-size:12px;border:0.5px solid #e5e5e3;background:transparent;color:#6b6b6b;cursor:pointer}
-.btn-ghost:hover{border-color:#d0d0cc;color:#1a1a1a}
-.btn-solid{padding:6px 16px;border-radius:6px;font-size:12px;font-weight:600;border:none;background:#1a1a1a;color:#fff;cursor:pointer}
-.btn-solid:hover{opacity:.82}
-.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(10px);background:#1a1a1a;color:#fff;font-size:12px;font-weight:500;padding:8px 18px;border-radius:999px;opacity:0;transition:all .25s;pointer-events:none;z-index:300;white-space:nowrap}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-@media(max-width:768px){.sidebar{display:none}.main-wrap{margin-left:0;width:100%}}
+/* ── 모바일 반응형 ── */
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .hamburger{display:flex}
+  .main-wrap{margin-left:0}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .detail-panel{position:fixed;inset:0;width:100%;max-width:100%;border-radius:0;z-index:350;max-height:100vh;overflow-y:auto}
+  .resizer{display:none}
+  .topbar{padding:0 16px}
+}
+
+/* ── 터치 이벤트 지원 ── */
+button, [onclick], [data-nav], .sb-item, .task-card, .chip {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
 
 </style>
 </head>
 <body>
+<!-- 모바일 딤 -->
+<div class="sidebar-dim" id="sidebarDim"></div>
 <div class="app">
 <div class="sidebar">
   <div class="sb-brand"><div class="sb-brand-name">GZ Plan</div><div class="sb-brand-sub">경영기획팀</div></div>
@@ -195,14 +223,17 @@ body{margin:0;padding:0}
   </div>
   <div class="sb-bottom">
     <div class="sb-sync"><div class="sync-dot" id="syncDot"></div><span>실시간 동기화</span></div>
-    <button class="btn-ghost" id="logoutBtn" style="width:100%;font-size:11px;padding:5px">로그아웃</button>
+    <button class="btn-ghost" id="logoutBtn" onclick="localStorage.removeItem('tt_user');sessionStorage.clear();location.href='index.html'" style="width:100%;font-size:11px;padding:5px">로그아웃</button>
   </div>
 </div>
 <div class="main-wrap">
   <div class="topbar">
+  <button class="hamburger" id="hamburgerBtn" aria-label="메뉴">
+    <span></span><span></span><span></span>
+  </button>
     <div class="page-title">팀 업무 현황</div>
     <div class="topbar-right">
-      <button class="btn-ghost" id="addBtn" style="display:none">+ 업무 추가</button>
+      <button class="btn-ghost" id="addBtn" onclick="if(window.openModal)window.openModal()" style="display:none">+ 업무 추가</button>
     </div>
   </div>
   <div class="member-tabs" id="memberTabs"></div>
@@ -226,14 +257,14 @@ body{margin:0;padding:0}
           <div class="dp-member" id="dpMember"></div>
           <input class="dp-title-input" id="dpTitle"/>
         </div>
-        <button class="dp-close" id="closeDetailBtn">✕</button>
+        <button class="dp-close" id="closeDetailBtn" onclick="if(window.closeDetail)window.closeDetail()" style="touch-action:manipulation">✕</button>
       </div>
       <div class="dp-meta" id="dpMeta"></div>
       <div class="dp-sec">히스토리</div>
       <div class="timeline" id="dpTimeline"></div>
       <div class="dp-note">
         <textarea class="note-input" id="noteInput" placeholder="팀장 코멘트 입력..."></textarea>
-        <button class="note-submit" id="addNoteBtn">메모 추가</button>
+        <button class="note-submit" id="addNoteBtn" onclick="if(window.addNote)window.addNote()" style="touch-action:manipulation">메모 추가</button>
       </div>
     </div>
   </div>
@@ -255,8 +286,8 @@ body{margin:0;padding:0}
     <div class="fg"><label>마감일</label><input id="iDue" type="date"/></div>
     <div class="fg"><label>최종보고자</label><select id="iReporter"><option value="">없음</option></select></div>
     <div class="modal-btns">
-      <button class="btn-cancel" id="modalCancelBtn">취소</button>
-      <button class="btn-ok" id="addTaskOkBtn">추가하기</button>
+      <button class="btn-cancel" id="modalCancelBtn" onclick="if(window.closeModal)window.closeModal()" style="touch-action:manipulation">취소</button>
+      <button class="btn-ok" id="addTaskOkBtn" onclick="if(window.addTask)window.addTask()" style="touch-action:manipulation">추가하기</button>
     </div>
   </div>
 </div>
@@ -339,6 +370,38 @@ if (ME.role !== 'manager' && ME.role !== 'admin') { localStorage.removeItem('tt_
   if (nm) nm.textContent = ME.displayName || ME.id || '';
   if (av) av.textContent = ((ME.displayName || ME.id || '--').slice(0, 2));
 })();
+
+
+
+// ── 모바일 햄버거 ──
+(function() {
+  function openSB() {
+    var s = document.querySelector('.sidebar');
+    var d = document.getElementById('sidebarDim');
+    if (s) s.classList.add('open');
+    if (d) d.classList.add('show');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeSB() {
+    var s = document.querySelector('.sidebar');
+    var d = document.getElementById('sidebarDim');
+    if (s) s.classList.remove('open');
+    if (d) d.classList.remove('show');
+    document.body.style.overflow = '';
+  }
+  var hb = document.getElementById('hamburgerBtn');
+  var dim = document.getElementById('sidebarDim');
+  if (hb) { hb.onclick = openSB; }
+  if (dim) { dim.onclick = closeSB; }
+  // 사이드바 nav 클릭시 닫기
+  document.querySelectorAll('.sidebar [data-nav]').forEach(function(el) {
+    el.addEventListener('click', closeSB);
+  });
+  // window에 노출 (외부에서 호출 가능)
+  window.openSidebar = openSB;
+  window.closeSidebar = closeSB;
+})();
+
 
 document.getElementById('sbUserName').textContent = ME.displayName;
   document.getElementById('sbUserInitial').textContent = ME.displayName.slice(0,2);

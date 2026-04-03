@@ -492,8 +492,8 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
   </div>
   <!-- 상단 뷰 탭 (팀원 현황 | 업무 관리) -->
   <div style="display:flex;border-bottom:0.5px solid var(--border);background:var(--bg);padding:0 24px;flex-shrink:0">
-    <button class="tab-btn active" id="viewTabWork" onclick="switchViewTab('work')" style="padding:10px 16px;font-size:12px;font-weight:500;border:none;border-bottom:2px solid var(--text);background:transparent;color:var(--text);cursor:pointer;touch-action:manipulation">팀원 업무 현황</button>
-    <button class="tab-btn" id="viewTabPool" onclick="switchViewTab('pool')" style="padding:10px 16px;font-size:12px;font-weight:500;border:none;border-bottom:2px solid transparent;background:transparent;color:var(--text2);cursor:pointer;touch-action:manipulation">📋 업무 관리</button>
+    <button class="tab-btn active" id="viewTabWork" onclick="if(window.switchViewTab)window.switchViewTab('work')" style="padding:10px 16px;font-size:12px;font-weight:500;border:none;border-bottom:2px solid var(--text);background:transparent;color:var(--text);cursor:pointer;touch-action:manipulation">팀원 업무 현황</button>
+    <button class="tab-btn" id="viewTabPool" onclick="if(window.switchViewTab)window.switchViewTab('pool')" style="padding:10px 16px;font-size:12px;font-weight:500;border:none;border-bottom:2px solid transparent;background:transparent;color:var(--text2);cursor:pointer;touch-action:manipulation">📋 업무 관리</button>
   </div>
 
   <!-- 팀원 업무 현황 뷰 -->
@@ -672,6 +672,19 @@ if (ME.role !== 'manager' && ME.role !== 'admin') { localStorage.removeItem('tt_
 })();
 
 
+
+
+// ── 뷰 탭 전환 폴백 (module 로드 전 클릭 대응) ──
+window.switchViewTab = window.switchViewTab || function(tab) {
+  var vw = document.getElementById('viewWork');
+  var vp = document.getElementById('viewPool');
+  var bw = document.getElementById('viewTabWork');
+  var bp = document.getElementById('viewTabPool');
+  if (vw) vw.style.display = tab==='work' ? '' : 'none';
+  if (vp) vp.style.display = tab==='work' ? 'none' : '';
+  if (bw) { bw.style.borderBottomColor = tab==='work'?'var(--text)':'transparent'; bw.style.color = tab==='work'?'var(--text)':'var(--text2)'; bw.style.fontWeight = tab==='work'?'600':'500'; }
+  if (bp) { bp.style.borderBottomColor = tab==='work'?'transparent':'var(--text)'; bp.style.color = tab==='work'?'var(--text2)':'var(--text)'; bp.style.fontWeight = tab==='work'?'500':'600'; }
+};
 
 // ── 모바일 햄버거 ──
 (function() {

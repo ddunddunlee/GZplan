@@ -389,9 +389,32 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
 
 /* ── 페이지 고유 CSS ── */
 
+/* ── 팀원 탭 ── */
+.member-tabs{display:flex;overflow-x:auto;border-bottom:0.5px solid var(--border);background:var(--bg);padding:0 24px;flex-shrink:0;-webkit-overflow-scrolling:touch}
+.member-tabs::-webkit-scrollbar{display:none}
+.member-tab{padding:10px 14px;font-size:12px;font-weight:500;color:var(--text3);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:5px;flex-shrink:0;min-height:42px}
+.member-tab:hover{color:var(--text2)}
+.member-tab.active{color:var(--text);border-bottom-color:var(--text);font-weight:600}
+.member-tab .cnt{font-size:10px;padding:1px 5px;border-radius:var(--pill);background:var(--bg3);color:var(--text3)}
+.member-tab.active .cnt{background:var(--text);color:var(--bg)}
+/* ── 팀원 필터 칩 ── */
+.member-chip{border-left-width:3px!important}
+/* ── 업무 관리 탭 ── */
+.task-pool-card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.task-pool-card .tc-body{flex:1;min-width:0}
+.task-pool-card .tc-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.task-pool-card .tc-meta{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.assign-select{padding:4px 8px;font-size:12px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:inherit;outline:none;cursor:pointer}
+.assign-btn{padding:4px 12px;font-size:12px;font-weight:600;border:none;border-radius:var(--radius-sm);background:var(--blue);color:#fff;cursor:pointer;white-space:nowrap}
+.assign-btn:hover{opacity:.85}
 @media(max-width:767px){
   .member-tabs{padding:0 14px}
   .member-tab{padding:8px 10px;font-size:11px}
+}
+
+
+@media(max-width:767px){
+
   .content-wrap{padding:14px 14px 80px!important}
 }
 
@@ -421,8 +444,7 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
     <div class="sb-item" data-nav="calendar.html"><div class="sb-icon">▦</div><div class="sb-label">캘린더</div></div>
     <div class="sb-item" data-nav="meeting.html"><div class="sb-icon">◈</div><div class="sb-label">회의록</div></div>
     <!-- 메모장: 팀원 전용 -->
-    <div class="sb-sec">관리</div>
-    <div class="sb-item" data-nav="admin.html"><div class="sb-icon">◯</div><div class="sb-label">계정 관리</div></div>
+    <!-- 계정 관리: 어드민 전용 -->
   </div>
   <div class="sb-bottom">
     <div class="sb-sync"><div class="sync-dot" id="syncDot"></div><span>실시간 동기화</span></div>
@@ -439,8 +461,16 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
       <button class="btn-ghost" id="addBtn" onclick="if(window.openModal)window.openModal()" style="display:none">+ 업무 추가</button>
     </div>
   </div>
-  <div class="member-tabs" id="memberTabs"></div>
-  <div style="flex:1;padding:20px 24px 80px;display:flex;gap:16px;align-items:flex-start">
+  <!-- 상단 뷰 탭 (팀원 현황 | 업무 관리) -->
+  <div style="display:flex;border-bottom:0.5px solid var(--border);background:var(--bg);padding:0 24px;flex-shrink:0">
+    <button class="tab-btn active" id="viewTabWork" onclick="switchViewTab('work')" style="padding:10px 16px;font-size:12px;font-weight:500;border:none;border-bottom:2px solid var(--text);background:transparent;color:var(--text);cursor:pointer;touch-action:manipulation">팀원 업무 현황</button>
+    <button class="tab-btn" id="viewTabPool" onclick="switchViewTab('pool')" style="padding:10px 16px;font-size:12px;font-weight:500;border:none;border-bottom:2px solid transparent;background:transparent;color:var(--text2);cursor:pointer;touch-action:manipulation">📋 업무 관리</button>
+  </div>
+
+  <!-- 팀원 업무 현황 뷰 -->
+  <div id="viewWork">
+    <div class="member-tabs" id="memberTabs"></div>
+    <div style="flex:1;padding:20px 24px 80px;display:flex;gap:16px;align-items:flex-start">
     <div style="flex:1;min-width:0">
       <div class="stats" id="statsRow"></div>
       <div class="filter-row" id="memberFilterRow"></div>
@@ -471,6 +501,20 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
       </div>
     </div>
   </div>
+  </div><!-- end viewWork -->
+
+  <!-- 업무 관리(Pool) 뷰 -->
+  <div id="viewPool" style="display:none;padding:20px 24px 80px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div>
+        <div style="font-size:15px;font-weight:600;color:var(--text)">업무 관리</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:3px">담당자 없이 업무를 등록하고, 팀원에게 배정하세요</div>
+      </div>
+      <button class="btn-solid" onclick="if(window.openPoolModal)window.openPoolModal()" style="touch-action:manipulation">+ 업무 추가</button>
+    </div>
+    <div id="taskPoolList"><div class="empty">등록된 업무가 없어요</div></div>
+  </div>
+
 </div>
 </div>
 
@@ -485,8 +529,9 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
         <option value="4">4 — 긴급</option><option value="2">2 — 낮음</option><option value="1">1 — 매우 낮음</option>
       </select>
     </div>
-    <div class="fg"><label>시작일</label><input id="iStart" type="date"/></div>
-    <div class="fg"><label>마감일</label><input id="iDue" type="date"/></div>
+    <div class="fg"><label>업무 발생일</label><input id="iOccurred" type="date"/></div>
+    <div class="fg"><label>업무 시작일</label><input id="iStart" type="date"/></div>
+    <div class="fg"><label>업무 타겟일</label><input id="iDue" type="date"/></div>
     <div class="fg"><label>최종보고자</label><select id="iReporter"><option value="">없음</option></select></div>
     <div class="modal-btns">
       <button class="btn-cancel" id="modalCancelBtn" onclick="if(window.closeModal)window.closeModal()" style="touch-action:manipulation">취소</button>
@@ -494,6 +539,30 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
     </div>
   </div>
 </div>
+
+<!-- 업무 관리 풀 - 새 업무 추가 모달 -->
+<div class="overlay" id="poolOverlay">
+  <div class="modal">
+    <h3>업무 추가 (담당자 미지정)</h3>
+    <div class="fg"><label>업무명</label><input id="pTitle" placeholder="업무 내용을 입력하세요"/></div>
+    <div class="fg"><label>설명 (선택)</label><input id="pDesc" placeholder="상세 설명"/></div>
+    <div class="fg"><label>중요도</label>
+      <select id="pPriority">
+        <option value="3">3 — 보통</option><option value="5">5 — 매우 긴급</option>
+        <option value="4">4 — 긴급</option><option value="2">2 — 낮음</option><option value="1">1 — 매우 낮음</option>
+      </select>
+    </div>
+    <div class="fg"><label>업무 발생일</label><input id="pOccurred" type="date"/></div>
+    <div class="fg"><label>업무 시작일</label><input id="pStart" type="date"/></div>
+    <div class="fg"><label>업무 타겟일</label><input id="pDue" type="date"/></div>
+    <div class="fg"><label>최종보고자 (선택)</label><select id="pReporter"><option value="">없음</option></select></div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="if(window.closePoolModal)window.closePoolModal()">취소</button>
+      <button class="btn-ok" onclick="if(window.addPoolTask)window.addPoolTask()">추가하기</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script type="module">
@@ -743,6 +812,155 @@ function subscribe() {
 subscribe();
 
 // ════════════════════════════════════════════
+// 뷰 탭 전환 (팀원 현황 | 업무 관리)
+// ════════════════════════════════════════════
+window.switchViewTab = function(tab) {
+  const isWork = tab === 'work';
+  document.getElementById('viewWork').style.display = isWork ? '' : 'none';
+  document.getElementById('viewPool').style.display = isWork ? 'none' : '';
+  const btnWork = document.getElementById('viewTabWork');
+  const btnPool = document.getElementById('viewTabPool');
+  if (btnWork) {
+    btnWork.style.borderBottomColor = isWork ? 'var(--text)' : 'transparent';
+    btnWork.style.color = isWork ? 'var(--text)' : 'var(--text2)';
+    btnWork.style.fontWeight = isWork ? '600' : '500';
+  }
+  if (btnPool) {
+    btnPool.style.borderBottomColor = isWork ? 'transparent' : 'var(--text)';
+    btnPool.style.color = isWork ? 'var(--text2)' : 'var(--text)';
+    btnPool.style.fontWeight = isWork ? '500' : '600';
+  }
+};
+
+// ════════════════════════════════════════════
+// 업무 관리 풀 (taskPool)
+// ════════════════════════════════════════════
+let poolTasks = [];
+
+// Firestore 구독
+onSnapshot(query(collection(db, 'taskPool'), orderBy('createdAt', 'desc')), snap => {
+  poolTasks = snap.docs.map(d => ({ _id: d.id, ...d.data() }));
+  renderTaskPool();
+});
+
+function renderTaskPool() {
+  const el = document.getElementById('taskPoolList');
+  if (!el) return;
+  if (!poolTasks.length) {
+    el.innerHTML = '<div class="empty">등록된 업무가 없어요<br><span style="font-size:12px">업무를 추가하고 팀원에게 배정해보세요</span></div>';
+    return;
+  }
+  const PRIORITY_LABELS = {5:'매우 긴급',4:'긴급',3:'보통',2:'낮음',1:'매우 낮음'};
+  el.innerHTML = poolTasks.map(t => {
+    const pCls = `priority-badge p${t.priority||3}`;
+    const daysSince = t.occurredDate
+      ? Math.floor((Date.now() - new Date(t.occurredDate).getTime()) / 86400000)
+      : null;
+    return `<div class="task-pool-card">
+      <div class="priority-bar" style="background:${priorityColor(t.priority)}"></div>
+      <div class="tc-body">
+        <div class="tc-title">${t.title}</div>
+        <div class="tc-meta">
+          <span class="${pCls}">${PRIORITY_LABELS[t.priority||3]}</span>
+          ${t.occurredDate ? `<span class="task-date">발생 ${fmtShort(t.occurredDate)}${daysSince!==null&&daysSince>0?` · ${daysSince}일 경과`:''}</span>` : ''}
+          ${t.due ? `<span class="task-date">타겟 ${fmtShort(t.due)}</span>` : ''}
+          ${t.reporter ? `<span class="reporter-badge">${t.reporter}</span>` : ''}
+        </div>
+        ${t.desc ? `<div style="font-size:12px;color:var(--text3);margin-top:4px">${t.desc}</div>` : ''}
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;flex-shrink:0">
+        <select class="assign-select" id="asel_${t._id}" onchange="">
+          <option value="">담당자 선택</option>
+          ${MEMBER_IDS.map(id => `<option value="${id}">${id}</option>`).join('')}
+        </select>
+        <div style="display:flex;gap:5px">
+          <button class="assign-btn" onclick="assignTask('${t._id}')">배정</button>
+          <button class="del-btn" onclick="deletePoolTask('${t._id}',event)" style="border:0.5px solid var(--border);border-radius:var(--radius-sm)">✕</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.openPoolModal = () => {
+  ['pTitle','pDesc','pStart','pDue','pOccurred'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value = '';
+  });
+  document.getElementById('pPriority').value = '3';
+  document.getElementById('pOccurred').value = new Date().toISOString().split('T')[0];
+  // 보고자 옵션
+  const sel = document.getElementById('pReporter');
+  if(sel) sel.innerHTML = '<option value="">없음</option>' + REPORTERS.map(r=>`<option value="${r}">${r}</option>`).join('');
+  document.getElementById('poolOverlay').classList.add('show');
+  setTimeout(() => document.getElementById('pTitle')?.focus(), 80);
+};
+
+window.closePoolModal = () => {
+  document.getElementById('poolOverlay').classList.remove('show');
+};
+
+window.addPoolTask = async () => {
+  const title = document.getElementById('pTitle').value.trim();
+  if (!title) { toast('업무명을 입력해주세요'); return; }
+  const data = {
+    title,
+    desc:         document.getElementById('pDesc').value.trim(),
+    priority:     Number(document.getElementById('pPriority').value) || 3,
+    occurredDate: document.getElementById('pOccurred').value || '',
+    startDate:    document.getElementById('pStart').value || '',
+    due:          document.getElementById('pDue').value || '',
+    reporter:     document.getElementById('pReporter').value || '',
+    status:       'todo',
+    createdAt:    new Date().toISOString(),
+    createdBy:    ME.displayName,
+  };
+  try {
+    await addDoc(collection(db, 'taskPool'), data);
+    window.closePoolModal();
+    toast('업무가 추가됐어요 ✓');
+  } catch(e) { toast('오류: ' + e.message); }
+};
+
+window.assignTask = async (poolId) => {
+  const sel = document.getElementById('asel_' + poolId);
+  const memberId = sel?.value;
+  if (!memberId) { toast('담당자를 선택해주세요'); return; }
+  const task = poolTasks.find(t => t._id === poolId);
+  if (!task) return;
+  try {
+    const ts = new Date().toISOString();
+    const taskData = {
+      title:       task.title,
+      desc:        task.desc || '',
+      priority:    task.priority || 3,
+      occurredDate: task.occurredDate || '',
+      startDate:   task.startDate || '',
+      due:         task.due || '',
+      reporter:    task.reporter || '',
+      status:      'todo',
+      assignee:    memberId,
+      pinned:      false,
+      order:       Date.now(),
+      updated:     ts,
+      history:     [{ id: Date.now()+'', type:'create', text:`팀장이 업무를 배정했어요 (${ME.displayName})`, date: ts }],
+      createdAt:   ts,
+    };
+    await addDoc(col(memberId), taskData);
+    await deleteDoc(doc(db, 'taskPool', poolId));
+    toast(`${memberId}에게 업무가 배정됐어요 ✓`);
+  } catch(e) { toast('오류: ' + e.message); }
+};
+
+window.deletePoolTask = async (poolId, e) => {
+  e?.stopPropagation();
+  if (!confirm('이 업무를 삭제할까요?')) return;
+  try {
+    await deleteDoc(doc(db, 'taskPool', poolId));
+    toast('삭제됐어요');
+  } catch(e) { toast('오류: ' + e.message); }
+};
+
+// ════════════════════════════════════════════
 // 렌더링
 // ════════════════════════════════════════════
 function getAllTasks() {
@@ -939,7 +1157,20 @@ function renderDetail(t) {
         onchange="updatePriority('${t._id}','${t._mid}',this.value);togglePriorityEdit('${t._id}')">${priorityOpts}</select>
     </div>` : ''}
     <div class="dp-row">
-      <span class="dp-lbl">시작일</span>
+      <span class="dp-lbl">업무 발생일</span>
+      <span class="dp-val" style="display:flex;align-items:center;gap:6px;justify-content:flex-end">
+        ${isAll
+          ? `<span>${t.occurredDate ? fmtDate(t.occurredDate) : '-'}</span>`
+          : `<input class="dp-edit" type="date" value="${t.occurredDate || ''}"
+               onchange="updateOccurredDate('${t._id}','${t._mid}',this.value)"
+               style="width:120px;text-align:right" />`}
+        ${t.occurredDate && daysElapsed(t.occurredDate) > 0
+          ? `<span style="font-size:10px;color:var(--orange);font-weight:600">${daysElapsed(t.occurredDate)}일 경과</span>`
+          : ''}
+      </span>
+    </div>
+    <div class="dp-row">
+      <span class="dp-lbl">업무 시작일</span>
       ${isAll
         ? `<span class="dp-val">${t.startDate ? fmtDate(t.startDate) : '-'}</span>`
         : `<input class="dp-edit" type="date" value="${t.startDate || ''}"
@@ -947,7 +1178,7 @@ function renderDetail(t) {
              style="width:140px;text-align:right" />`}
     </div>
     <div class="dp-row">
-      <span class="dp-lbl">마감일</span>
+      <span class="dp-lbl">업무 타겟일</span>
       ${isAll
         ? `<span class="dp-val">${t.due ? fmtDate(t.due) : '-'}</span>`
         : `<input class="dp-edit" type="date" value="${t.due || ''}"
@@ -1124,6 +1355,15 @@ window.updateReporter = async (docId, memberId, val) => {
   });
 };
 
+
+window.updateOccurredDate = async (id, val) => {
+  const ts = new Date().toISOString();
+  const t = Object.values(mData).flatMap(m=>m.tasks).find(t=>t._id===id);
+  if(!t) return;
+  await fsUpd(t._mid, id, { occurredDate: val, updated: ts,
+    history: [...(t.history||[]), { id: Date.now()+'', type:'status', text:'업무 발생일: '+val, date: ts }]
+  });
+};
 window.updateStartDate = async (docId, memberId, val) => {
   const t = mData[memberId]?.tasks.find(t => t._id === docId);
   if (!t) return;

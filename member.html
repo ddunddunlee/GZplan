@@ -253,8 +253,6 @@ body{margin:0;padding:0}
 <div class="toast" id="toast"></div>
 
 <script type="module">
-import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import {getFirestore,collection,doc,getDoc,onSnapshot,addDoc,updateDoc,deleteDoc,serverTimestamp,query,orderBy} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import {
@@ -279,10 +277,20 @@ const db  = getFirestore(initializeApp(FIREBASE_CONFIG));
 const sess = localStorage.getItem('tt_user');
 if (!sess) { location.href = 'index.html'; throw ''; }
 let ME;
-try { ME = JSON.parse(sess); } catch { localStorage.removeItem('tt_user'); location.href = 'index.html'; throw ''; }
-if (!ME?.id || !ME?.role) { localStorage.removeItem('tt_user'); location.href = 'index.html'; throw ''; }
+try { ME = JSON.parse(sess); } catch { localStorage.removeItem('tt_user'); sessionStorage.clear(); location.href = 'index.html'; throw ''; }
+if (!ME?.id || !ME?.role) { localStorage.removeItem('tt_user'); sessionStorage.clear(); location.href = 'index.html'; throw ''; }
 if (ME.role === 'manager' || ME.role === 'admin') { location.href = 'manager.html'; throw ''; }
-if (ME.role !== 'member') { localStorage.removeItem('tt_user'); location.href = 'index.html'; throw ''; }
+if (ME.role !== 'member') { localStorage.removeItem('tt_user'); sessionStorage.clear(); location.href = 'index.html'; throw ''; }
+
+// ── 사이드바 이름 즉시 표시 ──
+(function initSidebar() {
+  var nm = document.getElementById('sbUserName');
+  var av = document.getElementById('sbAvatar');
+  var pt = document.getElementById('pageTitle');
+  if (nm) nm.textContent = ME.displayName || ME.id || '';
+  if (av) av.textContent = ((ME.displayName || ME.id || '--').slice(0, 2));
+  if (pt) pt.textContent = (ME.displayName || '') + '의 업무';
+})();
 
 async function loadReporters() {
   try {
@@ -1040,55 +1048,87 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-// ── DOM 이벤트 바인딩 (module defer 대응) ──
-document.getElementById('modalCancelBtn')?.addEventListener('click', () => window.closeModal?.());
-document.getElementById('addTaskOkBtn')?.addEventListener('click', () => window.addTask?.());
-document.getElementById('addNoteBtn')?.addEventListener('click', () => window.addNote?.());
-document.getElementById('closeDetailBtn')?.addEventListener('click', () => window.closeDetail?.());
-// 필터 칩
-document.querySelectorAll('[data-filter]').forEach(btn => {
-  btn.addEventListener('click', function() { window.setFilter?.(this.dataset.filter, this); });
-});
 
 
+
+
+// ── 사이드바 이름 즉시 표시 ──
+(function() {
+  var nm = document.getElementById('sbUserName');
+  var av = document.getElementById('sbAvatar');
+  var pt = document.getElementById('pageTitle');
+  if (nm) nm.textContent = ME.displayName || ME.id || '';
+  if (av) av.textContent = ((ME.displayName || ME.id || '--').slice(0, 2));
+  if (pt) pt.textContent = (ME.displayName || '') + '의 업무';
+})();
 
 loadReporters();
 
-// ── 사이드바 초기화 ──
-document.getElementById('sbUserName').textContent = ME.displayName || '';
-document.getElementById('sbAvatar').textContent = (ME.displayName||'').slice(0,2) || '--';
+</script>
+<script>
+// ── 버튼 바인딩 (일반 script - 즉시 실행) ──
+// window.xxx 함수는 module 스크립트에서 등록되므로 DOMContentLoaded 후 바인딩
+document.addEventListener('DOMContentLoaded', function() {
+  // 로그아웃
+  var logoutBtn = document.getElementById('logoutBtn');
+  if (logoutBtn) logoutBtn.addEventListener('click', function() {
+    localStorage.removeItem('tt_user');
+    sessionStorage.clear();
+    location.href = 'index.html';
+  });
 
-// ── 버튼 이벤트 바인딩 ──
-document.getElementById('logoutBtn').addEventListener('click', () => {
-  localStorage.removeItem('tt_user');
-  sessionStorage.clear();
-  location.href = 'index.html';
-});
-document.getElementById('notifBtn').addEventListener('click', () => window.toggleNotification());
-document.getElementById('addTaskBtn').addEventListener('click', () => window.openModal());
-document.getElementById('modalCancelBtn').addEventListener('click', () => window.closeModal());
-document.getElementById('addTaskOkBtn').addEventListener('click', () => window.addTask());
-document.getElementById('addNoteBtn').addEventListener('click', () => window.addNote());
-document.getElementById('closeDetailBtn').addEventListener('click', () => window.closeDetail());
+  // 사이드바 네비
+  document.querySelectorAll('[data-nav]').forEach(function(el) {
+    el.addEventListener('click', function() { location.href = el.dataset.nav; });
+  });
 
-// 필터 칩
-document.getElementById('filterRow').addEventListener('click', e => {
-  const btn = e.target.closest('[data-f]');
-  if (btn) window.setFilter(btn.dataset.f, btn);
-});
+  // 업무 추가 버튼
+  var addTaskBtn = document.getElementById('addTaskBtn');
+  if (addTaskBtn) addTaskBtn.addEventListener('click', function() {
+    if (window.openModal) window.openModal();
+  });
 
-// 사이드바 네비
-document.querySelectorAll('[data-nav]').forEach(el => {
-  el.addEventListener('click', () => location.href = el.dataset.nav);
-});
+  // 알림 버튼
+  var notifBtn = document.getElementById('notifBtn');
+  if (notifBtn) notifBtn.addEventListener('click', function() {
+    if (window.toggleNotification) window.toggleNotification();
+  });
 
-// 오버레이 닫기
-document.getElementById('overlay').addEventListener('click', e => {
-  if (e.target === e.currentTarget) window.closeModal();
-});
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') window.closeModal?.();
+  // 모달 버튼들
+  var cancelBtn = document.getElementById('modalCancelBtn');
+  if (cancelBtn) cancelBtn.addEventListener('click', function() {
+    if (window.closeModal) window.closeModal();
+  });
+  var okBtn = document.getElementById('addTaskOkBtn');
+  if (okBtn) okBtn.addEventListener('click', function() {
+    if (window.addTask) window.addTask();
+  });
+  var noteBtn = document.getElementById('addNoteBtn');
+  if (noteBtn) noteBtn.addEventListener('click', function() {
+    if (window.addNote) window.addNote();
+  });
+  var closeDetailBtn = document.getElementById('closeDetailBtn');
+  if (closeDetailBtn) closeDetailBtn.addEventListener('click', function() {
+    if (window.closeDetail) window.closeDetail();
+  });
+
+  // 필터 칩 (이벤트 위임)
+  var filterRow = document.getElementById('filterRow');
+  if (filterRow) filterRow.addEventListener('click', function(e) {
+    var btn = e.target.closest('[data-f]');
+    if (btn && window.setFilter) window.setFilter(btn.dataset.f, btn);
+  });
+
+  // 오버레이 닫기
+  var overlay = document.getElementById('overlay');
+  if (overlay) overlay.addEventListener('click', function(e) {
+    if (e.target === e.currentTarget && window.closeModal) window.closeModal();
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && window.closeModal) window.closeModal();
+  });
 });
 </script>
+
 </body>
 </html>

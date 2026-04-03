@@ -263,8 +263,6 @@ body{margin:0;padding:0}
 <div class="toast" id="toast"></div>
 
 <script type="module">
-import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import {getFirestore,collection,doc,getDoc,onSnapshot,addDoc,updateDoc,deleteDoc,serverTimestamp,query,orderBy} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import {
@@ -279,17 +277,14 @@ window.onerror = (msg, src, line, col, err) => {
   const box = document.getElementById('debugBox');
   if (box) {
     box.style.display = 'block';
-    box.textContent += `오류: ${msg}\n라인: ${line}\n${err?.stack || ''}\n\n`;
+    box.textContent += `오류: ${msg}
+라인: ${line}
+${err?.stack || ''}
+
+`;
   }
   return false;
 };
-
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import {
-  getFirestore, collection, doc, getDoc,
-  onSnapshot, addDoc, updateDoc, deleteDoc,
-  serverTimestamp, query, orderBy
-} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 const FIREBASE_CONFIG = {
   apiKey:            "AIzaSyA7KylsSyT3_0oQvhBtcrPc-gcdfVq90IQ",
@@ -333,15 +328,23 @@ const db = getFirestore(initializeApp(FIREBASE_CONFIG));
 const sess = localStorage.getItem('tt_user');
 if (!sess) { location.href = 'index.html'; throw ''; }
 let ME;
-try { ME = JSON.parse(sess); } catch { localStorage.removeItem('tt_user'); location.href = 'index.html'; throw ''; }
-if (!ME?.id || !ME?.role) { localStorage.removeItem('tt_user'); location.href = 'index.html'; throw ''; }
-if (ME.role !== 'manager' && ME.role !== 'admin') { localStorage.removeItem('tt_user'); location.href = 'index.html'; throw ''; }
+try { ME = JSON.parse(sess); } catch { localStorage.removeItem('tt_user'); sessionStorage.clear(); location.href = 'index.html'; throw ''; }
+if (!ME?.id || !ME?.role) { localStorage.removeItem('tt_user'); sessionStorage.clear(); location.href = 'index.html'; throw ''; }
+if (ME.role !== 'manager' && ME.role !== 'admin') { localStorage.removeItem('tt_user'); sessionStorage.clear(); location.href = 'index.html'; throw ''; }
+
+// ── 사이드바 이름 즉시 표시 ──
+(function initSidebar() {
+  var nm = document.getElementById('sbUserName');
+  var av = document.getElementById('sbAvatar');
+  if (nm) nm.textContent = ME.displayName || ME.id || '';
+  if (av) av.textContent = ((ME.displayName || ME.id || '--').slice(0, 2));
+})();
 
 document.getElementById('sbUserName').textContent = ME.displayName;
   document.getElementById('sbUserInitial').textContent = ME.displayName.slice(0,2);
 loadReporters();
 
-window.logout = () => { localStorage.removeItem('tt_user'); sessionStorage.clear(); location.href='index.html'; };
+window.logout = () => { localStorage.removeItem('tt_user'); sessionStorage.clear(); location.href = 'index.html'; };
 
 // ════════════════════════════════════════════
 // Firestore 헬퍼
@@ -1017,45 +1020,79 @@ document.querySelectorAll('[data-filter]').forEach(btn => {
   btn.addEventListener('click', function() { window.setFilter?.(this.dataset.filter, this); });
 });
 
+// 사이드바 이름 표시
+document.getElementById('sbUserName').textContent = ME.displayName || '';
+document.getElementById('sbAvatar').textContent = (ME.displayName||'').slice(0,2) || '--';
 
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // 로그아웃
+  var logoutBtn = document.getElementById('logoutBtn');
+  if (logoutBtn) logoutBtn.addEventListener('click', function() {
+    localStorage.removeItem('tt_user'); sessionStorage.clear(); location.href = 'index.html';
+  });
 
-// ── 버튼 이벤트 바인딩 ──
-document.getElementById('logoutBtn').addEventListener('click', () => window.logout());
-document.getElementById('addBtn').addEventListener('click', () => window.openModal());
-document.getElementById('modalCancelBtn').addEventListener('click', () => window.closeModal());
-document.getElementById('addTaskOkBtn').addEventListener('click', () => window.addTask());
-document.getElementById('addNoteBtn').addEventListener('click', () => window.addNote());
-document.getElementById('closeDetailBtn').addEventListener('click', () => window.closeDetail());
+  // 사이드바 네비
+  document.querySelectorAll('[data-nav]').forEach(function(el) {
+    el.addEventListener('click', function() { location.href = el.dataset.nav; });
+  });
 
-// 필터칩 이벤트 위임
-document.getElementById('filterRow').addEventListener('click', e => {
-  const b = e.target.closest('[data-f]');
-  if (b) window.setFilter(b.dataset.f, b);
-});
-// 팀원탭 이벤트 위임
-document.getElementById('memberTabs').addEventListener('click', e => {
-  const b = e.target.closest('[data-tab]');
-  if (b) window.switchTab(b.dataset.tab);
-});
-// 팀원 필터칩 이벤트 위임
-document.getElementById('memberFilterRow').addEventListener('click', e => {
-  const b = e.target.closest('[data-m]');
-  if (b) {
-    filterMember = b.dataset.m;
-    render();
-  }
-});
-// 사이드바 네비
-document.querySelectorAll('[data-nav]').forEach(el => {
-  el.addEventListener('click', () => location.href = el.dataset.nav);
-});
-// 오버레이 닫기
-document.getElementById('overlay').addEventListener('click', e => {
-  if (e.target === e.currentTarget) window.closeModal();
-});
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') window.closeModal?.();
+  // 업무 추가
+  var addBtn = document.getElementById('addBtn');
+  if (addBtn) addBtn.addEventListener('click', function() {
+    if (window.openModal) window.openModal();
+  });
+
+  // 모달
+  var cancelBtn = document.getElementById('modalCancelBtn');
+  if (cancelBtn) cancelBtn.addEventListener('click', function() {
+    if (window.closeModal) window.closeModal();
+  });
+  var okBtn = document.getElementById('addTaskOkBtn');
+  if (okBtn) okBtn.addEventListener('click', function() {
+    if (window.addTask) window.addTask();
+  });
+  var noteBtn = document.getElementById('addNoteBtn');
+  if (noteBtn) noteBtn.addEventListener('click', function() {
+    if (window.addNote) window.addNote();
+  });
+  var closeDetailBtn = document.getElementById('closeDetailBtn');
+  if (closeDetailBtn) closeDetailBtn.addEventListener('click', function() {
+    if (window.closeDetail) window.closeDetail();
+  });
+
+  // 필터
+  var filterRow = document.getElementById('filterRow');
+  if (filterRow) filterRow.addEventListener('click', function(e) {
+    var btn = e.target.closest('[data-f]');
+    if (btn && window.setFilter) window.setFilter(btn.dataset.f, btn);
+  });
+
+  // 팀원 탭 (이벤트 위임)
+  var memberTabs = document.getElementById('memberTabs');
+  if (memberTabs) memberTabs.addEventListener('click', function(e) {
+    var btn = e.target.closest('[data-tab]');
+    if (btn && window.switchTab) window.switchTab(btn.dataset.tab);
+  });
+
+  // 팀원 필터 (이벤트 위임)
+  var memberFilterRow = document.getElementById('memberFilterRow');
+  if (memberFilterRow) memberFilterRow.addEventListener('click', function(e) {
+    var btn = e.target.closest('[data-m]');
+    if (btn && window.setMemberFilter) window.setMemberFilter(btn.dataset.m);
+  });
+
+  // 오버레이
+  var overlay = document.getElementById('overlay');
+  if (overlay) overlay.addEventListener('click', function(e) {
+    if (e.target === e.currentTarget && window.closeModal) window.closeModal();
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && window.closeModal) window.closeModal();
+  });
 });
 </script>
+
 </body>
 </html>

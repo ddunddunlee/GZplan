@@ -41,41 +41,37 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Pretendard","Segoe UI",sans-s
   <div class="spin-wrap" id="spin"><div class="spin"></div></div>
 </div>
 
-<!-- 일반 script (defer 없음) - 페이지 로드 즉시 세션 초기화 -->
-<script>
-// ── index.html 진입 시 항상 세션 완전 초기화 ──
-localStorage.removeItem('tt_user');
-localStorage.removeItem('gz_default_tags');
-sessionStorage.clear();
-</script>
-
-<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-
 <script>
-const FC = {
+// ── 로그인 페이지 진입 시 기존 세션 초기화 ──
+// (단, 방금 로그인 성공 플래그가 없을 때만)
+if (!sessionStorage.getItem('logging_in')) {
+  localStorage.removeItem('tt_user');
+  sessionStorage.clear();
+}
+
+firebase.initializeApp({
   apiKey:            "AIzaSyA7KylsSyT3_0oQvhBtcrPc-gcdfVq90IQ",
   authDomain:        "gzplan.firebaseapp.com",
   projectId:         "gzplan",
   storageBucket:     "gzplan.firebasestorage.app",
   messagingSenderId: "186255862586",
   appId:             "1:186255862586:web:f36d21f76012ca43b8fe03"
-};
-firebase.initializeApp(FC);
-const db = firebase.firestore();
+});
+var db = firebase.firestore();
 
 function go(role) {
-  if (role === 'admin')   location.href = 'admin.html';
+  if (role === 'admin')        location.href = 'admin.html';
   else if (role === 'manager') location.href = 'manager.html';
-  else location.href = 'member.html';
+  else                         location.href = 'member.html';
 }
 
 async function doLogin() {
-  const id  = document.getElementById('uid').value.trim();
-  const pw  = document.getElementById('upw').value;
-  const err = document.getElementById('err');
-  const btn = document.getElementById('loginBtn');
+  var id  = document.getElementById('uid').value.trim();
+  var pw  = document.getElementById('upw').value;
+  var err = document.getElementById('err');
+  var btn = document.getElementById('loginBtn');
   err.textContent = '';
 
   if (!id || !pw) { err.textContent = '아이디와 비밀번호를 입력해주세요'; return; }
@@ -84,31 +80,33 @@ async function doLogin() {
   document.getElementById('spin').style.display = 'flex';
 
   try {
+    var userData;
+
     if (id === 'admin') {
-      let apw = 'admin1234', dis = false;
+      var apw = 'admin1234', dis = false;
       try {
-        const s = await db.collection('accounts').doc('admin').get();
-        if (s.exists) { apw = s.data().password || 'admin1234'; dis = s.data().disabled || false; }
+        var s = await db.collection('accounts').doc('admin').get();
+        if (s.exists) { apw = s.data().password || 'admin1234'; dis = !!s.data().disabled; }
       } catch(e) {}
       if (dis) { err.textContent = '비활성화된 계정이에요'; return; }
       if (pw !== apw) { err.textContent = '아이디 또는 비밀번호가 틀렸어요'; return; }
-      localStorage.setItem('tt_user', JSON.stringify({ id: 'admin', role: 'admin', displayName: 'admin' }));
-      go('admin'); return;
+      userData = { id: 'admin', role: 'admin', displayName: 'admin' };
+    } else {
+      var snap = await db.collection('accounts').doc(id).get();
+      if (!snap.exists) { err.textContent = '아이디 또는 비밀번호가 틀렸어요'; return; }
+      var d = snap.data();
+      if (d.password !== pw) { err.textContent = '아이디 또는 비밀번호가 틀렸어요'; return; }
+      if (d.disabled) { err.textContent = '비활성화된 계정이에요'; return; }
+      userData = { id: id, role: d.role, displayName: d.displayName || id };
     }
 
-    const snap = await db.collection('accounts').doc(id).get();
-    if (!snap.exists) { err.textContent = '아이디 또는 비밀번호가 틀렸어요'; return; }
-    const d = snap.data();
-    if (d.password !== pw) { err.textContent = '아이디 또는 비밀번호가 틀렸어요'; return; }
-    if (d.disabled) { err.textContent = '비활성화된 계정이에요'; return; }
-
-    localStorage.setItem('tt_user', JSON.stringify({
-      id, role: d.role, displayName: d.displayName || id
-    }));
-    go(d.role);
+    // 세션 저장 후 이동
+    localStorage.setItem('tt_user', JSON.stringify(userData));
+    go(userData.role);
 
   } catch(e) {
     err.textContent = '오류: ' + (e.message || String(e));
+    console.error(e);
   } finally {
     btn.disabled = false;
     document.getElementById('spin').style.display = 'none';
@@ -116,7 +114,7 @@ async function doLogin() {
 }
 
 document.getElementById('loginBtn').addEventListener('click', doLogin);
-document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+document.addEventListener('keydown', function(e) { if (e.key === 'Enter') doLogin(); });
 </script>
 </body>
 </html>

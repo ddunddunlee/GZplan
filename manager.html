@@ -404,7 +404,7 @@ if (ME.role !== 'manager' && ME.role !== 'admin') { localStorage.removeItem('tt_
 
 
 document.getElementById('sbUserName').textContent = ME.displayName;
-  document.getElementById('sbUserInitial').textContent = ME.displayName.slice(0,2);
+  document.getElementById('sbAvatar').textContent = ME.displayName.slice(0,2);
 loadReporters();
 
 window.logout = () => { localStorage.removeItem('tt_user'); sessionStorage.clear(); location.href = 'index.html'; };
@@ -434,7 +434,7 @@ let unsubs      = [];
 // 유틸 함수
 // ════════════════════════════════════════════
 const now     = () => new Date().toISOString();
-const setSync = v  => const sd=document.getElementById('syncDot');if(sd)sd.classList.toggle('syncing',v);
+const setSync = v => { const sd=document.getElementById('syncDot');if(sd)sd.classList.toggle('syncing',v); };
 
 function toast(msg) {
   const el = document.getElementById('toast');

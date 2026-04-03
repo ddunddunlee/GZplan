@@ -476,7 +476,7 @@ const sess=localStorage.getItem("tt_user");
 if(!sess){location.href="index.html";throw""}
 const ME=JSON.parse(sess);
 if(!ME.id){location.href="index.html";throw""}
-document.getElementById("tbUser").textContent=ME.displayName;
+document.getElementById("sbUserName").textContent=ME.displayName;
 window.logout=()=>{localStorage.removeItem('tt_user'); sessionStorage.clear(); location.href = 'index.html'};
 
 
@@ -604,7 +604,8 @@ window.newMeeting=()=>{
 };
 
 window.loadMeeting=id=>{
-  const m=meetings.find(x=>x.id===id);
+  const list=curMode==='shared'?sharedMeetings:meetings;
+  const m=list.find(x=>x.id===id);
   if(!m)return;
   curId=id;
   attendees=m.attendees||[];
@@ -628,7 +629,7 @@ window.loadMeeting=id=>{
 function initSpeechRecognition(){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(!SR){
-    document.getElementById("recCard").innerHTML=`
+    document.getElementById("recContent").innerHTML=`
       <div class="no-support">
         <p style="font-size:14px;font-weight:500;margin-bottom:8px">🚫 녹음 기능 미지원</p>
         <p style="font-size:13px">이 브라우저는 Web Speech API를 지원하지 않아요.<br>Chrome 또는 Edge를 사용해주세요.</p>
@@ -704,7 +705,7 @@ window.summarize=async()=>{
   if(!text){toast("전사 텍스트를 먼저 입력해주세요");return}
   const btn=document.getElementById("summarizeBtn");
   btn.disabled=true;
-  document.getElementById("aiLoading").style.display="flex";
+  document.getElementById("aiLoadingBadge").style.display="flex";
   document.getElementById("summaryArea").value="";
 
   const title=document.getElementById("meetTitle").value.trim()||"회의";
@@ -757,7 +758,7 @@ ${noteSection}
     toast("오류: "+e.message);
   }finally{
     btn.disabled=false;
-    document.getElementById("aiLoading").style.display="none";
+    document.getElementById("aiLoadingBadge").style.display="none";
   }
 };
 
@@ -783,7 +784,11 @@ window.saveMeeting=async()=>{
 
   try{
     if(curId){
-      await updateDoc(doc(db,"meetings",curId),data);
+      await updateDoc(
+        curMode==='shared'
+          ? doc(db,'meetings_shared',curId)
+          : doc(db,'meetings',ME.id,'items',curId),
+        data);
       toast("회의록이 수정됐어요 ✓");
     }else{
       data.createdAt=new Date().toISOString();
@@ -803,9 +808,11 @@ window.saveMeeting=async()=>{
       };
       const calRef=await addDoc(collection(db,"schedules"),calData);
       data.calendarId=calRef.id;
-      const ref=await addDoc(collection(db,"meetings"),data);
+      const ref=await addDoc(
+        isShared ? collection(db,'meetings_shared') : collection(db,'meetings',ME.id,'items'),
+        data);
       curId=ref.id;
-      document.getElementById("deleteBtn").style.display="";
+      document.getElementById("deleteMeetingBtn").style.display="";
       document.getElementById("calNote").style.display="";
       toast("회의록이 저장됐어요 ✓ 캘린더에도 등록됐어요");
     }

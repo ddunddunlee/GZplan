@@ -472,9 +472,6 @@ document.addEventListener('DOMContentLoaded', function() {
 <script type="module">
 import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import {getFirestore,collection,doc,getDoc,setDoc,onSnapshot,addDoc,updateDoc,deleteDoc,query,orderBy} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-
-import{initializeApp}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import{getFirestore,collection,doc,getDoc,setDoc,onSnapshot,addDoc,updateDoc,deleteDoc,query,orderBy}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 const FC={apiKey:"AIzaSyA7KylsSyT3_0oQvhBtcrPc-gcdfVq90IQ",authDomain:"gzplan.firebaseapp.com",projectId:"gzplan",storageBucket:"gzplan.firebasestorage.app",messagingSenderId:"186255862586",appId:"1:186255862586:web:f36d21f76012ca43b8fe03"};
 const MEMBER_IDS=["강신욱","김용욱","오문식","이길우","이도영","이영찬","이윤형"];
 const MEMBER_COLORS=["#378ADD","#7F77DD","#EF9F27","#639922","#E24B4A","#D4537E","#1D9E75"];
@@ -824,51 +821,6 @@ window.closeModal=id=>document.getElementById(id).classList.remove('show');
 document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===e.currentTarget)e.target.classList.remove('show')}));
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.overlay.show').forEach(o=>o.classList.remove('show'))});
 loadCategories();renderCalendar();
-</script>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  var lb = document.getElementById('logoutBtn');
-  if (lb) lb.addEventListener('click', function() {
-    localStorage.removeItem('tt_user'); sessionStorage.clear(); location.href = 'index.html';
-  });
-  document.querySelectorAll('[data-nav]').forEach(function(el) {
-    el.addEventListener('click', function() { location.href = el.dataset.nav; });
-  });
-  // 캘린더 버튼 바인딩
-  var addPersonal = document.getElementById('addPersonalBtn');
-  if (addPersonal) addPersonal.addEventListener('click', function() { if(window.openAddModal) window.openAddModal('personal'); });
-  var addCommonTop = document.getElementById('addCommonBtnTop');
-  if (addCommonTop) addCommonTop.addEventListener('click', function() { if(window.openAddModal) window.openAddModal('common'); });
-  var addCommon = document.getElementById('addCommonBtn');
-  if (addCommon) addCommon.addEventListener('click', function() { if(window.openAddModal) window.openAddModal('common'); });
-  var prevBtn = document.getElementById('prevBtn');
-  if (prevBtn) prevBtn.addEventListener('click', function() { if(window.moveMonth) window.moveMonth(-1); });
-  var nextBtn = document.getElementById('nextBtn');
-  if (nextBtn) nextBtn.addEventListener('click', function() { if(window.moveMonth) window.moveMonth(1); });
-  var todayBtn = document.getElementById('todayBtn');
-  if (todayBtn) todayBtn.addEventListener('click', function() { if(window.goToday) window.goToday(); });
-  var addCatBtn = document.getElementById('addCatBtn');
-  if (addCatBtn) addCatBtn.addEventListener('click', function() { if(window.addCategory) window.addCategory(); });
-  // 탭 전환
-  document.querySelectorAll('[data-tab]').forEach(function(btn) {
-    btn.addEventListener('click', function() { if(window.switchView) window.switchView(btn.dataset.tab); });
-  });
-  var typeFilterRow = document.getElementById('typeFilterRow');
-  if (typeFilterRow) typeFilterRow.addEventListener('click', function(e) {
-    var b = e.target.closest('[data-tf]');
-    if (b && window.setTF) window.setTF(b.dataset.tf);
-  });
-  var memberFilterRow = document.getElementById('memberFilterRow');
-  if (memberFilterRow) memberFilterRow.addEventListener('click', function(e) {
-    var b = e.target.closest('[data-mf]');
-    if (b && window.setMF) window.setMF(b.dataset.mf);
-  });
-});
-
-// 초기화
-loadCategories();
-renderCalendar();
 </script>
 </body>
 </html>

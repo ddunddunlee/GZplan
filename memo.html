@@ -402,15 +402,11 @@ mark{background:#FFF3CD;border-radius:2px}
 <script type="module">
 import{initializeApp}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import{getFirestore,collection,doc,onSnapshot,addDoc,updateDoc,deleteDoc,serverTimestamp,query,orderBy}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-
-import{initializeApp}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import{getFirestore,collection,doc,onSnapshot,addDoc,updateDoc,deleteDoc,serverTimestamp,query,orderBy}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 const C={apiKey:"AIzaSyA7KylsSyT3_0oQvhBtcrPc-gcdfVq90IQ",authDomain:"gzplan.firebaseapp.com",projectId:"gzplan",storageBucket:"gzplan.firebasestorage.app",messagingSenderId:"186255862586",appId:"1:186255862586:web:f36d21f76012ca43b8fe03"};
 const db=getFirestore(initializeApp(C));
 const sess=localStorage.getItem('tt_user');
 if(!sess)location.href='index.html';
 const ME=JSON.parse(sess||'{}');
-document.querySelectorAll('[data-nav]').forEach(el=>el.addEventListener('click',()=>location.href=el.dataset.nav));
 // 모든 역할 접근 가능 (팀원 개인별 메모)
 let memos=[],activeTag=null,editingId=null;
 const mRef=()=>collection(db,'memos',ME.id,'items');
@@ -493,11 +489,6 @@ document.getElementById('memoInput').addEventListener('keydown',e=>{if(e.key==='
 
 // render를 window에 노출
 window.renderMemo = render;
-window.clearSearch = () => {
-  document.getElementById('searchInput').value = '';
-  activeTag = null;
-  render();
-};
 </script>
 </body>
 </html>

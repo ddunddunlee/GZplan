@@ -227,51 +227,57 @@ button, [onclick], [data-nav], .sb-item, .task-card, .chip {
   </div>
 </div>
 <div class="main-wrap">
+  <!-- 탑바 -->
   <div class="topbar">
-  <button class="hamburger" id="hamburgerBtn" aria-label="메뉴">
-    <span></span><span></span><span></span>
-  </button>
+    <button class="hamburger" id="hamburgerBtn" aria-label="메뉴"><span></span><span></span><span></span></button>
     <div class="page-title">팀 업무 현황</div>
     <div class="topbar-right">
-      <button class="btn-ghost" id="addBtn" onclick="if(window.openModal)window.openModal()" style="display:none">+ 업무 추가</button>
+      <button class="btn-ghost" id="addBtn" onclick="if(window.openModal)window.openModal()" style="display:none;touch-action:manipulation">+ 업무 추가</button>
     </div>
   </div>
-  <div class="member-tabs" id="memberTabs"></div>
-  <div style="flex:1;padding:20px 24px 80px;display:flex;gap:16px;align-items:flex-start">
-    <div style="flex:1;min-width:0">
-      <div class="stats" id="statsRow"></div>
-      <div class="filter-row" id="memberFilterRow"></div>
-      <div class="filter-row" id="filterRow">
-        <button class="chip active" data-f="active">전체</button>
-        <button class="chip" data-f="todo">대기</button>
-        <button class="chip" data-f="inprogress">진행 중</button>
-        <button class="chip" data-f="done">완료</button>
-        <button class="chip" data-f="stale">⚠ 오래된 업무</button>
-      </div>
-      <div class="task-list" id="taskList"></div>
-    </div>
-    <div class="resizer" id="resizer"></div>
-    <div class="detail-panel" id="detailPanel">
-      <div class="dp-head">
-        <div style="flex:1;min-width:0">
-          <div class="dp-member" id="dpMember"></div>
-          <input class="dp-title-input" id="dpTitle"/>
+
+  <!-- 상단 뷰 탭 -->
+  <div style="display:flex;border-bottom:0.5px solid var(--border);background:var(--bg);padding:0 24px;flex-shrink:0">
+    <button id="viewTabWork" onclick="if(window.switchViewTab)window.switchViewTab('work')" style="padding:10px 16px;font-size:12px;font-weight:600;border:none;border-bottom:2px solid var(--text);background:transparent;color:var(--text);cursor:pointer;touch-action:manipulation">팀원 업무 현황</button>
+    <button id="viewTabPool" onclick="if(window.switchViewTab)window.switchViewTab('pool')" style="padding:10px 16px;font-size:12px;font-weight:500;border:none;border-bottom:2px solid transparent;background:transparent;color:var(--text2);cursor:pointer;touch-action:manipulation">📋 업무 관리</button>
+  </div>
+
+  <!-- 팀원 업무 현황 뷰 -->
+  <div id="viewWork">
+    <div style="flex:1;padding:20px 24px 80px;display:flex;gap:16px;align-items:flex-start">
+      <div style="flex:1;min-width:0">
+        <div class="stats" id="statsRow"></div>
+        <div class="filter-row" id="memberFilterRow"></div>
+        <div class="filter-row" id="filterRow">
+          <button class="chip active" data-f="active">전체</button>
+          <button class="chip" data-f="todo">대기</button>
+          <button class="chip" data-f="inprogress">진행 중</button>
+          <button class="chip" data-f="done">완료</button>
+          <button class="chip" data-f="stale">⚠ 오래된 업무</button>
         </div>
-        <button class="dp-close" id="closeDetailBtn" onclick="if(window.closeDetail)window.closeDetail()" style="touch-action:manipulation">✕</button>
+        <div class="task-list" id="taskList"></div>
       </div>
-      <div class="dp-meta" id="dpMeta"></div>
-      <div class="dp-sec">히스토리</div>
-      <div class="timeline" id="dpTimeline"></div>
-      <div class="dp-note">
-        <textarea class="note-input" id="noteInput" placeholder="팀장 코멘트 입력..."></textarea>
-        <button class="note-submit" id="addNoteBtn" onclick="if(window.addNote)window.addNote()" style="touch-action:manipulation">메모 추가</button>
+      <div class="resizer" id="resizer"></div>
+      <div class="detail-panel" id="detailPanel">
+        <div class="dp-head">
+          <div style="flex:1;min-width:0">
+            <div class="dp-member" id="dpMember"></div>
+            <input class="dp-title-input" id="dpTitle"/>
+          </div>
+          <button class="dp-close" id="closeDetailBtn" onclick="if(window.closeDetail)window.closeDetail()" style="touch-action:manipulation">✕</button>
+        </div>
+        <div class="dp-meta" id="dpMeta"></div>
+        <div class="dp-sec">히스토리</div>
+        <div class="timeline" id="dpTimeline"></div>
+        <div class="dp-note">
+          <textarea class="note-input" id="noteInput" placeholder="팀장 코멘트 입력..."></textarea>
+          <button class="note-submit" id="addNoteBtn" onclick="if(window.addNote)window.addNote()" style="touch-action:manipulation">메모 추가</button>
+        </div>
       </div>
     </div>
-    </div>
-  </div>
   </div><!-- end viewWork -->
 
-  <!-- 업무 관리(Pool) 뷰 -->
+  <!-- 업무 관리 뷰 -->
   <div id="viewPool" style="display:none;padding:20px 24px 80px">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
       <div>
@@ -284,8 +290,6 @@ button, [onclick], [data-nav], .sb-item, .task-card, .chip {
   </div>
 
 </div>
-</div>
-
 <div class="overlay" id="overlay">
   <div class="modal">
     <h3>새 업무 추가 — <span id="modalMemberName" style="color:var(--text2);font-weight:400"></span></h3>
@@ -1334,5 +1338,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+</div><!-- end app -->
 </body>
 </html>

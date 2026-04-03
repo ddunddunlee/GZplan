@@ -232,7 +232,7 @@ button, [onclick], [data-nav], .sb-item, .task-card, .chip {
     <button class="hamburger" id="hamburgerBtn" aria-label="메뉴"><span></span><span></span><span></span></button>
     <div class="page-title">팀 업무 현황</div>
     <div class="topbar-right">
-      <button class="btn-ghost" id="addBtn" onclick="if(window.openModal)window.openModal()" style="display:none;touch-action:manipulation">+ 업무 추가</button>
+      <button class="btn-ghost" id="addBtn" onclick="if(window.openModal)window.openModal()" style="touch-action:manipulation">+ 업무 추가</button>
     </div>
   </div>
 
@@ -742,7 +742,7 @@ function getAllTasks() {
 
 function renderMemberTabs() {
   const addBtn = document.getElementById('addBtn');
-  if (addBtn) addBtn.style.display = curTab !== '__all__' ? '' : 'none';
+  if (addBtn) addBtn.style.display = ''; // 항상 표시
 }
 
 function render() {
@@ -1017,7 +1017,7 @@ window.switchTab = id => {
   document.getElementById('detailPanel').classList.remove('open');
   document.getElementById('noteInput').value = '';
   document.querySelectorAll('.chip').forEach((c, i) => c.classList.toggle('active', i === 0));
-  document.getElementById('addBtn').style.display = id === '__all__' ? 'none' : '';
+  document.getElementById('addBtn').style.display = ''; // 항상 표시
   render();
 };
 

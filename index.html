@@ -46,7 +46,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Pretendard","Segoe UI",sans-s
 <script>
 // 진입 시 현재 localStorage 상태 확인
 var existing = localStorage.getItem('tt_user');
-log('진입 - 기존 tt_user: ' + (existing ? JSON.stringify(existing).slice(0,60) : 'null'));
 
 // 기존 세션 초기화
 localStorage.removeItem('tt_user');
@@ -64,8 +63,6 @@ var db = firebase.firestore();
 
 function go(role) {
   var dest = role === 'admin' ? 'admin.html' : role === 'manager' ? 'manager.html' : 'member.html';
-  log('이동: ' + dest + ' (role=' + role + ')');
-  log('저장된 tt_user: ' + localStorage.getItem('tt_user'));
   setTimeout(function() { location.href = dest; }, 100);
 }
 
@@ -89,7 +86,7 @@ async function doLogin() {
       try {
         var s = await db.collection('accounts').doc('admin').get();
         if (s.exists) { apw = s.data().password || 'admin1234'; dis = !!s.data().disabled; }
-      } catch(e) { log('admin 조회 오류: ' + e.message); }
+      } catch(e) { }
       if (dis) { err.textContent = '비활성화된 계정이에요'; return; }
       if (pw !== apw) { err.textContent = '아이디 또는 비밀번호가 틀렸어요'; return; }
       userData = { id: 'admin', role: 'admin', displayName: 'admin' };
@@ -102,9 +99,7 @@ async function doLogin() {
       userData = { id: id, role: d.role, displayName: d.displayName || id };
     }
 
-    log('userData: ' + JSON.stringify(userData));
     localStorage.setItem('tt_user', JSON.stringify(userData));
-    log('저장 확인: ' + localStorage.getItem('tt_user'));
     go(userData.role);
 
   } catch(e) {

@@ -135,6 +135,44 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 .member-tab .cnt{font-size:10px;padding:1px 5px;border-radius:var(--pill);background:var(--bg3);color:var(--text3)}
 .member-tab.active .cnt{background:var(--text);color:var(--bg)}
 .chip.member-chip{border-left-width:3px}
+
+/* ── 핵심 레이아웃 ── */
+html,body{height:100%}
+body{margin:0;padding:0}
+.app{display:flex;min-height:100vh;width:100%}
+.sidebar{width:220px;flex-shrink:0;background:#fff;border-right:0.5px solid #e5e5e3;display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100}
+.main-wrap{margin-left:220px;flex:1;display:flex;flex-direction:column;min-height:100vh;width:calc(100% - 220px)}
+.sb-brand{padding:20px 16px 16px;border-bottom:0.5px solid #f0f0ee}
+.sb-brand-name{font-size:15px;font-weight:600;color:#1a1a1a;letter-spacing:-.3px}
+.sb-brand-sub{font-size:11px;color:#a8a8a8;margin-top:2px}
+.sb-user{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:0.5px solid #f0f0ee}
+.sb-avatar{width:30px;height:30px;border-radius:50%;background:#1a1a1a;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;flex-shrink:0}
+.sb-user-name{font-size:13px;font-weight:500;color:#1a1a1a}
+.sb-user-role{font-size:11px;color:#a8a8a8}
+.sb-nav{flex:1;padding:8px 0;overflow-y:auto}
+.sb-sec{padding:4px 16px;font-size:10px;font-weight:600;color:#c0c0bc;letter-spacing:.08em;text-transform:uppercase;margin-top:10px}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;margin:1px 8px;border-radius:6px;transition:background .12s;user-select:none}
+.sb-item:hover{background:#f7f7f5}
+.sb-item.active{background:#f0f0ee}
+.sb-item.active .sb-label,.sb-item.active .sb-icon{color:#1a1a1a;font-weight:500}
+.sb-icon{font-size:14px;width:20px;text-align:center;color:#888;flex-shrink:0}
+.sb-label{font-size:13px;color:#6b6b6b;flex:1}
+.sb-badge{font-size:10px;font-weight:600;padding:1px 6px;border-radius:999px;background:#FCEBEB;color:#A32D2D}
+.sb-bottom{padding:12px 16px;border-top:0.5px solid #f0f0ee;display:flex;flex-direction:column;gap:8px}
+.sb-sync{display:flex;align-items:center;gap:6px;font-size:11px;color:#a8a8a8}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:#639922;flex-shrink:0}
+.sync-dot.syncing{background:#EF9F27;animation:blink .8s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.topbar{background:#fff;border-bottom:0.5px solid #e5e5e3;padding:0 24px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;flex-shrink:0;box-sizing:border-box}
+.page-title{font-size:15px;font-weight:600;color:#1a1a1a}
+.btn-ghost{padding:6px 14px;border-radius:6px;font-size:12px;border:0.5px solid #e5e5e3;background:transparent;color:#6b6b6b;cursor:pointer}
+.btn-ghost:hover{border-color:#d0d0cc;color:#1a1a1a}
+.btn-solid{padding:6px 16px;border-radius:6px;font-size:12px;font-weight:600;border:none;background:#1a1a1a;color:#fff;cursor:pointer}
+.btn-solid:hover{opacity:.82}
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(10px);background:#1a1a1a;color:#fff;font-size:12px;font-weight:500;padding:8px 18px;border-radius:999px;opacity:0;transition:all .25s;pointer-events:none;z-index:300;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(max-width:768px){.sidebar{display:none}.main-wrap{margin-left:0;width:100%}}
+
 </style>
 </head>
 <body>
@@ -151,7 +189,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
     <div class="sb-sec">도구</div>
     <div class="sb-item" data-nav="calendar.html"><div class="sb-icon">▦</div><div class="sb-label">캘린더</div></div>
     <div class="sb-item" data-nav="meeting.html"><div class="sb-icon">◈</div><div class="sb-label">회의록</div></div>
-    <div class="sb-item" data-nav="memo.html"><div class="sb-icon">◉</div><div class="sb-label">메모장</div></div>
+    <!-- 메모장: 팀원 전용 -->
     <div class="sb-sec">관리</div>
     <div class="sb-item" data-nav="admin.html"><div class="sb-icon">◯</div><div class="sb-label">계정 관리</div></div>
   </div>
@@ -301,7 +339,7 @@ document.getElementById('sbUserName').textContent = ME.displayName;
   document.getElementById('sbUserInitial').textContent = ME.displayName.slice(0,2);
 loadReporters();
 
-window.logout = () =>; { localStorage.removeItem('tt_user'); location.href = 'index.html'; };
+window.logout = () => { localStorage.removeItem('tt_user'); sessionStorage.clear(); location.href='index.html'; };
 
 // ════════════════════════════════════════════
 // Firestore 헬퍼
@@ -708,7 +746,7 @@ window.selTask = (docId, memberId) =>; {
   render();
 };
 
-window.closeDetail = () =>; {
+window.closeDetail = () => {
   selDocId = null;
   selMId   = null;
   document.getElementById('detailPanel').classList.remove('open');
@@ -827,7 +865,7 @@ window.updateDue = async (docId, memberId, val) =>; {
   });
 };
 
-window.addNote = async () =>; {
+window.addNote = async () => {
   const inp  = document.getElementById('noteInput');
   const text = inp.value.trim();
   if (!text || !selDocId || !selMId) return;
@@ -853,19 +891,19 @@ window.deleteHistory = async (docId, memberId, histId) =>; {
 // ════════════════════════════════════════════
 // 모달 — 업무 추가 (팀원 탭에서)
 // ════════════════════════════════════════════
-window.openModal = () =>; {
+window.openModal = () => {
   document.getElementById('modalMemberName').textContent = curTab;
   document.getElementById('overlay').classList.add('show');
   setTimeout(() => document.getElementById('iTitle').focus(), 80);
 };
-window.closeModal = () =>; {
+window.closeModal = () => {
   document.getElementById('overlay').classList.remove('show');
   ['iTitle', 'iDesc', 'iStart', 'iDue'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('iPriority').value = '3';
   document.getElementById('iReporter').value = '';
 };
 
-window.addTask = async () =>; {
+window.addTask = async () => {
   if (curTab === '__all__') return;
   const title = document.getElementById('iTitle').value.trim();
   if (!title) { toast('업무명을 입력해주세요'); return; }
@@ -952,7 +990,6 @@ document.querySelectorAll('[data-mfilter]').forEach(btn => {
 });
 
 // ── DOM 이벤트 바인딩 (module defer 대응) ──
-document.getElementById('logoutBtn')?.addEventListener('click', () => window.logout?.());
 document.getElementById('modalCancelBtn')?.addEventListener('click', () => window.closeModal?.());
 document.getElementById('addTaskOkBtn')?.addEventListener('click', () => window.addTask?.());
 document.getElementById('addNoteBtn')?.addEventListener('click', () => window.addNote?.());

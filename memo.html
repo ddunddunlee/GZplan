@@ -13,7 +13,7 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#fff;--bg2:#f5f5f3;--bg3:#eaeae8;--text:#1a1a1a;--text2:#6b6b6b;--text3:#a8a8a8;--border:rgba(0,0,0,.09);--border2:rgba(0,0,0,.16);--border3:rgba(0,0,0,.30);--radius:12px;--radius-sm:8px;--pill:999px;--accent:#378ADD;--accent-bg:#E6F1FB}
 @media(prefers-color-scheme:dark){:root{--bg:#1c1c1e;--bg2:#2c2c2e;--bg3:#111110;--text:#f2f2f7;--text2:#aeaeb2;--text3:#636366;--border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.15);--border3:rgba(255,255,255,.30)}}
-body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-serif;background:var(--bg3);color:var(--text);min-height:100vh}
+body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-serif;background:#f7f7f5;color:#1a1a1a;min-height:100vh;display:flex}
 .header{display:flex;align-items:flex-end;justify-content:space-between;padding:2rem 1rem 1.5rem;max-width:780px;margin:0 auto}
 .header-left h1{font-size:22px;font-weight:600;letter-spacing:-.3px}
 .header-left p{font-size:13px;color:var(--text2);margin-top:3px}
@@ -70,6 +70,30 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 </style>
 </head>
 <body>
+<div style="display:flex;width:100%;min-height:100vh">
+<div style="width:220px;flex-shrink:0;background:#fff;border-right:0.5px solid #e5e5e3;display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100">
+  <div style="padding:20px 16px 16px;border-bottom:0.5px solid #f0f0ee">
+    <div style="font-size:15px;font-weight:600;color:#1a1a1a">GZ Plan</div>
+    <div style="font-size:11px;color:#a8a8a8;margin-top:2px">경영기획팀</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:0.5px solid #f0f0ee">
+    <div id="sbAv" style="width:30px;height:30px;border-radius:50%;background:#1a1a1a;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;flex-shrink:0">--</div>
+    <div><div id="sbNm" style="font-size:13px;font-weight:500;color:#1a1a1a"></div><div id="sbRl" style="font-size:11px;color:#a8a8a8"></div></div>
+  </div>
+  <div style="flex:1;padding:8px 0;overflow-y:auto">
+    <div style="padding:4px 16px;font-size:10px;font-weight:600;color:#c0c0bc;letter-spacing:.08em;text-transform:uppercase;margin-top:10px">업무</div>
+    <div id="sbTask" onclick="" style="display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;margin:1px 8px;border-radius:6px" onmouseover="this.style.background='#f7f7f5'" onmouseout="this.style.background='transparent'"><span style="font-size:15px;width:20px;text-align:center;color:#888">☐</span><span style="font-size:13px;color:#6b6b6b">내 업무 / 팀 업무</span></div>
+    <div style="padding:4px 16px;font-size:10px;font-weight:600;color:#c0c0bc;letter-spacing:.08em;text-transform:uppercase;margin-top:10px">도구</div>
+    <div onclick="location.href='calendar.html'" style="display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;margin:1px 8px;border-radius:6px" onmouseover="this.style.background='#f7f7f5'" onmouseout="this.style.background='transparent'"><span style="font-size:15px;width:20px;text-align:center;color:#888">▦</span><span style="font-size:13px;color:#6b6b6b">캘린더</span></div>
+    <div onclick="location.href='meeting.html'" style="display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;margin:1px 8px;border-radius:6px" onmouseover="this.style.background='#f7f7f5'" onmouseout="this.style.background='transparent'"><span style="font-size:15px;width:20px;text-align:center;color:#888">◈</span><span style="font-size:13px;color:#6b6b6b">회의록</span></div>
+    <div style="display:flex;align-items:center;gap:10px;padding:9px 16px;margin:1px 8px;border-radius:6px;background:#f0f0ee"><span style="font-size:15px;width:20px;text-align:center;color:#1a1a1a">◉</span><span style="font-size:13px;color:#1a1a1a;font-weight:500">메모장</span></div>
+  </div>
+  <div style="padding:12px 16px;border-top:0.5px solid #f0f0ee">
+    <button onclick="logout()" style="font-size:11px;padding:5px 10px;border:0.5px solid #e5e5e3;border-radius:6px;background:transparent;color:#6b6b6b;cursor:pointer;width:100%">로그아웃</button>
+  </div>
+</div>
+<div style="margin-left:220px;flex:1;display:flex;flex-direction:column">
+
 <div class="header">
   <div class="header-left">
     <h1>회의 메모장</h1>
@@ -209,5 +233,7 @@ document.getElementById('overlay').addEventListener('click',e=>{if(e.target===e.
 document.addEventListener('keydown',e=>{if(e.key==='Escape')window.closeModal();});
 document.getElementById('memoInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.metaKey||e.ctrlKey))window.saveMemo();});
 </script>
+</div><!-- main -->
+</div><!-- flex -->
 </body>
 </html>

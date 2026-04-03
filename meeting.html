@@ -22,8 +22,8 @@
   --purple-bg:#EEEDFE;--purple-t:#3C3489;
 }
 @media(prefers-color-scheme:dark){:root{--bg:#1c1c1e;--bg2:#2c2c2e;--bg3:#111110;--text:#f2f2f7;--text2:#aeaeb2;--text3:#636366;--border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.15);--border3:rgba(255,255,255,.30)}}
-body{font-family:-apple-system,BlinkMacSystemFont,"Pretendard","Segoe UI",sans-serif;background:var(--bg3);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
-.topbar{background:var(--bg);border-bottom:.5px solid var(--border);padding:.85rem 1.5rem;display:flex;align-items:center;gap:12px;flex-wrap:wrap;flex-shrink:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Pretendard","Segoe UI",sans-serif;background:#f7f7f5;color:#1a1a1a;min-height:100vh}
+.topbar{background:#fff;border-bottom:0.5px solid #e5e5e3;padding:.85rem 1.5rem;display:flex;align-items:center;gap:12px;flex-wrap:wrap;flex-shrink:0}
 .topbar h1{font-size:16px;font-weight:600}
 .tb-badge{font-size:11px;font-weight:600;padding:2px 8px;border-radius:var(--pill);background:var(--blue-bg);color:var(--blue-t)}
 .tb-right{margin-left:auto;display:flex;gap:8px;align-items:center}
@@ -98,15 +98,33 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Pretendard","Segoe UI",sans-s
 </style>
 </head>
 <body>
-
-<div class="topbar">
-  <h1>회의록</h1>
-  <span class="tb-badge">GZ 경영기획팀</span>
-  <div class="tb-right">
-    <span id="tbUser" style="font-size:12px;color:var(--text2)"></span>
-    <button class="icon-btn" onclick="goBack()">← 업무 트래커</button>
-    <button class="icon-btn" onclick="logout()">로그아웃</button>
+<div style="display:flex;width:100%;min-height:100vh">
+<div style="width:220px;flex-shrink:0;background:#fff;border-right:0.5px solid #e5e5e3;display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100">
+  <div style="padding:20px 16px 16px;border-bottom:0.5px solid #f0f0ee">
+    <div style="font-size:15px;font-weight:600;color:#1a1a1a;letter-spacing:-.3px">GZ Plan</div>
+    <div style="font-size:11px;color:#a8a8a8;margin-top:2px">경영기획팀</div>
   </div>
+  <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:0.5px solid #f0f0ee">
+    <div id="sbAvatar" style="width:30px;height:30px;border-radius:50%;background:#1a1a1a;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;flex-shrink:0">--</div>
+    <div><div id="sbName" style="font-size:13px;font-weight:500;color:#1a1a1a"></div><div id="sbRole" style="font-size:11px;color:#a8a8a8"></div></div>
+  </div>
+  <div style="flex:1;padding:8px 0;overflow-y:auto">
+    <div style="padding:4px 16px;font-size:10px;font-weight:600;color:#c0c0bc;letter-spacing:.08em;text-transform:uppercase;margin-top:10px">업무</div>
+    <div id="sb-task" onclick="goBack()" style="display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;margin:1px 8px;border-radius:6px" onmouseover="this.style.background='#f7f7f5'" onmouseout="this.style.background='transparent'"><span style="font-size:15px;width:20px;text-align:center;color:#888">☐</span><span style="font-size:13px;color:#6b6b6b">내 업무 / 팀 업무</span></div>
+    <div style="padding:4px 16px;font-size:10px;font-weight:600;color:#c0c0bc;letter-spacing:.08em;text-transform:uppercase;margin-top:10px">도구</div>
+    <div onclick="location.href='calendar.html'" style="display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;margin:1px 8px;border-radius:6px" onmouseover="this.style.background='#f7f7f5'" onmouseout="this.style.background='transparent'"><span style="font-size:15px;width:20px;text-align:center;color:#888">▦</span><span style="font-size:13px;color:#6b6b6b">캘린더</span></div>
+    <div style="display:flex;align-items:center;gap:10px;padding:9px 16px;margin:1px 8px;border-radius:6px;background:#f0f0ee"><span style="font-size:15px;width:20px;text-align:center;color:#1a1a1a">◈</span><span style="font-size:13px;color:#1a1a1a;font-weight:500">회의록</span></div>
+    <div onclick="location.href='memo.html'" style="display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;margin:1px 8px;border-radius:6px" onmouseover="this.style.background='#f7f7f5'" onmouseout="this.style.background='transparent'"><span style="font-size:15px;width:20px;text-align:center;color:#888">◉</span><span style="font-size:13px;color:#6b6b6b">메모장</span></div>
+  </div>
+  <div style="padding:12px 16px;border-top:0.5px solid #f0f0ee">
+    <button onclick="logout()" style="font-size:11px;padding:5px 10px;border:0.5px solid #e5e5e3;border-radius:6px;background:transparent;color:#6b6b6b;cursor:pointer;width:100%">로그아웃</button>
+  </div>
+</div>
+<div style="margin-left:220px;flex:1;display:flex;overflow:hidden">
+
+<div style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0">
+<div class="topbar">
+  <div style="font-size:15px;font-weight:600;color:#1a1a1a">회의록</div>
 </div>
 
 <div class="layout">
@@ -579,5 +597,8 @@ document.getElementById("delOverlay").addEventListener("click",e=>{if(e.target==
 window.newMeeting();
 initSpeechRecognition();
 </script>
+</div><!-- content -->
+</div><!-- main -->
+</div><!-- flex -->
 </body>
 </html>

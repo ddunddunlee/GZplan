@@ -5,705 +5,254 @@
 <link rel="manifest" href="./manifest.json" />
 <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="GZ기획팀" />
-<meta name="theme-color" content="#185FA5" />
+<meta name="theme-color" content="#ffffff" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>어드민 — 계정 관리</title>
+<title>GZ Plan — 계정 관리</title>
 <style>
-/* ── 리셋 & 변수 ── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-  --bg: #fff;       --bg2: #f5f5f3;   --bg3: #eaeae8;
-  --text: #1a1a1a;  --text2: #6b6b6b; --text3: #a8a8a8;
-  --border:  rgba(0,0,0,.09);
-  --border2: rgba(0,0,0,.16);
-  --border3: rgba(0,0,0,.30);
-  --radius: 12px;  --radius-sm: 8px;  --pill: 999px;
-  --blue-bg: #E6F1FB; --blue-t: #0C447C;
-  --green-bg: #EAF3DE; --green-t: #27500A;
-  --amber-bg: #FAEEDA; --amber-t: #633806;
-  --red: #a32d2d;  --red-bg: #FCEBEB;
-  --purple-bg: #EEEDFE; --purple-t: #3C3489;
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#fff;--bg2:#f7f7f5;--bg3:#f0f0ee;
+  --text:#1a1a1a;--text2:#6b6b6b;--text3:#a8a8a8;
+  --border:#e5e5e3;--border2:#d0d0cc;
+  --radius:10px;--radius-sm:6px;--pill:999px;
+  --blue:#378ADD;--blue-bg:#E6F1FB;--blue-t:#0C447C;
+  --green-bg:#EAF3DE;--green-t:#27500A;
+  --amber-bg:#FAEEDA;--amber-t:#633806;
+  --red:#A32D2D;--red-bg:#FCEBEB;
+  --purple-bg:#EEEDFE;--purple-t:#3C3489;
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #1c1c1e;  --bg2: #2c2c2e;   --bg3: #111110;
-    --text: #f2f2f7; --text2: #aeaeb2; --text3: #636366;
-    --border:  rgba(255,255,255,.08);
-    --border2: rgba(255,255,255,.15);
-    --border3: rgba(255,255,255,.30);
-  }
-}
-
-/* ── 레이아웃 ── */
-body { font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Segoe UI', sans-serif; background: var(--bg3); color: var(--text); min-height: 100vh; }
-#gate { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; gap: 16px; }
-.spin { width: 26px; height: 26px; border: 2.5px solid var(--border2); border-top-color: var(--text); border-radius: 50%; animation: sp .7s linear infinite; }
-@keyframes sp { to { transform: rotate(360deg); } }
-#app { display: none; }
-
-/* ── 탑바 ── */
-.topbar { background: var(--bg); border-bottom: .5px solid var(--border); padding: .85rem 1.5rem; display: flex; align-items: center; gap: 12px; }
-.topbar h1 { font-size: 16px; font-weight: 700; }
-.topbar-badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: var(--pill); background: var(--purple-bg); color: var(--purple-t); }
-.topbar-right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
-.topbar-user  { font-size: 12px; color: var(--text2); }
-.icon-btn { padding: 6px 14px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 500; border: .5px solid var(--border2); background: var(--bg); color: var(--text2); cursor: pointer; }
-.icon-btn:hover { border-color: var(--border3); color: var(--text); }
-
-/* ── 콘텐츠 ── */
-.content { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 6rem; }
-
-/* ── 통계 카드 ── */
-.stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.75rem; }
-.stat-card  { background: var(--bg); border-radius: var(--radius); padding: .85rem 1rem; border: .5px solid var(--border); }
-.stat-label { font-size: 12px; color: var(--text2); margin-bottom: 4px; }
-.stat-value { font-size: 24px; font-weight: 700; }
-
-/* ── 초기 계정 등록 배너 ── */
-.init-box { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; border-radius: var(--radius); padding: 1rem 1.25rem; margin-bottom: 1.25rem; border: .5px solid rgba(99,56,6,.35); background: var(--amber-bg); }
-.init-box.done { border-color: rgba(39,80,10,.35); background: var(--green-bg); }
-.init-box-text { font-size: 13px; color: var(--amber-t); line-height: 1.5; }
-.init-box.done .init-box-text { color: var(--green-t); }
-.init-box strong { font-weight: 700; }
-.init-btn { flex-shrink: 0; padding: 10px 18px; font-size: 14px; font-weight: 700; border-radius: var(--radius-sm); border: none; background: var(--amber-t); color: #fff; cursor: pointer; }
-.init-box.done .init-btn { background: var(--green-t); }
-.init-btn:disabled { opacity: .5; }
-
-/* ── admin 비밀번호 변경 ── */
-.pw-section { background: var(--bg); border: .5px solid var(--border); border-radius: var(--radius); padding: 1.2rem 1.25rem; margin-bottom: 1.5rem; }
-.pw-section-title { font-size: 14px; font-weight: 700; margin-bottom: 1rem; }
-.pw-fields { display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; }
-.pw-fields .fg { flex: 1; min-width: 140px; margin: 0; }
-
-/* ── 폼 공통 ── */
-.fg { margin-bottom: .9rem; }
-.fg label { font-size: 12px; color: var(--text2); display: block; margin-bottom: 5px; }
-.fg input, .fg select {
-  width: 100%; padding: 9px 11px; font-size: 14px;
-  border: .5px solid var(--border2); border-radius: var(--radius-sm);
-  background: var(--bg2); color: var(--text); font-family: inherit; outline: none;
-}
-.fg input:focus, .fg select:focus { border-color: #378ADD; }
-.err-line { font-size: 12px; color: var(--red); min-height: 18px; margin-top: 6px; }
-
-/* ── 섹션 헤더 ── */
-.section-head  { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
-.section-title { font-size: 15px; font-weight: 700; }
-.add-btn { padding: 7px 18px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 700; background: var(--text); color: var(--bg); border: none; cursor: pointer; }
-.add-btn:hover { opacity: .82; }
-
-/* ── 계정 목록 ── */
-.account-list { display: flex; flex-direction: column; gap: 7px; }
-.account-row {
-  background: var(--bg); border: .5px solid var(--border); border-radius: var(--radius);
-  padding: .85rem 1.1rem;
-  display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
-}
-.account-row.is-admin { border-color: rgba(60,52,137,.28); }
-.acc-info  { flex: 1; min-width: 100px; }
-.acc-name  { font-size: 14px; font-weight: 600; }
-.acc-sub   { font-size: 12px; color: var(--text2); margin-top: 2px; }
-
-/* 역할/상태 배지 */
-.role-badge   { font-size: 11px; font-weight: 600; padding: 2px 10px; border-radius: var(--pill); }
-.role-admin   { background: var(--purple-bg); color: var(--purple-t); }
-.role-manager { background: var(--blue-bg);   color: var(--blue-t); }
-.role-member  { background: var(--green-bg);  color: var(--green-t); }
-.status-badge { font-size: 11px; font-weight: 600; padding: 2px 10px; border-radius: var(--pill); }
-.status-on    { background: var(--green-bg); color: var(--green-t); }
-.status-off   { background: var(--red-bg);   color: var(--red); }
-
-/* 계정 액션 버튼 */
-.acc-actions { display: flex; gap: 5px; flex-wrap: wrap; }
-.act-btn { padding: 6px 12px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 500; border: .5px solid var(--border2); background: transparent; color: var(--text2); cursor: pointer; }
-.act-btn:hover  { border-color: var(--border3); color: var(--text); }
-.act-btn.act-enable  { color: var(--green-t); border-color: rgba(39,80,10,.35); }
-.act-btn.act-disable { color: var(--red);     border-color: rgba(163,45,45,.35); }
-.act-btn.danger      { color: var(--red);     border-color: rgba(163,45,45,.35); }
-.empty { text-align: center; padding: 3rem; color: var(--text3); font-size: 14px; }
-
-/* ── 모달 ── */
-.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); align-items: center; justify-content: center; z-index: 200; padding: 1rem; }
-.overlay.show { display: flex; }
-.modal { background: var(--bg); border-radius: var(--radius); border: .5px solid var(--border2); padding: 1.5rem; width: 100%; max-width: 400px; box-shadow: 0 8px 32px rgba(0,0,0,.14); }
-.modal h3 { font-size: 16px; font-weight: 700; margin-bottom: 1.25rem; }
-.modal-note { font-size: 13px; color: var(--text2); margin-bottom: 1.25rem; line-height: 1.5; }
-.pw-row { display: flex; gap: 6px; }
-.pw-row input { flex: 1; }
-.pw-show { padding: 9px 11px; border: .5px solid var(--border2); border-radius: var(--radius-sm); background: var(--bg2); cursor: pointer; font-size: 13px; color: var(--text2); }
-.modal-btns { display: flex; gap: 8px; justify-content: flex-end; margin-top: 1.25rem; }
-.btn-cancel { padding: 7px 18px; font-size: 13px; border: .5px solid var(--border2); border-radius: var(--radius-sm); background: transparent; color: var(--text2); cursor: pointer; }
-.btn-ok     { padding: 7px 20px; font-size: 13px; font-weight: 700; border: none; border-radius: var(--radius-sm); background: var(--text); color: var(--bg); cursor: pointer; }
-
-/* ── 토스트 ── */
-.toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(10px); background: var(--text); color: var(--bg); font-size: 13px; font-weight: 500; padding: 9px 20px; border-radius: var(--pill); opacity: 0; transition: all .25s; pointer-events: none; z-index: 300; white-space: nowrap; }
-.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-serif;background:var(--bg2);color:var(--text);min-height:100vh;display:flex}
+.app{display:flex;width:100%;min-height:100vh}
+.sidebar{width:220px;flex-shrink:0;background:var(--bg);border-right:0.5px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100}
+.sb-brand{padding:20px 16px 16px;border-bottom:0.5px solid var(--bg3)}
+.sb-brand-name{font-size:15px;font-weight:600;color:var(--text);letter-spacing:-.3px}
+.sb-brand-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.sb-user{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:0.5px solid var(--bg3)}
+.sb-avatar{width:30px;height:30px;border-radius:50%;background:var(--purple-t);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;flex-shrink:0}
+.sb-user-name{font-size:13px;font-weight:500;color:var(--text)}
+.sb-user-role{font-size:11px;color:var(--purple-t)}
+.sb-nav{flex:1;padding:8px 0;overflow-y:auto}
+.sb-section{padding:4px 16px;font-size:10px;font-weight:600;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-top:10px}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;margin:1px 8px;border-radius:var(--radius-sm);transition:background .12s}
+.sb-item:hover{background:var(--bg2)}
+.sb-item.active{background:var(--bg3)}
+.sb-item.active .sb-label{color:var(--text);font-weight:500}
+.sb-icon{font-size:15px;width:20px;text-align:center;color:var(--text2)}
+.sb-label{font-size:13px;color:var(--text2);flex:1}
+.sb-bottom{padding:12px 16px;border-top:0.5px solid var(--bg3)}
+.main-wrap{margin-left:220px;flex:1;display:flex;flex-direction:column;min-height:100vh}
+.topbar{background:var(--bg);border-bottom:0.5px solid var(--border);padding:0 24px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.page-title{font-size:15px;font-weight:600;color:var(--text)}
+.content{max-width:860px;margin:0 auto;padding:1.5rem 24px 6rem;width:100%}
+#gate{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:16px}
+.spin{width:26px;height:26px;border:2.5px solid var(--border);border-top-color:var(--text);border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+#app{display:none}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1.75rem}
+.stat-card{background:var(--bg);border-radius:var(--radius);padding:.85rem 1rem;border:0.5px solid var(--border)}
+.stat-label{font-size:12px;color:var(--text2);margin-bottom:4px}
+.stat-value{font-size:24px;font-weight:700}
+.init-box{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;border-radius:var(--radius);padding:1rem 1.25rem;margin-bottom:1.25rem;border:0.5px solid rgba(99,56,6,.35);background:var(--amber-bg)}
+.init-box.done{border-color:rgba(39,80,10,.35);background:var(--green-bg)}
+.init-box-text{font-size:13px;color:var(--amber-t);line-height:1.5}
+.init-box.done .init-box-text{color:var(--green-t)}
+.init-box strong{font-weight:700}
+.init-btn{flex-shrink:0;padding:9px 16px;font-size:13px;font-weight:700;border-radius:var(--radius-sm);border:none;background:var(--amber-t);color:#fff;cursor:pointer}
+.init-box.done .init-btn{background:var(--green-t)}
+.init-btn:disabled{opacity:.5}
+.pw-section{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:1.2rem 1.25rem;margin-bottom:1.5rem}
+.pw-section-title{font-size:14px;font-weight:700;margin-bottom:1rem}
+.pw-fields{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap}
+.pw-fields .fg{flex:1;min-width:140px;margin:0}
+.fg{margin-bottom:.9rem}
+.fg label{font-size:12px;color:var(--text2);display:block;margin-bottom:5px}
+.fg input,.fg select{width:100%;padding:9px 11px;font-size:14px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:inherit;outline:none}
+.fg input:focus,.fg select:focus{border-color:var(--border2)}
+.err-line{font-size:12px;color:var(--red);min-height:18px;margin-top:6px}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.section-title{font-size:15px;font-weight:700}
+.add-btn{padding:7px 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:700;background:var(--text);color:var(--bg);border:none;cursor:pointer}
+.add-btn:hover{opacity:.82}
+.account-list{display:flex;flex-direction:column;gap:7px}
+.account-row{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:.85rem 1.1rem;display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.account-row.is-admin{border-color:rgba(60,52,137,.28)}
+.acc-info{flex:1;min-width:100px}
+.acc-name{font-size:14px;font-weight:600}
+.acc-sub{font-size:12px;color:var(--text2);margin-top:2px}
+.role-badge{font-size:11px;font-weight:600;padding:2px 10px;border-radius:var(--pill)}
+.role-admin{background:var(--purple-bg);color:var(--purple-t)}
+.role-manager{background:var(--blue-bg);color:var(--blue-t)}
+.role-member{background:var(--green-bg);color:var(--green-t)}
+.status-badge{font-size:11px;font-weight:600;padding:2px 10px;border-radius:var(--pill)}
+.status-on{background:var(--green-bg);color:var(--green-t)}
+.status-off{background:var(--red-bg);color:var(--red)}
+.acc-actions{display:flex;gap:5px;flex-wrap:wrap}
+.act-btn{padding:5px 10px;border-radius:var(--radius-sm);font-size:12px;font-weight:500;border:0.5px solid var(--border);background:transparent;color:var(--text2);cursor:pointer}
+.act-btn:hover{border-color:var(--border2);color:var(--text)}
+.act-btn.act-enable{color:var(--green-t);border-color:rgba(39,80,10,.35)}
+.act-btn.act-disable{color:var(--red);border-color:rgba(163,45,45,.35)}
+.act-btn.danger{color:var(--red);border-color:rgba(163,45,45,.35)}
+.empty{text-align:center;padding:3rem;color:var(--text3);font-size:14px}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);align-items:center;justify-content:center;z-index:200;padding:1rem}
+.overlay.show{display:flex}
+.modal{background:var(--bg);border-radius:var(--radius);border:0.5px solid var(--border);padding:1.5rem;width:100%;max-width:400px}
+.modal h3{font-size:15px;font-weight:700;margin-bottom:1.25rem}
+.modal-note{font-size:13px;color:var(--text2);margin-bottom:1.25rem;line-height:1.5}
+.pw-row{display:flex;gap:6px}
+.pw-row input{flex:1}
+.pw-show{padding:9px 11px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);cursor:pointer;font-size:13px;color:var(--text2)}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem}
+.btn-cancel{padding:7px 16px;font-size:13px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--text2);cursor:pointer}
+.btn-ok{padding:7px 18px;font-size:13px;font-weight:700;border:none;border-radius:var(--radius-sm);background:var(--text);color:var(--bg);cursor:pointer}
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(10px);background:var(--text);color:var(--bg);font-size:13px;font-weight:500;padding:9px 20px;border-radius:var(--pill);opacity:0;transition:all .25s;pointer-events:none;z-index:300;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
 </head>
 <body>
+<div class="app">
 
-<div id="gate"><div class="spin"></div></div>
-
-<div id="app">
-  <!-- 탑바 -->
-  <div class="topbar">
-    <h1>어드민</h1>
-    <span class="topbar-badge">계정 관리</span>
-    <div class="topbar-right">
-      <span class="topbar-user" id="topUser"></span>
-      <button class="icon-btn" onclick="logout()">로그아웃</button>
-    </div>
+<div class="sidebar">
+  <div class="sb-brand"><div class="sb-brand-name">GZ Plan</div><div class="sb-brand-sub">경영기획팀</div></div>
+  <div class="sb-user">
+    <div class="sb-avatar">AD</div>
+    <div><div class="sb-user-name">admin</div><div class="sb-user-role">어드민</div></div>
   </div>
-
-  <div class="content">
-
-    <!-- 통계 -->
-    <div class="stats-row" id="statsRow"></div>
-
-    <!-- 초기 계정 등록 배너 -->
-    <div class="init-box" id="initBox">
-      <div class="init-box-text">
-        <strong>초기 계정 미등록</strong><br>
-        팀원 7명의 계정을 등록해주세요. 아이디: 이름, 비밀번호: 1234
-      </div>
-      <button class="init-btn" id="initBtn" onclick="initAccounts()">팀원 계정 일괄 등록</button>
-    </div>
-
-    <!-- admin 비밀번호 변경 -->
-    <div class="pw-section">
-      <div class="pw-section-title">🔐 내 비밀번호 변경 (admin)</div>
-      <div class="pw-fields">
-        <div class="fg">
-          <label>현재 비밀번호</label>
-          <input id="curPw" type="password" placeholder="현재 비밀번호" />
-        </div>
-        <div class="fg">
-          <label>새 비밀번호</label>
-          <input id="newAdminPw" type="password" placeholder="새 비밀번호 (4자 이상)" />
-        </div>
-        <div class="fg">
-          <label>새 비밀번호 확인</label>
-          <input id="confirmAdminPw" type="password" placeholder="한 번 더 입력" />
-        </div>
-        <button class="btn-ok" style="padding:9px 18px;margin-bottom:.9rem" onclick="changeAdminPw()">변경</button>
-      </div>
-      <div class="err-line" id="adminPwErr"></div>
-    </div>
-
-    <!-- 계정 목록 -->
-    <div class="section-head">
-      <div class="section-title">계정 목록</div>
-      <button class="add-btn" onclick="openAddModal()">+ 계정 추가</button>
-    </div>
-    <div class="account-list" id="accountList"></div>
-
-  <!-- 보고자 목록 관리 -->
-    <div style="margin-top:2rem">
-      <div class="section-head">
-        <div class="section-title">최종보고자 목록 관리</div>
-        <button class="add-btn" onclick="openReporterModal()">+ 보고자 추가</button>
-      </div>
-      <div style="background:var(--bg);border:.5px solid var(--border);border-radius:var(--radius);padding:1rem 1.25rem;">
-        <div id="reporterList" style="display:flex;flex-wrap:wrap;gap:8px;min-height:32px;"></div>
-        <p style="font-size:12px;color:var(--text3);margin-top:10px">팀원이 업무 추가 시 선택할 수 있는 최종보고자 목록이에요.</p>
-      </div>
-    </div>
-
+  <div class="sb-nav">
+    <div class="sb-section">업무</div>
+    <div class="sb-item" onclick="location.href='manager.html'"><div class="sb-icon">☐</div><div class="sb-label">팀 업무 현황</div></div>
+    <div class="sb-section">도구</div>
+    <div class="sb-item" onclick="location.href='calendar.html'"><div class="sb-icon">▦</div><div class="sb-label">캘린더</div></div>
+    <div class="sb-item" onclick="location.href='meeting.html'"><div class="sb-icon">◈</div><div class="sb-label">회의록</div></div>
+    <div class="sb-section">관리</div>
+    <div class="sb-item active"><div class="sb-icon">◯</div><div class="sb-label">계정 관리</div></div>
+  </div>
+  <div class="sb-bottom">
+    <button onclick="logout()" style="font-size:11px;padding:5px 10px;border:0.5px solid var(--border);border-radius:6px;background:transparent;color:var(--text2);cursor:pointer;width:100%">로그아웃</button>
   </div>
 </div>
 
-<!-- 계정 추가 모달 -->
+<div class="main-wrap">
+  <div id="gate"><div class="spin"></div></div>
+  <div id="app">
+    <div class="topbar"><div class="page-title">계정 관리</div></div>
+    <div class="content">
+      <div class="stats-row" id="statsRow"></div>
+      <div class="init-box" id="initBox">
+        <div class="init-box-text"><strong>초기 계정 미등록</strong><br>팀원 7명의 계정을 등록해주세요. 아이디: 이름, 비밀번호: 1234</div>
+        <button class="init-btn" id="initBtn" onclick="initAccounts()">팀원 계정 일괄 등록</button>
+      </div>
+      <div class="pw-section">
+        <div class="pw-section-title">🔐 내 비밀번호 변경 (admin)</div>
+        <div class="pw-fields">
+          <div class="fg"><label>현재 비밀번호</label><input id="curPw" type="password" placeholder="현재 비밀번호" /></div>
+          <div class="fg"><label>새 비밀번호</label><input id="newAdminPw" type="password" placeholder="새 비밀번호 (4자 이상)" /></div>
+          <div class="fg"><label>새 비밀번호 확인</label><input id="confirmAdminPw" type="password" placeholder="한 번 더 입력" /></div>
+          <button class="btn-ok" style="padding:9px 16px;margin-bottom:.9rem" onclick="changeAdminPw()">변경</button>
+        </div>
+        <div class="err-line" id="adminPwErr"></div>
+      </div>
+      <div class="section-head">
+        <div class="section-title">계정 목록</div>
+        <button class="add-btn" onclick="openAddModal()">+ 계정 추가</button>
+      </div>
+      <div class="account-list" id="accountList"></div>
+      <div style="margin-top:2rem">
+        <div class="section-head">
+          <div class="section-title">최종보고자 목록</div>
+          <button class="add-btn" onclick="openReporterModal()">+ 보고자 추가</button>
+        </div>
+        <div style="background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:1rem 1.25rem">
+          <div id="reporterList" style="display:flex;flex-wrap:wrap;gap:8px;min-height:32px"></div>
+          <p style="font-size:12px;color:var(--text3);margin-top:10px">팀원이 업무 추가 시 선택할 수 있는 최종보고자 목록이에요.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
 <div class="overlay" id="addOverlay">
   <div class="modal">
     <h3>계정 추가</h3>
     <div class="modal-note">아이디는 한 번 설정하면 변경할 수 없어요.</div>
     <div class="fg"><label>표시 이름</label><input id="aName" placeholder="예: 홍길동" /></div>
     <div class="fg"><label>아이디</label><input id="aId" placeholder="예: 홍길동" /></div>
-    <div class="fg">
-      <label>비밀번호</label>
-      <div class="pw-row">
-        <input id="aPw" type="password" placeholder="초기 비밀번호" />
-        <button class="pw-show" onclick="togglePwVisible('aPw', this)">보기</button>
-      </div>
-    </div>
-    <div class="fg">
-      <label>역할</label>
-      <select id="aRole">
-        <option value="member">팀원</option>
-        <option value="manager">팀장</option>
-        <option value="admin">어드민</option>
-      </select>
-    </div>
+    <div class="fg"><label>비밀번호</label><div class="pw-row"><input id="aPw" type="password" placeholder="초기 비밀번호" /><button class="pw-show" onclick="togglePwVisible('aPw',this)">보기</button></div></div>
+    <div class="fg"><label>역할</label><select id="aRole"><option value="member">팀원</option><option value="manager">팀장</option><option value="admin">어드민</option></select></div>
     <div class="err-line" id="addErr"></div>
-    <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeModal('addOverlay')">취소</button>
-      <button class="btn-ok" onclick="addAccount()">추가하기</button>
-    </div>
+    <div class="modal-btns"><button class="btn-cancel" onclick="closeModal('addOverlay')">취소</button><button class="btn-ok" onclick="addAccount()">추가하기</button></div>
   </div>
 </div>
-
-<!-- 팀원 비밀번호 변경 모달 -->
 <div class="overlay" id="pwOverlay">
   <div class="modal">
     <h3>비밀번호 변경</h3>
     <div class="modal-note" id="pwTargetLabel"></div>
-    <div class="fg">
-      <label>새 비밀번호</label>
-      <div class="pw-row">
-        <input id="newPw" type="password" placeholder="새 비밀번호" />
-        <button class="pw-show" onclick="togglePwVisible('newPw', this)">보기</button>
-      </div>
-    </div>
-    <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeModal('pwOverlay')">취소</button>
-      <button class="btn-ok" onclick="savePw()">변경하기</button>
-    </div>
+    <div class="fg"><label>새 비밀번호</label><div class="pw-row"><input id="newPw" type="password" placeholder="새 비밀번호" /><button class="pw-show" onclick="togglePwVisible('newPw',this)">보기</button></div></div>
+    <div class="modal-btns"><button class="btn-cancel" onclick="closeModal('pwOverlay')">취소</button><button class="btn-ok" onclick="savePw()">변경하기</button></div>
   </div>
 </div>
-
-<!-- 역할 변경 모달 -->
 <div class="overlay" id="roleOverlay">
   <div class="modal">
     <h3>역할 변경</h3>
     <div class="modal-note" id="roleTargetLabel"></div>
-    <div class="fg">
-      <label>역할</label>
-      <select id="newRole">
-        <option value="member">팀원</option>
-        <option value="manager">팀장</option>
-        <option value="admin">어드민</option>
-      </select>
-    </div>
-    <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeModal('roleOverlay')">취소</button>
-      <button class="btn-ok" onclick="saveRole()">변경하기</button>
-    </div>
+    <div class="fg"><label>역할</label><select id="newRole"><option value="member">팀원</option><option value="manager">팀장</option><option value="admin">어드민</option></select></div>
+    <div class="modal-btns"><button class="btn-cancel" onclick="closeModal('roleOverlay')">취소</button><button class="btn-ok" onclick="saveRole()">변경하기</button></div>
   </div>
 </div>
-
-<!-- 보고자 추가 모달 -->
 <div class="overlay" id="reporterOverlay">
   <div class="modal">
     <h3>보고자 추가</h3>
-    <div class="fg">
-      <label>보고자 이름</label>
-      <input id="rName" placeholder="예: CEO, 홀딩스, 본부장" />
-    </div>
-    <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeModal('reporterOverlay')">취소</button>
-      <button class="btn-ok" onclick="addReporter()">추가하기</button>
-    </div>
+    <div class="fg"><label>보고자 이름</label><input id="rName" placeholder="예: CEO, 홀딩스, 본부장" /></div>
+    <div class="modal-btns"><button class="btn-cancel" onclick="closeModal('reporterOverlay')">취소</button><button class="btn-ok" onclick="addReporter()">추가하기</button></div>
   </div>
 </div>
-
 <div class="toast" id="toast"></div>
 
 <script type="module">
-// ════════════════════════════════════════════
-// Firebase 설정
-// ════════════════════════════════════════════
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import {
-  getFirestore, collection, doc,
-  getDocs, getDoc, setDoc, updateDoc, deleteDoc
-} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-
-const FIREBASE_CONFIG = {
-  apiKey:            "AIzaSyA7KylsSyT3_0oQvhBtcrPc-gcdfVq90IQ",
-  authDomain:        "gzplan.firebaseapp.com",
-  projectId:         "gzplan",
-  storageBucket:     "gzplan.firebasestorage.app",
-  messagingSenderId: "186255862586",
-  appId:             "1:186255862586:web:f36d21f76012ca43b8fe03",
-};
-
-// ════════════════════════════════════════════
-// 상수
-// ════════════════════════════════════════════
-const ADMIN_ID      = "admin";
-const ADMIN_PW_INIT = "admin1234";  // Firestore에 admin 계정 등록 전 초기 비밀번호
-
-// 초기 등록할 팀원 목록
-// 팀원 추가/삭제 시 이 배열을 수정하세요
-const INIT_MEMBERS = [
-  { id: "이도영", name: "이도영" },
-  { id: "이영찬", name: "이영찬" },
-  { id: "이윤형", name: "이윤형" },
-  { id: "강신욱", name: "강신욱" },
-  { id: "김용욱", name: "김용욱" },
-  { id: "오문식", name: "오문식" },
-  { id: "이길우", name: "이길우" },
-];
-
-// ════════════════════════════════════════════
-// 초기화 & 인증
-// ════════════════════════════════════════════
-const db = getFirestore(initializeApp(FIREBASE_CONFIG));
-
-// 상태 변수 선언 (인증 전에 먼저)
-let accounts    = [];
-let currentUser = null;
-let editingId   = null;
-
-// 인증 체크
-const sess = localStorage.getItem('tt_user');
-if (!sess) {
-  location.href = 'index.html';
-} else {
-  const u = JSON.parse(sess);
-  if (u.role !== 'admin') {
-    location.href = 'index.html';
-  } else {
-    currentUser = u;
-    document.getElementById('gate').style.display = 'none';
-    document.getElementById('app').style.display  = 'block';
-    document.getElementById('topUser').textContent = u.id;
-    init();
-  }
-}
-
-window.logout = () => { localStorage.removeItem('tt_user'); location.href = 'index.html'; };
-
-async function init() {
-  await Promise.all([loadAccounts(), loadReporters()]);
-}
-
-// ════════════════════════════════════════════
-// 계정 데이터 로드
-// ════════════════════════════════════════════
-async function loadAccounts() {
-  try {
-    const snap = await getDocs(collection(db, 'accounts'));
-    accounts = snap.docs.map(d => ({ docId: d.id, ...d.data() }));
-    accounts.sort((a, b) => {
-      const order = { admin: 0, manager: 1, member: 2 };
-      return (order[a.role] ?? 3) - (order[b.role] ?? 3) || a.docId.localeCompare(b.docId, 'ko');
-    });
-  } catch (e) {
-    accounts = [];
-  }
-
-  // 초기 배너 업데이트
-  const memberCount = accounts.filter(a => a.role === 'member').length;
-  const initBox = document.getElementById('initBox');
-  if (memberCount >= INIT_MEMBERS.length) {
-    initBox.classList.add('done');
-    initBox.querySelector('.init-box-text').innerHTML =
-      `<strong>팀원 계정 등록 완료</strong><br>팀원 ${memberCount}명이 등록되어 있어요.`;
-    initBox.querySelector('.init-btn').textContent = '재등록 (주의)';
-  } else {
-    initBox.classList.remove('done');
-    initBox.querySelector('.init-box-text').innerHTML =
-      `<strong>초기 계정 미등록</strong><br>팀원 7명의 계정을 등록해주세요. 아이디: 이름, 비밀번호: 1234`;
-    initBox.querySelector('.init-btn').textContent = '팀원 계정 일괄 등록';
-  }
-
-  renderStats();
-  renderList();
-}
-
-// ════════════════════════════════════════════
-// 렌더링
-// ════════════════════════════════════════════
-function renderStats() {
-  const total    = accounts.length;
-  const admins   = accounts.filter(a => a.role === 'admin').length;
-  const managers = accounts.filter(a => a.role === 'manager').length;
-  const members  = accounts.filter(a => a.role === 'member').length;
-  document.getElementById('statsRow').innerHTML = `
-    <div class="stat-card"><div class="stat-label">전체 계정</div><div class="stat-value">${total}</div></div>
-    <div class="stat-card"><div class="stat-label">어드민</div><div class="stat-value">${admins}</div></div>
-    <div class="stat-card"><div class="stat-label">팀장</div><div class="stat-value">${managers}</div></div>
-    <div class="stat-card"><div class="stat-label">팀원</div><div class="stat-value">${members}</div></div>`;
-}
-
-function renderList() {
-  const el = document.getElementById('accountList');
-  if (!accounts.length) {
-    el.innerHTML = '<div class="empty">등록된 계정이 없어요<br><small>위 버튼으로 팀원을 일괄 등록해주세요</small></div>';
-    return;
-  }
-  const roleLabel = { admin: '어드민', manager: '팀장', member: '팀원' };
-  el.innerHTML = accounts.map(a => {
-    const isMe = a.docId === currentUser?.id;
-    const safe = (a.displayName || a.docId).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-    return `
-      <div class="account-row ${a.role === 'admin' ? 'is-admin' : ''}">
-        <div class="acc-info">
-          <div class="acc-name">
-            ${a.displayName || a.docId}
-            ${isMe ? '<span style="font-size:11px;color:var(--text3)"> (나)</span>' : ''}
-          </div>
-          <div class="acc-sub">@${a.docId}</div>
-        </div>
-        <span class="role-badge role-${a.role}">${roleLabel[a.role] || a.role}</span>
-        <span class="status-badge ${a.disabled ? 'status-off' : 'status-on'}">${a.disabled ? '비활성' : '활성'}</span>
-        <div class="acc-actions">
-          <button class="act-btn" onclick="openPwModal('${a.docId}','${safe}')">비번 변경</button>
-          <button class="act-btn" onclick="openRoleModal('${a.docId}','${safe}','${a.role}')">역할 변경</button>
-          ${isMe ? '' : `
-            <button class="act-btn ${a.disabled ? 'act-enable' : 'act-disable'}"
-              onclick="toggleDisabled('${a.docId}', ${!!a.disabled})">
-              ${a.disabled ? '활성화' : '비활성화'}
-            </button>
-            <button class="act-btn danger" onclick="deleteAccount('${a.docId}','${safe}')">삭제</button>`}
-        </div>
-      </div>`;
-  }).join('');
-}
-
-// ════════════════════════════════════════════
-// 팀원 일괄 등록
-// ════════════════════════════════════════════
-window.initAccounts = async () => {
-  const btn = document.getElementById('initBtn');
-  btn.disabled = true;
-  btn.textContent = '등록 중...';
-
-  let added = 0;
-  for (const m of INIT_MEMBERS) {
-    if (accounts.find(a => a.docId === m.id)) continue;
-    try {
-      await setDoc(doc(db, 'accounts', m.id), {
-        displayName: m.name,
-        password:    '1234',
-        role:        'member',
-        disabled:    false,
-        createdAt:   new Date().toISOString()
-      });
-      added++;
-      btn.textContent = `등록 중... (${added}명)`;
-    } catch (e) {
-      console.error(m.name, e);
-    }
-  }
-
-  btn.disabled = false;
-  toast(added ? `${added}명 등록 완료 ✓` : '새로 등록할 계정이 없어요');
-  loadAccounts();
-};
-
-// ════════════════════════════════════════════
-// admin 비밀번호 변경
-// ════════════════════════════════════════════
-window.changeAdminPw = async () => {
-  const cur  = document.getElementById('curPw').value;
-  const newPw = document.getElementById('newAdminPw').value;
-  const conf  = document.getElementById('confirmAdminPw').value;
-  const errEl = document.getElementById('adminPwErr');
-  errEl.textContent = '';
-
-  if (!cur || !newPw || !conf)  { errEl.textContent = '모든 항목을 입력해주세요'; return; }
-  if (newPw !== conf)           { errEl.textContent = '새 비밀번호가 일치하지 않아요'; return; }
-  if (newPw.length < 4)        { errEl.textContent = '비밀번호는 4자 이상이어야 해요'; return; }
-
-  // 현재 비밀번호 검증 (Firestore 우선, 없으면 초기값)
-  const snap = await getDoc(doc(db, 'accounts', ADMIN_ID));
-  const expected = snap.exists() ? snap.data().password : ADMIN_PW_INIT;
-  if (cur !== expected) { errEl.textContent = '현재 비밀번호가 틀렸어요'; return; }
-
-  await setDoc(doc(db, 'accounts', ADMIN_ID), {
-    displayName: 'admin',
-    password:    newPw,
-    role:        'admin',
-    disabled:    false,
-    updatedAt:   new Date().toISOString()
-  }, { merge: true });
-
-  ['curPw', 'newAdminPw', 'confirmAdminPw'].forEach(id => document.getElementById(id).value = '');
-  toast('admin 비밀번호가 변경됐어요 ✓');
-  loadAccounts();
-};
-
-// ════════════════════════════════════════════
-// 계정 추가
-// ════════════════════════════════════════════
-window.openAddModal = () => {
-  ['aName', 'aId', 'aPw'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('aRole').value = 'member';
-  document.getElementById('addErr').textContent = '';
-  document.getElementById('addOverlay').classList.add('show');
-  setTimeout(() => document.getElementById('aName').focus(), 80);
-};
-
-window.addAccount = async () => {
-  const name = document.getElementById('aName').value.trim();
-  const id   = document.getElementById('aId').value.trim();
-  const pw   = document.getElementById('aPw').value;
-  const role = document.getElementById('aRole').value;
-  const err  = document.getElementById('addErr');
-  const btn  = document.querySelector('#addOverlay .btn-ok');
-  err.textContent = '';
-
-  if (!name || !id || !pw) { err.textContent = '모든 항목을 입력해주세요'; return; }
-  if (pw.length < 4)       { err.textContent = '비밀번호는 4자 이상이어야 해요'; return; }
-
-  btn.disabled = true;
-  btn.textContent = '추가 중...';
-  try {
-    const exists = await getDoc(doc(db, 'accounts', id));
-    if (exists.exists()) { err.textContent = '이미 사용 중인 아이디예요'; return; }
-    await setDoc(doc(db, 'accounts', id), {
-      displayName: name, password: pw, role, disabled: false, createdAt: new Date().toISOString()
-    });
-    closeModal('addOverlay');
-    toast(`${name} 계정을 추가했어요 ✓`);
-    loadAccounts();
-  } catch (e) {
-    err.textContent = '오류: ' + e.message;
-  } finally {
-    btn.disabled = false;
-    btn.textContent = '추가하기';
-  }
-};
-
-// ════════════════════════════════════════════
-// 팀원 비밀번호 변경
-// ════════════════════════════════════════════
-window.openPwModal = (id, name) => {
-  editingId = id;
-  document.getElementById('pwTargetLabel').textContent = `대상: ${name} (@${id})`;
-  document.getElementById('newPw').value = '';
-  document.getElementById('pwOverlay').classList.add('show');
-  setTimeout(() => document.getElementById('newPw').focus(), 80);
-};
-
-window.savePw = async () => {
-  const pw = document.getElementById('newPw').value;
-  if (!pw)        { toast('새 비밀번호를 입력해주세요'); return; }
-  if (pw.length < 4) { toast('비밀번호는 4자 이상이어야 해요'); return; }
-  await updateDoc(doc(db, 'accounts', editingId), { password: pw });
-  closeModal('pwOverlay');
-  toast('비밀번호를 변경했어요 ✓');
-};
-
-// ════════════════════════════════════════════
-// 역할 변경
-// ════════════════════════════════════════════
-window.openRoleModal = (id, name, currentRole) => {
-  editingId = id;
-  document.getElementById('roleTargetLabel').textContent = `대상: ${name} (@${id})`;
-  document.getElementById('newRole').value = currentRole;
-  document.getElementById('roleOverlay').classList.add('show');
-};
-
-window.saveRole = async () => {
-  const role = document.getElementById('newRole').value;
-  await updateDoc(doc(db, 'accounts', editingId), { role });
-  closeModal('roleOverlay');
-  toast('역할을 변경했어요 ✓');
-  loadAccounts();
-};
-
-// ════════════════════════════════════════════
-// 활성/비활성 토글
-// ════════════════════════════════════════════
-window.toggleDisabled = async (id, isDisabled) => {
-  const action = isDisabled ? '활성화' : '비활성화';
-  if (!confirm(`이 계정을 ${action}할까요?`)) return;
-  await updateDoc(doc(db, 'accounts', id), { disabled: !isDisabled });
-  toast(`계정을 ${action}했어요 ✓`);
-  loadAccounts();
-};
-
-// ════════════════════════════════════════════
-// 계정 삭제
-// ════════════════════════════════════════════
-window.deleteAccount = async (id, name) => {
-  if (id === currentUser?.id) { toast('자신의 계정은 삭제할 수 없어요'); return; }
-  if (!confirm(`"${name}" 계정을 삭제할까요?\n이 작업은 되돌릴 수 없어요.`)) return;
-  await deleteDoc(doc(db, 'accounts', id));
-  toast(`${name} 계정을 삭제했어요`);
-  loadAccounts();
-};
-
-// ════════════════════════════════════════════
-// 공통 유틸
-// ════════════════════════════════════════════
-// ════════════════════════════════════════════
-// 보고자 목록 관리
-// ════════════════════════════════════════════
-let reporters = [];
-
-async function loadReporters() {
-  try {
-    const snap = await getDoc(doc(db, 'settings', 'reporters'));
-    reporters = snap.exists() ? (snap.data().list || []) : [];
-  } catch { reporters = []; }
-  renderReporters();
-}
-
-function renderReporters() {
-  const el = document.getElementById('reporterList');
-  if (!reporters.length) {
-    el.innerHTML = '<span style="font-size:13px;color:var(--text3)">등록된 보고자가 없어요</span>';
-    return;
-  }
-  el.innerHTML = reporters.map((r, i) => `
-    <span style="display:inline-flex;align-items:center;gap:5px;background:var(--purple-bg);color:var(--purple-t);
-      font-size:13px;font-weight:500;padding:4px 10px;border-radius:999px;">
-      ${r}
-      <button onclick="deleteReporter(${i})"
-        style="background:none;border:none;cursor:pointer;color:inherit;font-size:12px;opacity:.6;padding:0;line-height:1">✕</button>
-    </span>`).join('');
-}
-
-async function saveReporters() {
-  await setDoc(doc(db, 'settings', 'reporters'), { list: reporters });
-}
-
-window.openReporterModal = () => {
-  document.getElementById('rName').value = '';
-  document.getElementById('reporterOverlay').classList.add('show');
-  setTimeout(() => document.getElementById('rName').focus(), 80);
-};
-
-window.addReporter = async () => {
-  const name = document.getElementById('rName').value.trim();
-  if (!name) { toast('이름을 입력해주세요'); return; }
-  if (reporters.includes(name)) { toast('이미 있는 보고자예요'); return; }
-  reporters.push(name);
-  await saveReporters();
-  closeModal('reporterOverlay');
-  renderReporters();
-  toast(`${name} 추가됐어요 ✓`);
-};
-
-window.deleteReporter = async (idx) => {
-  const name = reporters[idx];
-  if (!confirm(`"${name}"을 삭제할까요?`)) return;
-  reporters.splice(idx, 1);
-  await saveReporters();
-  renderReporters();
-  toast(`${name} 삭제됐어요`);
-};
-
-window.closeModal = id => document.getElementById(id).classList.remove('show');
-
-window.togglePwVisible = (inputId, btn) => {
-  const el = document.getElementById(inputId);
-  const show = el.type === 'password';
-  el.type = show ? 'text' : 'password';
-  btn.textContent = show ? '숨기기' : '보기';
-};
-
-function toast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  clearTimeout(el._t);
-  el._t = setTimeout(() => el.classList.remove('show'), 2400);
-}
-
-// 모달 외부 클릭 / ESC 닫기
-document.querySelectorAll('.overlay').forEach(o =>
-  o.addEventListener('click', e => { if (e.target === e.currentTarget) e.target.classList.remove('show'); })
-);
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') document.querySelectorAll('.overlay.show').forEach(o => o.classList.remove('show'));
-});
+import { getFirestore, collection, doc, getDocs, getDoc, setDoc, updateDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+const FIREBASE_CONFIG={apiKey:"AIzaSyA7KylsSyT3_0oQvhBtcrPc-gcdfVq90IQ",authDomain:"gzplan.firebaseapp.com",projectId:"gzplan",storageBucket:"gzplan.firebasestorage.app",messagingSenderId:"186255862586",appId:"1:186255862586:web:f36d21f76012ca43b8fe03"};
+const ADMIN_ID="admin",ADMIN_PW_INIT="admin1234";
+const INIT_MEMBERS=[{id:"이도영",name:"이도영"},{id:"이영찬",name:"이영찬"},{id:"이윤형",name:"이윤형"},{id:"강신욱",name:"강신욱"},{id:"김용욱",name:"김용욱"},{id:"오문식",name:"오문식"},{id:"이길우",name:"이길우"}];
+const db=getFirestore(initializeApp(FIREBASE_CONFIG));
+let accounts=[],currentUser=null,editingId=null,reporters=[];
+const sess=localStorage.getItem('tt_user');
+if(!sess){location.href='index.html';}
+else{const u=JSON.parse(sess);if(u.role!=='admin'){location.href='index.html';}
+else{currentUser=u;document.getElementById('gate').style.display='none';document.getElementById('app').style.display='block';init();}}
+window.logout=()=>{localStorage.removeItem('tt_user');location.href='index.html'};
+async function init(){await Promise.all([loadAccounts(),loadReporters()])}
+async function loadAccounts(){try{const snap=await getDocs(collection(db,'accounts'));accounts=snap.docs.map(d=>({docId:d.id,...d.data()}));accounts.sort((a,b)=>{const o={admin:0,manager:1,member:2};return(o[a.role]??3)-(o[b.role]??3)||a.docId.localeCompare(b.docId,'ko')});}catch(e){accounts=[]}
+const mc=accounts.filter(a=>a.role==='member').length;const ib=document.getElementById('initBox');
+if(mc>=INIT_MEMBERS.length){ib.classList.add('done');ib.querySelector('.init-box-text').innerHTML=`<strong>팀원 계정 등록 완료</strong><br>팀원 ${mc}명이 등록되어 있어요.`;ib.querySelector('.init-btn').textContent='재등록 (주의)';}
+else{ib.classList.remove('done');ib.querySelector('.init-box-text').innerHTML='<strong>초기 계정 미등록</strong><br>팀원 7명의 계정을 등록해주세요.';ib.querySelector('.init-btn').textContent='팀원 계정 일괄 등록';}
+renderStats();renderList();}
+function renderStats(){const t=accounts.length,a=accounts.filter(x=>x.role==='admin').length,m=accounts.filter(x=>x.role==='manager').length,mb=accounts.filter(x=>x.role==='member').length;document.getElementById('statsRow').innerHTML=`<div class="stat-card"><div class="stat-label">전체 계정</div><div class="stat-value">${t}</div></div><div class="stat-card"><div class="stat-label">어드민</div><div class="stat-value">${a}</div></div><div class="stat-card"><div class="stat-label">팀장</div><div class="stat-value">${m}</div></div><div class="stat-card"><div class="stat-label">팀원</div><div class="stat-value">${mb}</div></div>`;}
+function renderList(){const el=document.getElementById('accountList');if(!accounts.length){el.innerHTML='<div class="empty">등록된 계정이 없어요</div>';return;}
+const rl={admin:'어드민',manager:'팀장',member:'팀원'};
+el.innerHTML=accounts.map(a=>{const isMe=a.docId===currentUser?.id;const safe=(a.displayName||a.docId).replace(/'/g,"\'");return`<div class="account-row ${a.role==='admin'?'is-admin':''}"><div class="acc-info"><div class="acc-name">${a.displayName||a.docId}${isMe?'<span style="font-size:11px;color:var(--text3)"> (나)</span>':''}</div><div class="acc-sub">@${a.docId}</div></div><span class="role-badge role-${a.role}">${rl[a.role]||a.role}</span><span class="status-badge ${a.disabled?'status-off':'status-on'}">${a.disabled?'비활성':'활성'}</span><div class="acc-actions"><button class="act-btn" onclick="openPwModal('${a.docId}','${safe}')">비번 변경</button><button class="act-btn" onclick="openRoleModal('${a.docId}','${safe}','${a.role}')">역할 변경</button>${isMe?'':`<button class="act-btn ${a.disabled?'act-enable':'act-disable'}" onclick="toggleDisabled('${a.docId}',${!!a.disabled})">${a.disabled?'활성화':'비활성화'}</button><button class="act-btn danger" onclick="deleteAccount('${a.docId}','${safe}')">삭제</button>`}</div></div>`}).join('');}
+window.initAccounts=async()=>{const btn=document.getElementById('initBtn');btn.disabled=true;btn.textContent='등록 중...';let added=0;for(const m of INIT_MEMBERS){if(accounts.find(a=>a.docId===m.id))continue;try{await setDoc(doc(db,'accounts',m.id),{displayName:m.name,password:'1234',role:'member',disabled:false,createdAt:new Date().toISOString()});added++;btn.textContent=`등록 중... (${added}명)`;}catch(e){}}btn.disabled=false;toast(added?`${added}명 등록 완료 ✓`:'새로 등록할 계정이 없어요');loadAccounts();};
+window.changeAdminPw=async()=>{const cur=document.getElementById('curPw').value,nw=document.getElementById('newAdminPw').value,cf=document.getElementById('confirmAdminPw').value,err=document.getElementById('adminPwErr');err.textContent='';if(!cur||!nw||!cf){err.textContent='모든 항목을 입력해주세요';return}if(nw!==cf){err.textContent='새 비밀번호가 일치하지 않아요';return}if(nw.length<4){err.textContent='비밀번호는 4자 이상이어야 해요';return}const snap=await getDoc(doc(db,'accounts',ADMIN_ID));const expected=snap.exists()?snap.data().password:ADMIN_PW_INIT;if(cur!==expected){err.textContent='현재 비밀번호가 틀렸어요';return}await setDoc(doc(db,'accounts',ADMIN_ID),{displayName:'admin',password:nw,role:'admin',disabled:false,updatedAt:new Date().toISOString()},{merge:true});['curPw','newAdminPw','confirmAdminPw'].forEach(id=>document.getElementById(id).value='');toast('비밀번호가 변경됐어요 ✓');loadAccounts();};
+window.openAddModal=()=>{['aName','aId','aPw'].forEach(id=>document.getElementById(id).value='');document.getElementById('aRole').value='member';document.getElementById('addErr').textContent='';document.getElementById('addOverlay').classList.add('show');setTimeout(()=>document.getElementById('aName').focus(),80);};
+window.addAccount=async()=>{const name=document.getElementById('aName').value.trim(),id=document.getElementById('aId').value.trim(),pw=document.getElementById('aPw').value,role=document.getElementById('aRole').value,err=document.getElementById('addErr'),btn=document.querySelector('#addOverlay .btn-ok');err.textContent='';if(!name||!id||!pw){err.textContent='모든 항목을 입력해주세요';return}if(pw.length<4){err.textContent='비밀번호는 4자 이상이어야 해요';return}btn.disabled=true;btn.textContent='추가 중...';try{const ex=await getDoc(doc(db,'accounts',id));if(ex.exists()){err.textContent='이미 사용 중인 아이디예요';return}await setDoc(doc(db,'accounts',id),{displayName:name,password:pw,role,disabled:false,createdAt:new Date().toISOString()});closeModal('addOverlay');toast(`${name} 계정을 추가했어요 ✓`);loadAccounts();}catch(e){err.textContent='오류: '+e.message;}finally{btn.disabled=false;btn.textContent='추가하기';}};
+window.openPwModal=(id,name)=>{editingId=id;document.getElementById('pwTargetLabel').textContent=`대상: ${name} (@${id})`;document.getElementById('newPw').value='';document.getElementById('pwOverlay').classList.add('show');setTimeout(()=>document.getElementById('newPw').focus(),80);};
+window.savePw=async()=>{const pw=document.getElementById('newPw').value;if(!pw){toast('새 비밀번호를 입력해주세요');return}if(pw.length<4){toast('비밀번호는 4자 이상이어야 해요');return}await updateDoc(doc(db,'accounts',editingId),{password:pw});closeModal('pwOverlay');toast('비밀번호를 변경했어요 ✓');};
+window.openRoleModal=(id,name,cr)=>{editingId=id;document.getElementById('roleTargetLabel').textContent=`대상: ${name} (@${id})`;document.getElementById('newRole').value=cr;document.getElementById('roleOverlay').classList.add('show');};
+window.saveRole=async()=>{const role=document.getElementById('newRole').value;await updateDoc(doc(db,'accounts',editingId),{role});closeModal('roleOverlay');toast('역할을 변경했어요 ✓');loadAccounts();};
+window.toggleDisabled=async(id,isD)=>{if(!confirm(`이 계정을 ${isD?'활성화':'비활성화'}할까요?`))return;await updateDoc(doc(db,'accounts',id),{disabled:!isD});toast(`계정을 ${isD?'활성화':'비활성화'}했어요 ✓`);loadAccounts();};
+window.deleteAccount=async(id,name)=>{if(id===currentUser?.id){toast('자신의 계정은 삭제할 수 없어요');return}if(!confirm(`"${name}" 계정을 삭제할까요?`))return;await deleteDoc(doc(db,'accounts',id));toast(`${name} 계정을 삭제했어요`);loadAccounts();};
+async function loadReporters(){try{const snap=await getDoc(doc(db,'settings','reporters'));reporters=snap.exists()?(snap.data().list||[]):[];}catch{reporters=[]}renderReporters();}
+function renderReporters(){const el=document.getElementById('reporterList');if(!reporters.length){el.innerHTML='<span style="font-size:13px;color:var(--text3)">등록된 보고자가 없어요</span>';return;}el.innerHTML=reporters.map((r,i)=>`<span style="display:inline-flex;align-items:center;gap:5px;background:var(--purple-bg);color:var(--purple-t);font-size:13px;font-weight:500;padding:4px 10px;border-radius:999px">${r}<button onclick="deleteReporter(${i})" style="background:none;border:none;cursor:pointer;color:inherit;font-size:12px;opacity:.6;padding:0;line-height:1">✕</button></span>`).join('');}
+async function saveReporters(){await setDoc(doc(db,'settings','reporters'),{list:reporters});}
+window.openReporterModal=()=>{document.getElementById('rName').value='';document.getElementById('reporterOverlay').classList.add('show');setTimeout(()=>document.getElementById('rName').focus(),80);};
+window.addReporter=async()=>{const name=document.getElementById('rName').value.trim();if(!name){toast('이름을 입력해주세요');return}if(reporters.includes(name)){toast('이미 있는 보고자예요');return}reporters.push(name);await saveReporters();closeModal('reporterOverlay');renderReporters();toast(`${name} 추가됐어요 ✓`);};
+window.deleteReporter=async(idx)=>{const name=reporters[idx];if(!confirm(`"${name}"을 삭제할까요?`))return;reporters.splice(idx,1);await saveReporters();renderReporters();toast(`${name} 삭제됐어요`);};
+window.closeModal=id=>document.getElementById(id).classList.remove('show');
+window.togglePwVisible=(inputId,btn)=>{const el=document.getElementById(inputId);const show=el.type==='password';el.type=show?'text':'password';btn.textContent=show?'숨기기':'보기';};
+function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),2400);}
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===e.currentTarget)e.target.classList.remove('show')}));
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.overlay.show').forEach(o=>o.classList.remove('show'))});
 </script>
 </body>
 </html>

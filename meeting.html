@@ -163,6 +163,11 @@ body{margin:0;padding:0}
       <span style="font-size:13px;font-weight:600;color:var(--text)">회의록</span>
       <button class="btn-solid" id="newMeetingBtn" style="font-size:11px;padding:4px 10px">+ 새 회의</button>
     </div>
+    <!-- 개인/공통 탭 -->
+    <div style="display:flex;border-bottom:0.5px solid var(--bg3);flex-shrink:0">
+      <button id="tabPersonal" style="flex:1;padding:8px;font-size:12px;font-weight:500;border:none;border-bottom:2px solid var(--text);background:transparent;color:var(--text);cursor:pointer">개인</button>
+      <button id="tabShared" style="flex:1;padding:8px;font-size:12px;font-weight:500;border:none;border-bottom:2px solid transparent;background:transparent;color:var(--text2);cursor:pointer">공통 🌐</button>
+    </div>
     <div style="flex:1;overflow-y:auto" id="sbList">
       <div style="padding:2rem;text-align:center;color:var(--text3);font-size:13px;line-height:1.6">저장된 회의록이 없어요<br>새 회의를 시작해주세요</div>
     </div>
@@ -171,6 +176,9 @@ body{margin:0;padding:0}
     <div class="topbar">
       <div class="page-title" id="meetPageTitle">새 회의록</div>
       <div style="display:flex;gap:8px">
+        <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2);cursor:pointer">
+          <input type="checkbox" id="shareChk" style="width:auto"> 팀 전체 공유
+        </label>
         <button class="btn-ghost" id="copySummaryBtn">📋 복사</button>
         <button class="btn-ghost" id="deleteMeetingBtn" style="display:none;color:var(--red);border-color:rgba(163,45,45,.3)">삭제</button>
         <button class="btn-solid" id="saveMeetingBtn">💾 저장</button>
@@ -208,6 +216,18 @@ body{margin:0;padding:0}
         </div>
         <textarea id="transcriptArea" placeholder="녹음을 시작하거나 회의 내용을 직접 붙여넣으세요..." style="width:100%;min-height:100px;padding:10px;font-size:13px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:inherit;resize:vertical;outline:none"></textarea>
       </div>
+      <!-- 내 메모 카드 -->
+      <div style="background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:1.25rem">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="font-size:12px;font-weight:600;color:var(--text2)">✏️ 내 메모</div>
+          <button class="btn-ghost" id="tagSettingBtn" style="font-size:11px;padding:3px 10px">⚙ 태그 설정</button>
+        </div>
+        <!-- 빠른 태그 버튼 -->
+        <div id="quickTagsRow" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px"></div>
+        <textarea id="userNoteArea" placeholder="보충 설명, 결정사항, 액션 아이템 등을 자유롭게 입력하세요. #태그도 사용할 수 있어요." style="width:100%;min-height:100px;padding:10px;font-size:13px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:inherit;resize:vertical;outline:none"></textarea>
+        <!-- 태그 칩 필터 -->
+        <div id="noteTagChips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:8px"></div>
+      </div>
       <div style="background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:1.25rem">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
           <div style="font-size:12px;font-weight:600;color:var(--text2)">✅ 회의록 요약</div>
@@ -222,6 +242,17 @@ body{margin:0;padding:0}
 </div>
 </div>
 
+<div class="overlay" id="tagSettingOverlay">
+  <div class="modal" style="max-width:380px">
+    <h3>태그 설정</h3>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:12px">쉼표로 구분해서 입력하세요. # 없이 입력해도 자동으로 붙어요.</p>
+    <div class="fg"><label>기본 태그</label><input id="tagSettingInput" placeholder="#회의, #결정, #액션아이템"/></div>
+    <div class="modal-btns">
+      <button class="btn-cancel" id="tagSettingCancelBtn">취소</button>
+      <button class="btn-ok" id="tagSettingOkBtn">저장</button>
+    </div>
+  </div>
+</div>
 <div class="overlay" id="delOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);align-items:center;justify-content:center;z-index:200">
   <div class="modal" style="max-width:360px">
     <h3>회의록 삭제</h3>
@@ -238,8 +269,8 @@ body{margin:0;padding:0}
   var sess = localStorage.getItem('tt_user');
   if (!sess) { location.href = 'index.html'; return; }
   var u;
-  try { u = JSON.parse(sess); } catch(e) { localStorage.removeItem('tt_user'); location.href='index.html'; return; }
-  if (!u || !u.id || !u.role) { localStorage.removeItem('tt_user'); location.href='index.html'; return; }
+  try { u = JSON.parse(sess); } catch(e) { localStorage.removeItem('tt_user'); sessionStorage.clear(); location.href = 'index.html'; return; }
+  if (!u || !u.id || !u.role) { localStorage.removeItem('tt_user'); sessionStorage.clear(); location.href = 'index.html'; return; }
   var isMgr = u.role === 'manager' || u.role === 'admin';
   var av = document.getElementById('sbAvatar');
   var nm = document.getElementById('sbUserName');
@@ -263,16 +294,53 @@ body{margin:0;padding:0}
     }
   }
   document.getElementById('logoutBtn').onclick = function() {
-    localStorage.removeItem('tt_user');
-sessionStorage.clear();
-location.href='index.html';
+    localStorage.removeItem('tt_user'); sessionStorage.clear(); location.href = 'index.html';
   };
   document.querySelectorAll('[data-nav]').forEach(function(el) {
     el.addEventListener('click', function() { location.href = el.dataset.nav; });
   });
+
+  // ── 버튼 바인딩 (module defer 대응) ──
+  document.addEventListener('DOMContentLoaded', function() {
+    function bind(id, fn) {
+      var el = document.getElementById(id);
+      if (el) el.addEventListener('click', typeof fn==='function' ? fn : function() { if(window[fn]) window[fn](); });
+    }
+    bind('newMeetingBtn',   'newMeeting');
+    bind('saveMeetingBtn',  'saveMeeting');
+    bind('copySummaryBtn',  'copySummary');
+    bind('deleteMeetingBtn','deleteMeeting');
+    bind('summarizeBtn',    'summarize');
+    bind('recBtn',          'toggleRec');
+    bind('delConfirmBtn',   'confirmDelete');
+    bind('tagSettingBtn',   'openTagSetting');
+    bind('tagSettingOkBtn', 'saveTagSetting');
+    bind('tagSettingCancelBtn', function() { document.getElementById('tagSettingOverlay').classList.remove('show'); });
+    bind('delCancelBtn', function() { document.getElementById('delOverlay').classList.remove('show'); });
+
+    // 탭 전환
+    var tabP = document.getElementById('tabPersonal');
+    var tabS = document.getElementById('tabShared');
+    function setTab(mode) {
+      if (window._setCurMode) window._setCurMode(mode);
+      if (tabP) { tabP.style.borderBottomColor = mode==='personal'?'var(--text)':'transparent'; tabP.style.color = mode==='personal'?'var(--text)':'var(--text2)'; tabP.style.fontWeight = mode==='personal'?'500':'400'; }
+      if (tabS) { tabS.style.borderBottomColor = mode==='shared'?'var(--text)':'transparent'; tabS.style.color = mode==='shared'?'var(--text)':'var(--text2)'; tabS.style.fontWeight = mode==='shared'?'500':'400'; }
+    }
+    if (tabP) tabP.addEventListener('click', function() { setTab('personal'); });
+    if (tabS) tabS.addEventListener('click', function() { setTab('shared'); });
+
+    // 오버레이 닫기
+    document.querySelectorAll('.overlay').forEach(function(o) {
+      o.addEventListener('click', function(e) { if (e.target===e.currentTarget) o.classList.remove('show'); });
+    });
+    document.addEventListener('keydown', function(e) {
+      if (e.key==='Escape') document.querySelectorAll('.overlay.show').forEach(function(o) { o.classList.remove('show'); });
+    });
+  });
 })();
 </script>
 <script type="module">
+
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getFirestore,collection,doc,onSnapshot,addDoc,updateDoc,deleteDoc,query,orderBy}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
@@ -291,21 +359,31 @@ if(!sess){location.href="index.html";throw""}
 const ME=JSON.parse(sess);
 if(!ME.id){location.href="index.html";throw""}
 document.getElementById("tbUser").textContent=ME.displayName;
-window.logout=()=>{localStorage.removeItem("tt_user");location.href="index.html"};
+window.logout=()=>{localStorage.removeItem('tt_user'); sessionStorage.clear(); location.href = 'index.html'};
 
 
 // ════════════════════════════════════════════
 // 상태
 // ════════════════════════════════════════════
-let meetings=[];
-let curId=null;         // 현재 보고 있는 회의록 ID
-let attendees=[];       // 현재 참석자 목록
-let isRecording=false;
-let recognition=null;
-let recInterval=null;
-let recSeconds=0;
-let transcript="";
-let pendingDeleteId=null;
+let meetings=[], sharedMeetings=[];
+let curId=null, curMode='personal';  // curMode: 'personal' | 'shared'
+let attendees=[];
+let isRecording=false, recognition=null, recInterval=null, recSeconds=0;
+let transcript='', pendingDeleteId=null;
+// 태그
+const TAG_KEY='gz_meeting_tags';
+let defaultTags=JSON.parse(localStorage.getItem(TAG_KEY)||'["#회의","#결정","#액션아이템"]');
+function renderQuickTags(){
+  const el=document.getElementById('quickTagsRow');
+  if(!el)return;
+  el.innerHTML=defaultTags.map(t=>`<button onclick="insertMeetingTag('${t}')" style="padding:3px 10px;border-radius:999px;font-size:11px;border:0.5px solid var(--border);background:transparent;color:var(--text2);cursor:pointer">${t}</button>`).join('');
+}
+window.insertMeetingTag=tag=>{
+  const el=document.getElementById('userNoteArea');
+  const v=el.value, needSpace=v.length>0&&!v.endsWith(' ')&&!v.endsWith('\n');
+  el.value=(needSpace?v+' ':v)+tag+' '; el.focus();
+};
+function extractTags(text){return[...new Set((text.match(/#[\w가-힣]+/g)||[]))];}
 
 // ════════════════════════════════════════════
 // 유틸
@@ -328,13 +406,15 @@ function fmtDate(s){
 // ════════════════════════════════════════════
 // Firestore 구독
 // ════════════════════════════════════════════
-onSnapshot(query(collection(db,"meetings"),orderBy("date","desc")),snap=>{
+// 개인 회의록 구독
+onSnapshot(query(collection(db,'meetings',ME.id,'items'),orderBy('date','desc')),snap=>{
   meetings=snap.docs.map(d=>({id:d.id,...d.data()}));
-  renderSidebar();
-  if(curId){
-    const m=meetings.find(x=>x.id===curId);
-    if(m)highlightSidebar(curId);
-  }
+  if(curMode==='personal'){renderSidebar();if(curId)highlightSidebar(curId);}
+});
+// 공통 회의록 구독
+onSnapshot(query(collection(db,'meetings_shared'),orderBy('date','desc')),snap=>{
+  sharedMeetings=snap.docs.map(d=>({id:d.id,...d.data()}));
+  if(curMode==='shared'){renderSidebar();if(curId)highlightSidebar(curId);}
 });
 
 // ════════════════════════════════════════════
@@ -342,14 +422,17 @@ onSnapshot(query(collection(db,"meetings"),orderBy("date","desc")),snap=>{
 // ════════════════════════════════════════════
 function renderSidebar(){
   const el=document.getElementById("sbList");
-  if(!meetings.length){
+  const list=curMode==='shared'?sharedMeetings:meetings;
+  if(!list.length){
     el.innerHTML=`<div class="sb-empty">저장된 회의록이 없어요<br>새 회의를 시작해주세요</div>`;
     return;
   }
-  el.innerHTML=meetings.map(m=>`
+  el.innerHTML=list.map(m=>`
     <div class="sb-item${curId===m.id?" active":""}" onclick="loadMeeting('${m.id}')">
       <div class="sb-item-title">${m.title||"(제목 없음)"}</div>
-      <div class="sb-item-meta">${fmtDate(m.date)} · ${(m.attendees||[]).join(", ")||"참석자 없음"}</div>
+      <div class="sb-item-meta">${fmtDate(m.date)} · ${(m.attendees||[]).join(", ")||"참석자 없음"}
+        ${m.tags&&m.tags.length?'<br><span style="color:var(--blue-t);font-size:10px">'+m.tags.join(' ')+'</span>':''}
+      </div>
     </div>`).join("");
 }
 
@@ -390,12 +473,15 @@ window.newMeeting=()=>{
   document.getElementById("meetTitle").value="";
   document.getElementById("meetDate").value=toDatetimeLocal();
   document.getElementById("transcriptArea").value="";
+  const una=document.getElementById("userNoteArea");if(una)una.value="";
   document.getElementById("summaryArea").value="";
   document.getElementById("savedBadge").style.display="none";
-  document.getElementById("deleteBtn").style.display="none";
+  document.getElementById("deleteMeetingBtn").style.display="none";
   document.getElementById("calNote").style.display="none";
+  const sc=document.getElementById("shareChk");if(sc)sc.checked=false;
   renderAttendees();
   renderSidebar();
+  renderQuickTags();
   stopRec();
 };
 
@@ -409,8 +495,9 @@ window.loadMeeting=id=>{
   document.getElementById("meetDate").value=m.date?toDatetimeLocal(new Date(m.date)):"";
   document.getElementById("transcriptArea").value=m.transcript||"";
   document.getElementById("summaryArea").value=m.summary||"";
+  const una2=document.getElementById("userNoteArea");if(una2)una2.value=m.userNote||"";
   document.getElementById("savedBadge").style.display="";
-  document.getElementById("deleteBtn").style.display="";
+  document.getElementById("deleteMeetingBtn").style.display="";
   document.getElementById("calNote").style.display=m.calendarId?"":"none";
   renderAttendees();
   highlightSidebar(id);
@@ -505,27 +592,34 @@ window.summarize=async()=>{
   const title=document.getElementById("meetTitle").value.trim()||"회의";
   const date=document.getElementById("meetDate").value;
   const atts=attendees.join(", ")||"미기록";
-  const prompt=`다음은 "${title}" 회의의 전사 텍스트입니다.
+  const noteSection = userNote ? `
+[내 메모 및 보충 내용]
+${userNote}` : '';
+  const combinedText = text || '(녹음 전사 없음)';
+  const prompt=`다음은 "${title}" 회의 내용입니다.
 일시: ${date?new Date(date).toLocaleString("ko-KR"):"미기록"}
 참석자: ${atts}
 
 [전사 텍스트]
-${text}
+${combinedText}
+${noteSection}
 
 위 내용을 바탕으로 아래 형식으로 회의록을 작성해주세요. 각 항목이 없으면 "없음"으로 표시하세요.
+내 메모에 포함된 #태그는 요약 끝에 그대로 포함해주세요.
 
 📅 일시: (회의 일시)
 👥 참석자: (참석자 목록)
 
 📝 주요 안건
 • (안건 1)
-• (안건 2)
 
 ✅ 결정 사항
 • (결정된 내용)
 
 💬 기타 논의 사항
-• (기타 내용)`;
+• (기타 내용)
+
+🏷 태그: (내 메모의 #태그들, 없으면 생략)`;
 
   try{
     const res=await fetch("https://api.anthropic.com/v1/messages",{
@@ -556,11 +650,18 @@ window.saveMeeting=async()=>{
   const title=document.getElementById("meetTitle").value.trim();
   const date=document.getElementById("meetDate").value;
   const transcript=document.getElementById("transcriptArea").value.trim();
+  const userNote=document.getElementById("userNoteArea").value.trim();
   const summary=document.getElementById("summaryArea").value.trim();
+  const isShared=document.getElementById("shareChk").checked;
   if(!title){toast("회의 제목을 입력해주세요");return}
   if(!summary){toast("요약 내용이 없어요. AI 요약을 먼저 생성해주세요");return}
 
-  const data={title,date,attendees,transcript,summary,authorId:ME.id,author:ME.displayName,updatedAt:new Date().toISOString()};
+  const tags=[...new Set([
+    ...(userNote.match(/#[\w가-힣]+/g)||[]),
+    ...(summary.match(/#[\w가-힣]+/g)||[])
+  ])];
+  const data={title,date,attendees,transcript,userNote,summary,tags,
+    authorId:ME.id,author:ME.displayName,updatedAt:new Date().toISOString()};
 
   try{
     if(curId){
@@ -624,11 +725,13 @@ window.deleteMeeting=()=>{
 };
 
 window.confirmDelete=async()=>{
-  const m=meetings.find(x=>x.id===pendingDeleteId);
+  const m=(curMode==='shared'?sharedMeetings:meetings).find(x=>x.id===pendingDeleteId);
   if(m?.calendarId){
     try{await deleteDoc(doc(db,"schedules",m.calendarId))}catch(e){}
   }
-  await deleteDoc(doc(db,"meetings",pendingDeleteId));
+  await deleteDoc(curMode==='shared'
+      ? doc(db,'meetings_shared',pendingDeleteId)
+      : doc(db,'meetings',ME.id,'items',pendingDeleteId));
   closeOverlay();
   newMeeting();
   toast("회의록을 삭제했어요");
@@ -640,8 +743,26 @@ document.getElementById("delOverlay").addEventListener("click",e=>{if(e.target==
 // ════════════════════════════════════════════
 // 초기화
 // ════════════════════════════════════════════
+
+window.openTagSetting=()=>{
+  document.getElementById('tagSettingInput').value=defaultTags.join(', ');
+  document.getElementById('tagSettingOverlay').classList.add('show');
+  setTimeout(()=>document.getElementById('tagSettingInput').focus(),80);
+};
+window.saveTagSetting=()=>{
+  const val=document.getElementById('tagSettingInput').value;
+  defaultTags=val.split(',').map(t=>t.trim()).filter(t=>t).map(t=>t.startsWith('#')?t:'#'+t);
+  localStorage.setItem(TAG_KEY,JSON.stringify(defaultTags));
+  renderQuickTags();
+  document.getElementById('tagSettingOverlay').classList.remove('show');
+  toast('태그 설정 저장됐어요 ✓');
+};
+
+window._setCurMode=(mode)=>{ curMode=mode; renderSidebar(); window.newMeeting(); };
 window.newMeeting();
+renderQuickTags();
 initSpeechRecognition();
+
 </script>
 </div><!-- content -->
 </div><!-- main -->

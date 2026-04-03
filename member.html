@@ -282,15 +282,7 @@ if (!ME?.id || !ME?.role) { localStorage.removeItem('tt_user'); sessionStorage.c
 if (ME.role === 'manager' || ME.role === 'admin') { location.href = 'manager.html'; throw ''; }
 if (ME.role !== 'member') { localStorage.removeItem('tt_user'); sessionStorage.clear(); location.href = 'index.html'; throw ''; }
 
-// ── 사이드바 이름 즉시 표시 ──
-(function initSidebar() {
-  var nm = document.getElementById('sbUserName');
-  var av = document.getElementById('sbAvatar');
-  var pt = document.getElementById('pageTitle');
-  if (nm) nm.textContent = ME.displayName || ME.id || '';
-  if (av) av.textContent = ((ME.displayName || ME.id || '--').slice(0, 2));
-  if (pt) pt.textContent = (ME.displayName || '') + '의 업무';
-})();
+
 
 async function loadReporters() {
   try {
@@ -439,28 +431,18 @@ function renderStats() {
   const inprog  = tasks.filter(t => t.status === 'inprogress').length;
   const stale   = tasks.filter(isStale).length;
   const overdue = tasks.filter(isOverdue).length;
-  // 긴급 배지 (사이드바)
-  const urgent = tasks.filter(t => t.status !== 'done' && (isOverdue(t) || (t.priority||3) >= 4)).length;
-  const badge = document.getElementById('urgentBadge');
-  if (badge) { badge.style.display = urgent ? '' : 'none'; badge.textContent = urgent; }
-  // 페이지 타이틀
-  const pt = document.getElementById('pageTitle');
-  if (pt) pt.textContent = (ME.displayName || '') + '의 업무';
 
-  // 사이드바 배지
-  const _urgent = tasks.filter(t => t.status !== 'done' && (isOverdue(t) || (t.priority||3) >= 4)).length;
-  const _badge = document.getElementById('urgentBadge');
-  if (_badge) { _badge.style.display = _urgent ? '' : 'none'; _badge.textContent = _urgent; }
-  const _pt = document.getElementById('pageTitle');
-  if (_pt) _pt.textContent = (ME.displayName||'') + '의 업무';
-  const _ub=document.getElementById('urgentBadge'),_uc=tasks.filter(t=>t.status!=='done'&&(isOverdue(t)||(t.priority||3)>=4)).length;
-  if(_ub){_ub.style.display=_uc?'':'none';_ub.textContent=_uc;}
-  const _pt=document.getElementById('pageTitle');if(_pt)_pt.textContent=(ME.displayName||'')+'의 업무';
+  // 사이드바 긴급 배지
+  const urgent = tasks.filter(t => t.status !== 'done' && (isOverdue(t) || (t.priority||3) >= 4)).length;
+  const badge  = document.getElementById('urgentBadge');
+  if (badge) { badge.style.display = urgent ? '' : 'none'; badge.textContent = urgent; }
+
+  // 통계 카드
   document.getElementById('statsRow').innerHTML = `
     <div class="stat-card"><div class="stat-label">전체 업무</div><div class="stat-value">${total}</div></div>
     <div class="stat-card"><div class="stat-label">진행 중</div><div class="stat-value">${inprog}</div></div>
     <div class="stat-card"><div class="stat-label">오래된 업무</div><div class="stat-value warn">${stale}</div></div>
-    <div class="stat-card"><div class="stat-label">기한 초과</div><div class="stat-value danger">${overdue}</div></div>`;
+    <div class="stat-card"><div class="stat-label">기한 초과</div><div class="stat-value danger">${overdue}</div>`;
 }
 
 function renderAssigneeFilter() {
@@ -1051,16 +1033,6 @@ if ('serviceWorker' in navigator) {
 
 
 
-
-// ── 사이드바 이름 즉시 표시 ──
-(function() {
-  var nm = document.getElementById('sbUserName');
-  var av = document.getElementById('sbAvatar');
-  var pt = document.getElementById('pageTitle');
-  if (nm) nm.textContent = ME.displayName || ME.id || '';
-  if (av) av.textContent = ((ME.displayName || ME.id || '--').slice(0, 2));
-  if (pt) pt.textContent = (ME.displayName || '') + '의 업무';
-})();
 
 loadReporters();
 

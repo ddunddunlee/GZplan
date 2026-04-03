@@ -345,9 +345,7 @@ document.getElementById('sbUserRole').textContent='어드민';
 document.getElementById('sbUserRole').style.color='var(--purple-t)';
 document.getElementById('sbAvatar').style.background='var(--purple-t)';
 
-document.getElementById('logoutBtn').addEventListener('click',()=>{localStorage.removeItem('tt_user');
-sessionStorage.clear();
-location.href='index.html';});
+document.getElementById('logoutBtn').addEventListener('click',()=>{localStorage.removeItem('tt_user'); sessionStorage.clear(); location.href = 'index.html';});
 document.querySelectorAll('[data-nav]').forEach(el=>el.addEventListener('click',()=>location.href=el.dataset.nav));
 
 function toast(m){const e=document.getElementById('toast');e.textContent=m;e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),2400)}
@@ -493,5 +491,21 @@ document.getElementById('reporterOkBtn').addEventListener('click',async()=>{
 
 init();
 </script>
+
+<script>
+// ── 공통 버튼 바인딩 (즉시 실행) ──
+document.addEventListener('DOMContentLoaded', function() {
+  // 로그아웃
+  var lb = document.getElementById('logoutBtn');
+  if (lb) lb.addEventListener('click', function() {
+    localStorage.removeItem('tt_user'); sessionStorage.clear(); location.href = 'index.html';
+  });
+  // 사이드바 네비
+  document.querySelectorAll('[data-nav]').forEach(function(el) {
+    el.addEventListener('click', function() { location.href = el.dataset.nav; });
+  });
+});
+</script>
+
 </body>
 </html>

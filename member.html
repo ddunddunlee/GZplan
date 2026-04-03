@@ -282,6 +282,16 @@ if (!ME?.id || !ME?.role) { localStorage.removeItem('tt_user'); sessionStorage.c
 if (ME.role === 'manager' || ME.role === 'admin') { location.href = 'manager.html'; throw ''; }
 if (ME.role !== 'member') { localStorage.removeItem('tt_user'); sessionStorage.clear(); location.href = 'index.html'; throw ''; }
 
+// ── 사이드바 & 페이지 타이틀 초기화 (ME 정의 직후) ──
+(function() {
+  var av = document.getElementById('sbAvatar');
+  var nm = document.getElementById('sbUserName');
+  var pt = document.getElementById('pageTitle');
+  if (av) av.textContent = (ME.displayName || ME.id || '--').slice(0, 2);
+  if (nm) nm.textContent = ME.displayName || ME.id || '';
+  if (pt) pt.textContent = (ME.displayName || '') + '의 업무';
+})();
+
 
 
 async function loadReporters() {
@@ -652,10 +662,15 @@ function renderDetail(t) {
 // ════════════════════════════════════════════
 // 이벤트 핸들러 — 필터
 // ════════════════════════════════════════════
-window.setFilter = (f, el) => {
+window.setFilter = (f) => {
   filter = f;
-  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-  el.classList.add('active');
+  // filterRow 안의 chip만 active 토글
+  const filterRow = document.getElementById('filterRow');
+  if (filterRow) {
+    filterRow.querySelectorAll('[data-f]').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.f === f);
+    });
+  }
   render();
 };
 
@@ -873,9 +888,6 @@ document.getElementById('overlay').addEventListener('click', e => {
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') window.closeModal();
 });
-// 업무 추가 버튼
-document.getElementById('addTaskBtn')?.addEventListener('click', () => window.openModal());
-
 // ════════════════════════════════════════════
 // 드래그 앤 드롭 정렬
 // ════════════════════════════════════════════
@@ -1041,6 +1053,19 @@ loadReporters();
 // ── 버튼 바인딩 (일반 script - 즉시 실행) ──
 // window.xxx 함수는 module 스크립트에서 등록되므로 DOMContentLoaded 후 바인딩
 document.addEventListener('DOMContentLoaded', function() {
+  // 사이드바 이름 (일반 script에서도 처리 - module보다 빠름)
+  try {
+    var _s = localStorage.getItem('tt_user');
+    if (_s) {
+      var _u = JSON.parse(_s);
+      var _av = document.getElementById('sbAvatar');
+      var _nm = document.getElementById('sbUserName');
+      var _pt = document.getElementById('pageTitle');
+      if (_av) _av.textContent = (_u.displayName || _u.id || '--').slice(0, 2);
+      if (_nm) _nm.textContent = _u.displayName || _u.id || '';
+      if (_pt) _pt.textContent = (_u.displayName || '') + '의 업무';
+    }
+  } catch(e) {}
   // 로그아웃
   var logoutBtn = document.getElementById('logoutBtn');
   if (logoutBtn) logoutBtn.addEventListener('click', function() {
@@ -1057,7 +1082,13 @@ document.addEventListener('DOMContentLoaded', function() {
   // 업무 추가 버튼
   var addTaskBtn = document.getElementById('addTaskBtn');
   if (addTaskBtn) addTaskBtn.addEventListener('click', function() {
-    if (window.openModal) window.openModal();
+    // module script가 아직 로드 안됐을 경우 대비 - 직접 overlay 열기
+    var overlay = document.getElementById('overlay');
+    if (window.openModal) {
+      window.openModal();
+    } else if (overlay) {
+      overlay.classList.add('show');
+    }
   });
 
   // 알림 버튼
@@ -1088,7 +1119,7 @@ document.addEventListener('DOMContentLoaded', function() {
   var filterRow = document.getElementById('filterRow');
   if (filterRow) filterRow.addEventListener('click', function(e) {
     var btn = e.target.closest('[data-f]');
-    if (btn && window.setFilter) window.setFilter(btn.dataset.f, btn);
+    if (btn && window.setFilter) window.setFilter(btn.dataset.f);
   });
 
   // 오버레이 닫기

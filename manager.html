@@ -60,8 +60,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 
 /* ── 탑바 ── */
 .topbar{background:var(--bg);border-bottom:0.5px solid var(--border);padding:0 24px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;flex-shrink:0}
-.page-title{font-size:15px;font-weight:600;color:var(--text)}
-.topbar-right{display:flex;gap:8px;align-items:center}
+.page-title{font-size:15px;font-weight:600;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.topbar-right{display:flex;gap:8px;align-items:center;flex-shrink:0}
 
 /* ── 햄버거 버튼 (모바일) ── */
 .hamburger{display:none;width:36px;height:36px;border:none;background:transparent;cursor:pointer;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:4px;border-radius:var(--radius-sm);flex-shrink:0}
@@ -232,7 +232,7 @@ button, [onclick], [data-nav], .sb-item, .task-card, .chip {
     <button class="hamburger" id="hamburgerBtn" aria-label="메뉴"><span></span><span></span><span></span></button>
     <div class="page-title">팀 업무 현황</div>
     <div class="topbar-right">
-      <button class="btn-ghost" id="addBtn" onclick="if(window.openModal)window.openModal()" style="touch-action:manipulation">+ 업무 추가</button>
+      <button class="btn-solid" id="addBtn" onclick="if(window.openModal)window.openModal()" style="touch-action:manipulation">+ 업무 추가</button>
     </div>
   </div>
 

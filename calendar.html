@@ -200,6 +200,57 @@ button, [onclick], [data-nav], .sb-item, .task-card, .chip {
   touch-action: manipulation;
 }
 
+
+/* ── 캘린더 전용 CSS ── */
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:10px}
+.cal-title{font-size:18px;font-weight:600;color:var(--text);min-width:120px;text-align:center}
+.nav-btn{width:30px;height:30px;border-radius:var(--radius-sm);border:0.5px solid var(--border);background:var(--bg);color:var(--text2);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;touch-action:manipulation}
+.nav-btn:hover{border-color:var(--border2);color:var(--text)}
+.today-btn{padding:5px 12px;border-radius:var(--radius-sm);font-size:12px;border:0.5px solid var(--border);background:var(--bg);color:var(--text2);cursor:pointer;touch-action:manipulation}
+.today-btn:hover{border-color:var(--border2);color:var(--text)}
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:.75rem}
+.legend-item{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text2)}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.cal-grid{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);border-bottom:0.5px solid var(--border)}
+.cal-weekday{padding:8px;font-size:11px;font-weight:600;color:var(--text3);text-align:center}
+.cal-weekday:first-child{color:var(--red)}.cal-weekday:last-child{color:var(--blue)}
+.cal-days{display:grid;grid-template-columns:repeat(7,1fr)}
+.cal-day{min-height:100px;border-right:0.5px solid var(--border);border-bottom:0.5px solid var(--border);padding:4px 3px 3px;overflow:hidden;box-sizing:border-box}
+.cal-day:nth-child(7n){border-right:none}
+.cal-day.other-month .day-num{color:var(--text3)}
+.cal-day.today .day-num{background:var(--text);color:var(--bg);border-radius:50%}
+.day-num{font-size:11px;font-weight:500;width:20px;height:20px;display:flex;align-items:center;justify-content:center;margin-bottom:2px}
+.day-num.sun{color:var(--red)}.day-num.sat{color:var(--blue)}
+.event-bars{display:flex;flex-direction:column;gap:2px}
+.event-bar{font-size:10px;font-weight:500;padding:1px 4px;border-radius:3px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff;line-height:1.6;touch-action:manipulation}
+.event-bar:hover{opacity:.8}
+.bar-start{border-radius:3px 0 0 3px}.bar-end{border-radius:0 3px 3px 0}.bar-mid{border-radius:0}.bar-single{border-radius:3px}
+.more-label{font-size:10px;color:var(--text3);padding:1px 3px;cursor:pointer}
+.cat-manage{padding:1.5rem 24px;max-width:600px}
+.cat-list{display:flex;flex-direction:column;gap:8px;margin-bottom:1.5rem}
+.cat-row{display:flex;align-items:center;gap:10px;background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:.7rem 1rem}
+.cat-color-inp{width:28px;height:28px;padding:2px;border:0.5px solid var(--border);border-radius:6px;cursor:pointer;flex-shrink:0}
+.cat-name-inp{flex:1;font-size:14px;font-weight:500;border:none;background:transparent;color:var(--text);font-family:inherit;outline:none;padding:2px 4px;border-radius:4px;border:0.5px solid transparent}
+.cat-name-inp:focus{border-color:var(--border);background:var(--bg2)}
+.cat-del-btn{padding:4px 10px;font-size:12px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--text2);cursor:pointer;flex-shrink:0}
+.cat-del-btn:hover{background:var(--red-bg);color:var(--red)}
+.tab-row{display:flex;border-bottom:0.5px solid var(--border);background:var(--bg);padding:0 24px;flex-shrink:0}
+.tab-btn{padding:10px 16px;font-size:12px;font-weight:500;color:var(--text2);border:none;border-bottom:2px solid transparent;background:transparent;cursor:pointer;touch-action:manipulation}
+.tab-btn:hover{color:var(--text)}.tab-btn.active{color:var(--text);border-bottom-color:var(--text)}
+.repeat-box{border:0.5px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;background:var(--bg2);margin-top:6px;display:flex;flex-direction:column;gap:8px}
+.repeat-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px}
+.repeat-row select,.repeat-row input[type=number]{width:auto;padding:5px 8px;font-size:13px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:inherit;outline:none}
+.repeat-edit-opts{display:flex;flex-direction:column;gap:8px;margin:12px 0}
+.repeat-opt{display:flex;align-items:center;gap:8px;padding:10px 12px;border:0.5px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;font-size:13px}
+.repeat-opt:hover{border-color:var(--border2);background:var(--bg2)}
+.repeat-opt input[type=radio]{width:auto}
+@media(max-width:768px){
+  .cal-day{min-height:60px}
+  .event-bar{font-size:9px}
+  .cal-weekday{font-size:10px;padding:6px 2px}
+}
+
 </style>
 </head>
 <body>

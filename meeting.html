@@ -464,7 +464,10 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
   </button>
       <div class="page-title" id="meetPageTitle">새 회의록</div>
       <div style="display:flex;gap:8px">
-<button class="btn-ghost" id="copySummaryBtn" onclick="if(window.copySummary)window.copySummary()" style="touch-action:manipulation">📋 복사</button>
+<label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2);cursor:pointer;white-space:nowrap">
+          <input type="checkbox" id="shareChk" style="width:auto;cursor:pointer"> 🌐 팀 전체 공유
+        </label>
+        <button class="btn-ghost" id="copySummaryBtn" onclick="if(window.copySummary)window.copySummary()" style="touch-action:manipulation">📋 복사</button>
         <button class="btn-ghost" id="deleteMeetingBtn" onclick="if(window.deleteMeeting)window.deleteMeeting()" style="display:none;color:var(--red);border-color:rgba(163,45,45,.3)">삭제</button>
         <button class="btn-solid" id="saveMeetingBtn" onclick="if(window.saveMeeting)window.saveMeeting()" style="touch-action:manipulation">💾 저장</button>
       </div>
@@ -477,9 +480,9 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
           <div class="fg"><label>일시</label><input id="meetDate" type="datetime-local"/></div>
         </div>
         <div>
-          <div style="font-size:11px;color:var(--text3);margin-bottom:8px">참석자</div>
-          <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;min-height:28px" id="attendeeWrap"></div>
-          <div style="display:flex;flex-wrap:wrap;gap:4px" id="memberBtnRow"></div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:6px">참석자</div>
+          <input id="attendeeInput" placeholder="예: 현주용, 이영찬, 강신욱" style="width:100%;padding:8px 10px;font-size:13px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:inherit;outline:none"/>
+          <div style="font-size:11px;color:var(--text3);margin-top:4px">쉼표로 구분해서 입력하세요</div>
         </div>
       </div>
       <div id="recWrap" style="background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:1.25rem">
@@ -828,6 +831,7 @@ window.newMeeting=()=>{
   transcript="";
   document.getElementById("meetTitle").value="";
   document.getElementById("meetDate").value=toDatetimeLocal();
+  const attI=document.getElementById('attendeeInput');if(attI)attI.value='';
   document.getElementById("transcriptArea").value="";
   const una=document.getElementById("userNoteArea");if(una)una.value="";
   document.getElementById("summaryArea").value="";
@@ -856,6 +860,7 @@ window.loadMeeting=id=>{
   attendees=m.attendees||[];
   transcript=m.transcript||'';
   document.getElementById('meetTitle').value=m.title||'';
+  const attInput=document.getElementById('attendeeInput');if(attInput)attInput.value=(m.attendees||[]).join(', ');
   document.getElementById('meetDate').value=m.date?toDatetimeLocal(new Date(m.date)):'';
   document.getElementById('transcriptArea').value=m.transcript||'';
   document.getElementById('summaryArea').value=m.summary||'';
@@ -986,14 +991,16 @@ window.saveMeeting=async()=>{
   const transcript=document.getElementById("transcriptArea").value.trim();
   const userNote=document.getElementById("userNoteArea").value.trim();
   const summary=document.getElementById("summaryArea").value.trim();
-  const isShared=false; // 저장은 항상 개인 회의록으로
+  const isShared=document.getElementById("shareChk")?.checked||false;
   if(!title){toast("회의 제목을 입력해주세요");return}
 
   const tags=[...new Set([
     ...(userNote.match(/#[\w가-힣]+/g)||[]),
     ...(summary.match(/#[\w가-힣]+/g)||[])
   ])];
-  const data={title,date,attendees,transcript,userNote,summary,tags,
+  const attendeeText=document.getElementById('attendeeInput')?.value||'';
+  const attendees_arr=attendeeText?attendeeText.split(',').map(s=>s.trim()).filter(Boolean):[];
+  const data={title,date,attendees:attendees_arr,transcript,userNote,summary,tags,
     authorId:ME.id,author:ME.displayName,updatedAt:new Date().toISOString()};
 
   try{

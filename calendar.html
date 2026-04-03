@@ -484,7 +484,7 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
   </button>
     <div class="page-title">캘린더</div>
     <div class="topbar-right">
-      <button class="add-btn" id="addCommonBtnTop" style="display:none">🏢 공통 일정</button>
+      <button class="btn-ghost" id="addCommonBtnTop" style="display:none;border-color:var(--border2)">🏢 공통 일정 추가</button>
       <button class="btn-solid" id="addPersonalBtn">+ 개별 일정 추가</button>
     </div>
   </div>
@@ -500,7 +500,7 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
         <button class="nav-btn" id="nextBtn">›</button>
         <button class="today-btn" id="todayBtn">오늘</button>
       </div>
-      <button class="add-btn" id="addCommonBtn" style="display:none">🏢 공통 일정 추가</button>
+      
     </div>
     <div class="filter-row" id="typeFilterRow"></div>
     <div class="filter-row" id="memberFilterRow"></div>
@@ -803,13 +803,17 @@ function renderCatList(){
 function renderLegend(){
   const el=document.getElementById('legend');if(!el)return;
   let h='';
-  if(typeFilter!=='task'&&typeFilter!=='common')CAT_LIST.forEach(c=>{h+=`<div class="legend-item"><div class="legend-dot" style="background:${c.color}"></div>${c.label}</div>`});
-  if(typeFilter!=='task'&&typeFilter!=='personal')h+=`<div class="legend-item"><div class="legend-dot" style="background:#5F5E5A"></div>🏢 공통</div>`;
-  if(typeFilter!=='personal'&&typeFilter!=='common'){
-    h+=`<div class="legend-item"><div class="legend-dot" style="background:#888;border:1px dashed #888"></div>업무</div>`;
-    if(isMgr)MEMBER_IDS.forEach((id,i)=>{h+=`<div class="legend-item"><div class="legend-dot" style="background:${MEMBER_COLORS[i]}"></div>${id}</div>`});
+  // 팀장: 팀원 색상만 표시
+  if(isMgr && typeFilter!=='personal'&&typeFilter!=='common'){
+    MEMBER_IDS.forEach((id,i)=>{
+      h+=`<div class="legend-item"><div class="legend-dot" style="background:${MEMBER_COLORS[i]}"></div>${id}</div>`;
+    });
   }
-  h+=`<div class="legend-item"><span style="font-size:11px">🔁</span>반복</div>`;
+  // 팀원: 개인일정/공통 구분만
+  if(!isMgr){
+    if(typeFilter!=='common')h+=`<div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>개인</div>`;
+    if(typeFilter!=='personal')h+=`<div class="legend-item"><div class="legend-dot" style="background:#5F5E5A"></div>🏢 공통</div>`;
+  }
   el.innerHTML=h;
 }
 window.updCatColor=async(id,color)=>{const c=CAT_LIST.find(x=>x.id===id);if(c)c.color=color;await saveCats();rebuildCatMap();renderLegend();renderCalendar();toast('색상 변경됐어요 ✓')};

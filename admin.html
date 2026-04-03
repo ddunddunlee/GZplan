@@ -419,14 +419,9 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
     <div><div class="sb-user-name" id="sbUserName"></div><div class="sb-user-role" id="sbUserRole"></div></div>
   </div>
   <div class="sb-nav">
-    <div class="sb-sec">업무</div>
-    
-    <div class="sb-item" data-nav="manager.html"><div class="sb-icon">☐</div><div class="sb-label">팀 업무 현황</div></div>
-    <div class="sb-sec">도구</div>
-    <div class="sb-item" data-nav="calendar.html"><div class="sb-icon">▦</div><div class="sb-label">캘린더</div></div>
-    <div class="sb-item" data-nav="meeting.html"><div class="sb-icon">◈</div><div class="sb-label">회의록</div></div>
-    <div class="sb-item" data-nav="memo.html"><div class="sb-icon">◉</div><div class="sb-label">메모장</div></div>
-    <div class="sb-sec">관리</div><div class="sb-item active" data-nav="admin.html"><div class="sb-icon">◯</div><div class="sb-label">계정 관리</div></div>
+    <div class="sb-sec">관리</div>
+    <div class="sb-item active" id="navAccounts" onclick="switchAdminTab('accounts')" style="cursor:pointer"><div class="sb-icon">👤</div><div class="sb-label">계정 관리</div></div>
+    <div class="sb-item" id="navReporters" onclick="switchAdminTab('reporters')" style="cursor:pointer"><div class="sb-icon">📋</div><div class="sb-label">최종보고자 목록</div></div>
   </div>
   <div class="sb-bottom">
     <div class="sb-sync"><div class="sync-dot" id="syncDot" style="display:none"></div><span id="syncTxt" style="display:none">실시간 동기화</span></div>
@@ -442,40 +437,51 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
     <div style="width:24px;height:24px;border:2px solid var(--border);border-top-color:var(--text);border-radius:50%;animation:sp .7s linear infinite"></div>
     <style>@keyframes sp{to{transform:rotate(360deg)}}</style>
   </div>
-  <div id="appContent" style="display:none;padding:1.5rem 24px 6rem;max-width:860px;width:100%;margin:0 auto">
+  <div id="appContent" style="display:none;padding:0;width:100%">
+
+  <!-- 탭 헤더 (사이드바 클릭으로 전환) -->
+
+  <!-- 계정 관리 섹션 -->
+  <div id="tabAccounts" style="padding:1.5rem 24px 6rem;max-width:900px;margin:0 auto">
     <div class="stats" id="statsRow" style="margin-bottom:1.25rem"></div>
     <div class="init-box" id="initBox">
       <div class="init-box-text" id="initText"><strong>초기 계정 미등록</strong><br>팀원 7명의 계정을 등록해주세요.</div>
       <button class="init-btn" id="initBtn">팀원 계정 일괄 등록</button>
     </div>
-    <div class="card-sec">
+    <!-- admin 비번 변경 -->
+    <div class="card-sec" style="margin-bottom:1.25rem">
       <div class="card-sec-title">🔐 admin 비밀번호 변경</div>
       <div class="pw-fields">
         <div class="fg"><label>현재 비밀번호</label><input id="curPw" type="password" placeholder="현재 비밀번호"/></div>
         <div class="fg"><label>새 비밀번호</label><input id="newAdminPw" type="password" placeholder="새 비밀번호"/></div>
         <div class="fg"><label>확인</label><input id="confirmAdminPw" type="password" placeholder="한 번 더 입력"/></div>
-        <button class="btn-ok" id="changePwBtn" style="margin-bottom:.9rem;padding:9px 16px">변경</button>
+        <button class="btn-ok" id="changePwBtn" style="margin-bottom:.9rem;padding:9px 16px;align-self:flex-end">변경</button>
       </div>
       <div class="err-line" id="adminPwErr"></div>
     </div>
-    <div class="sec-head">
-      <div class="sec-title">계정 목록</div>
-      <button class="add-btn" id="openAddAccountBtn">+ 계정 추가</button>
+    <!-- 계정 목록 -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="font-size:15px;font-weight:700;color:var(--text)">계정 목록</div>
+      <button class="btn-solid" id="openAddAccountBtn">+ 계정 추가</button>
     </div>
-    <div class="account-list" id="accountList"></div>
-    <div style="margin-top:2rem">
-      <div class="sec-head">
-        <div class="sec-title">최종보고자 목록</div>
-        <button class="add-btn" id="openAddReporterBtn">+ 보고자 추가</button>
+    <div id="accountList"></div>
+  </div>
+
+  <!-- 최종보고자 목록 섹션 -->
+  <div id="tabReporters" style="display:none;padding:1.5rem 24px 6rem;max-width:900px;margin:0 auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div>
+        <div style="font-size:15px;font-weight:700;color:var(--text)">최종보고자 목록</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:3px">팀원이 업무 추가 시 선택할 수 있는 보고자 목록이에요</div>
       </div>
-      <div class="card-sec">
-        <div id="reporterList" style="display:flex;flex-wrap:wrap;gap:8px;min-height:32px"></div>
-        <p style="font-size:12px;color:var(--text3);margin-top:10px">팀원이 업무 추가 시 선택할 수 있는 최종보고자 목록이에요.</p>
-      </div>
+      <button class="btn-solid" id="openAddReporterBtn">+ 보고자 추가</button>
+    </div>
+    <div class="card-sec">
+      <div id="reporterList" style="display:flex;flex-wrap:wrap;gap:8px;min-height:40px"></div>
     </div>
   </div>
-</div>
-</div>
+
+</div
 
 <div class="overlay" id="addAccountOverlay">
   <div class="modal">
@@ -577,6 +583,15 @@ function closeOverlay(id){document.getElementById(id).classList.remove('show')}
 document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===e.currentTarget)e.target.classList.remove('show')}));
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.overlay.show').forEach(o=>o.classList.remove('show'))});
 
+
+// ── 관리 탭 전환 ──
+window.switchAdminTab = function(tab) {
+  document.getElementById('tabAccounts').style.display = tab==='accounts' ? '' : 'none';
+  document.getElementById('tabReporters').style.display = tab==='reporters' ? '' : 'none';
+  document.getElementById('navAccounts').classList.toggle('active', tab==='accounts');
+  document.getElementById('navReporters').classList.toggle('active', tab==='reporters');
+};
+
 async function init(){
   document.getElementById('gate').style.display='none';
   document.getElementById('appContent').style.display='block';
@@ -599,21 +614,38 @@ function renderStats(){
 
 function renderList(){
   const el=document.getElementById('accountList');
-  if(!accounts.length){el.innerHTML='<div style="text-align:center;padding:2rem;color:var(--text3);font-size:13px">등록된 계정이 없어요</div>';return;}
+  if(!accounts.length){el.innerHTML='<div style="text-align:center;padding:3rem;color:var(--text3);font-size:13px">등록된 계정이 없어요</div>';return;}
   const rl={admin:'어드민',manager:'팀장',member:'팀원'};
-  el.innerHTML=accounts.map(a=>{
+  const roleCls={admin:'role-admin',manager:'role-manager',member:'role-member'};
+  el.innerHTML=`<div style="display:flex;flex-direction:column;gap:8px">`+accounts.map(a=>{
     const isMe=a.docId===currentUser?.id;
-    return `<div class="account-row">
-      <div class="acc-info"><div class="acc-name">${a.displayName||a.docId}${isMe?' <span style="font-size:11px;color:var(--text3)">(나)</span>':''}</div><div class="acc-sub">@${a.docId}</div></div>
-      <span class="role-badge role-${a.role}">${rl[a.role]||a.role}</span>
-      <span class="status-badge ${a.disabled?'status-off':'status-on'}">${a.disabled?'비활성':'활성'}</span>
-      <div class="acc-actions">
-        <button class="act-btn" data-action="pw" data-id="${a.docId}" data-name="${a.displayName||a.docId}">비번 변경</button>
-        <button class="act-btn" data-action="role" data-id="${a.docId}" data-name="${a.displayName||a.docId}" data-role="${a.role}">역할 변경</button>
-        ${isMe?'':`<button class="act-btn ${a.disabled?'':'danger'}" data-action="toggle" data-id="${a.docId}" data-disabled="${a.disabled?'1':'0'}">${a.disabled?'활성화':'비활성화'}</button><button class="act-btn danger" data-action="del" data-id="${a.docId}" data-name="${a.displayName||a.docId}">삭제</button>`}
+    return `<div style="background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px 16px">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <!-- 아바타 -->
+        <div style="width:36px;height:36px;border-radius:50%;background:var(--text);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--bg);flex-shrink:0">
+          ${(a.displayName||a.docId).slice(0,2)}
+        </div>
+        <!-- 정보 -->
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px">
+            <span style="font-size:14px;font-weight:600;color:var(--text)">${a.displayName||a.docId}</span>
+            ${isMe?'<span style="font-size:10px;color:var(--text3);padding:1px 6px;border-radius:var(--pill);background:var(--bg3)">나</span>':''}
+            <span class="role-badge ${roleCls[a.role]||'role-member'}">${rl[a.role]||a.role}</span>
+            <span class="status-badge ${a.disabled?'status-off':'status-on'}">${a.disabled?'비활성':'활성'}</span>
+          </div>
+          <div style="font-size:11px;color:var(--text3)">@${a.docId}</div>
+        </div>
+        <!-- 액션 버튼 -->
+        <div style="display:flex;gap:5px;flex-wrap:wrap;flex-shrink:0">
+          <button class="act-btn" data-action="pw" data-id="${a.docId}" data-name="${a.displayName||a.docId}">비번 변경</button>
+          <button class="act-btn" data-action="role" data-id="${a.docId}" data-name="${a.displayName||a.docId}" data-role="${a.role}">역할 변경</button>
+          ${isMe?'':`
+          <button class="act-btn ${a.disabled?'':'danger'}" data-action="toggle" data-id="${a.docId}" data-disabled="${a.disabled?'1':'0'}">${a.disabled?'활성화':'비활성화'}</button>
+          <button class="act-btn danger" data-action="del" data-id="${a.docId}" data-name="${a.displayName||a.docId}">삭제</button>`}
+        </div>
       </div>
     </div>`;
-  }).join('');
+  }).join('')+'</div>';
 }
 
 // 계정 목록 이벤트 위임
@@ -695,8 +727,15 @@ async function loadReporters(){
 async function saveReporters(){await setDoc(doc(db,'settings','reporters'),{list:reporters});}
 function renderReporters(){
   const el=document.getElementById('reporterList');
-  if(!reporters.length){el.innerHTML='<span style="font-size:13px;color:var(--text3)">등록된 보고자가 없어요</span>';return;}
-  el.innerHTML=reporters.map((r,i)=>`<span style="display:inline-flex;align-items:center;gap:5px;background:var(--purple-bg);color:var(--purple-t);font-size:13px;font-weight:500;padding:4px 10px;border-radius:999px">${r}<button data-ri="${i}" style="background:none;border:none;cursor:pointer;color:inherit;font-size:12px;opacity:.6;padding:0;line-height:1">✕</button></span>`).join('');
+  if(!reporters.length){el.innerHTML='<div style="color:var(--text3);font-size:13px;padding:1rem 0">등록된 보고자가 없어요</div>';return;}
+  el.innerHTML=reporters.map((r,i)=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg2);border-radius:var(--radius-sm);gap:10px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:12px;width:22px;height:22px;background:var(--purple-bg);color:var(--purple-t);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600">${i+1}</span>
+        <span style="font-size:14px;font-weight:500;color:var(--text)">${r}</span>
+      </div>
+      <button data-ri="${i}" style="padding:3px 10px;font-size:12px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--red);cursor:pointer">삭제</button>
+    </div>`).join('');
 }
 document.getElementById('reporterList').addEventListener('click',async e=>{
   const btn=e.target.closest('[data-ri]');if(!btn)return;

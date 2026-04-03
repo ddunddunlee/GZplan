@@ -278,10 +278,11 @@ let REPORTERS   = [];
 const db  = getFirestore(initializeApp(FIREBASE_CONFIG));
 const sess = localStorage.getItem('tt_user');
 if (!sess) { location.href = 'index.html'; throw ''; }
-const ME = JSON.parse(sess);
-if (!ME.id) { location.href = 'index.html'; throw ''; }
+let ME;
+try { ME = JSON.parse(sess); } catch { localStorage.removeItem('tt_user'); location.href = 'index.html'; throw ''; }
+if (!ME?.id || !ME?.role) { localStorage.removeItem('tt_user'); location.href = 'index.html'; throw ''; }
 if (ME.role === 'manager' || ME.role === 'admin') { location.href = 'manager.html'; throw ''; }
-if (ME.role !== 'member') { location.href = 'index.html'; throw ''; }
+if (ME.role !== 'member') { localStorage.removeItem('tt_user'); location.href = 'index.html'; throw ''; }
 
 async function loadReporters() {
   try {

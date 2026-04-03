@@ -185,7 +185,9 @@ body{margin:0;padding:0}
 (function() {
   var sess = localStorage.getItem('tt_user');
   if (!sess) { location.href = 'index.html'; return; }
-  var u = JSON.parse(sess);
+  var u;
+  try { u = JSON.parse(sess); } catch(e) { localStorage.removeItem('tt_user'); location.href='index.html'; return; }
+  if (!u || !u.id || !u.role) { localStorage.removeItem('tt_user'); location.href='index.html'; return; }
   var isMgr = u.role === 'manager' || u.role === 'admin';
   var av = document.getElementById('sbAvatar');
   var nm = document.getElementById('sbUserName');

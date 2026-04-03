@@ -47,9 +47,13 @@ import {getFirestore,doc,getDoc} from 'https://www.gstatic.com/firebasejs/10.12.
 const FC={apiKey:"AIzaSyA7KylsSyT3_0oQvhBtcrPc-gcdfVq90IQ",authDomain:"gzplan.firebaseapp.com",projectId:"gzplan",storageBucket:"gzplan.firebasestorage.app",messagingSenderId:"186255862586",appId:"1:186255862586:web:f36d21f76012ca43b8fe03"};
 const db=getFirestore(initializeApp(FC));
 const go=r=>{location.href=r==='admin'?'admin.html':r==='manager'?'manager.html':'member.html'};
-const sess=localStorage.getItem('tt_user');
-if(sess){try{const u=JSON.parse(sess);if(u?.id&&u?.role)go(u.role);else localStorage.removeItem('tt_user');sessionStorage.clear();}catch{localStorage.removeItem('tt_user');sessionStorage.clear();}}
+// 항상 로그인 화면 표시 - 자동 로그인 없음
+localStorage.removeItem('tt_user');
+sessionStorage.clear();
 async function doLogin(){
+  // 기존 세션 완전 초기화
+  localStorage.removeItem('tt_user');
+  sessionStorage.clear();
   const id=document.getElementById('uid').value.trim(),pw=document.getElementById('upw').value;
   const err=document.getElementById('err'),btn=document.getElementById('loginBtn');
   err.textContent='';

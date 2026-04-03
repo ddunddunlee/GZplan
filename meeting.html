@@ -98,134 +98,138 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Pretendard","Segoe UI",sans-s
 </style>
 </head>
 <body>
-<div style="display:flex;width:100%;min-height:100vh">
-<div style="width:220px;flex-shrink:0;background:#fff;border-right:0.5px solid #e5e5e3;display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100">
-  <div style="padding:20px 16px 16px;border-bottom:0.5px solid #f0f0ee">
-    <div style="font-size:15px;font-weight:600;color:#1a1a1a;letter-spacing:-.3px">GZ Plan</div>
-    <div style="font-size:11px;color:#a8a8a8;margin-top:2px">경영기획팀</div>
+<div class="app">
+<div class="sidebar">
+  <div class="sb-brand"><div class="sb-brand-name">GZ Plan</div><div class="sb-brand-sub">경영기획팀</div></div>
+  <div class="sb-user">
+    <div class="sb-avatar" id="sbAvatar">--</div>
+    <div><div class="sb-user-name" id="sbUserName"></div><div class="sb-user-role" id="sbUserRole"></div></div>
   </div>
-  <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:0.5px solid #f0f0ee">
-    <div id="sbAvatar" style="width:30px;height:30px;border-radius:50%;background:#1a1a1a;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;flex-shrink:0">--</div>
-    <div><div id="sbName" style="font-size:13px;font-weight:500;color:#1a1a1a"></div><div id="sbRole" style="font-size:11px;color:#a8a8a8"></div></div>
+  <div class="sb-nav" id="sbNav">
+    <div class="sb-sec">업무</div>
+    <div class="sb-item" data-nav="member.html" id="sbTaskItem"><div class="sb-icon">☐</div><div class="sb-label" id="sbTaskLabel">내 업무</div></div>
+    <div class="sb-sec">도구</div>
+    <div class="sb-item" data-nav="calendar.html"><div class="sb-icon">▦</div><div class="sb-label">캘린더</div></div>
+    <div class="sb-item active" data-nav="meeting.html"><div class="sb-icon">◈</div><div class="sb-label">회의록</div></div>
+    <div class="sb-item" data-nav="memo.html"><div class="sb-icon">◉</div><div class="sb-label">메모장</div></div>
+    
   </div>
-  <div style="flex:1;padding:8px 0;overflow-y:auto">
-    <div style="padding:4px 16px;font-size:10px;font-weight:600;color:#c0c0bc;letter-spacing:.08em;text-transform:uppercase;margin-top:10px">업무</div>
-    <div id="sb-task" onclick="goBack()" style="display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;margin:1px 8px;border-radius:6px" onmouseover="this.style.background='#f7f7f5'" onmouseout="this.style.background='transparent'"><span style="font-size:15px;width:20px;text-align:center;color:#888">☐</span><span style="font-size:13px;color:#6b6b6b">내 업무 / 팀 업무</span></div>
-    <div style="padding:4px 16px;font-size:10px;font-weight:600;color:#c0c0bc;letter-spacing:.08em;text-transform:uppercase;margin-top:10px">도구</div>
-    <div onclick="location.href='calendar.html'" style="display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;margin:1px 8px;border-radius:6px" onmouseover="this.style.background='#f7f7f5'" onmouseout="this.style.background='transparent'"><span style="font-size:15px;width:20px;text-align:center;color:#888">▦</span><span style="font-size:13px;color:#6b6b6b">캘린더</span></div>
-    <div style="display:flex;align-items:center;gap:10px;padding:9px 16px;margin:1px 8px;border-radius:6px;background:#f0f0ee"><span style="font-size:15px;width:20px;text-align:center;color:#1a1a1a">◈</span><span style="font-size:13px;color:#1a1a1a;font-weight:500">회의록</span></div>
-    <div onclick="location.href='memo.html'" style="display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;margin:1px 8px;border-radius:6px" onmouseover="this.style.background='#f7f7f5'" onmouseout="this.style.background='transparent'"><span style="font-size:15px;width:20px;text-align:center;color:#888">◉</span><span style="font-size:13px;color:#6b6b6b">메모장</span></div>
-  </div>
-  <div style="padding:12px 16px;border-top:0.5px solid #f0f0ee">
-    <button onclick="logout()" style="font-size:11px;padding:5px 10px;border:0.5px solid #e5e5e3;border-radius:6px;background:transparent;color:#6b6b6b;cursor:pointer;width:100%">로그아웃</button>
+  <div class="sb-bottom">
+    <div class="sb-sync"><div class="sync-dot" id="syncDot"></div><span>실시간 동기화</span></div>
+    <button class="btn-ghost" id="logoutBtn" style="width:100%;font-size:11px;padding:5px">로그아웃</button>
   </div>
 </div>
-<div style="margin-left:220px;flex:1;display:flex;overflow:hidden">
-
-<div style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0">
-<div class="topbar">
-  <div style="font-size:15px;font-weight:600;color:#1a1a1a">회의록</div>
-</div>
-
-<div class="layout">
-  <!-- 사이드바: 회의록 목록 -->
-  <div class="sidebar">
-    <div class="sb-head">
-      <span class="sb-head-title">회의록 목록</span>
-      <button class="sb-new" onclick="newMeeting()">+ 새 회의</button>
+<div class="main-wrap" style="flex-direction:row">
+  <div style="width:220px;flex-shrink:0;border-right:0.5px solid var(--border);background:var(--bg);display:flex;flex-direction:column;overflow:hidden">
+    <div style="padding:14px 16px;border-bottom:0.5px solid var(--bg3);display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <span style="font-size:13px;font-weight:600;color:var(--text)">회의록</span>
+      <button class="btn-solid" id="newMeetingBtn" style="font-size:11px;padding:4px 10px">+ 새 회의</button>
     </div>
-    <div class="sb-list" id="sbList">
-      <div class="sb-empty">저장된 회의록이 없어요<br>새 회의를 시작해주세요</div>
+    <div style="flex:1;overflow-y:auto" id="sbList">
+      <div style="padding:2rem;text-align:center;color:var(--text3);font-size:13px;line-height:1.6">저장된 회의록이 없어요<br>새 회의를 시작해주세요</div>
     </div>
   </div>
-
-  <!-- 메인 -->
-  <div class="main">
-    <div class="main-inner" id="mainInner">
-
-      <!-- 회의 정보 -->
-      <div class="card">
-        <div class="card-title"><span>📋</span> 회의 정보</div>
-        <div class="info-row">
-          <div class="fg">
-            <label>회의 제목</label>
-            <input id="meetTitle" placeholder="예: 4월 주간 팀 회의" />
-          </div>
-          <div class="fg">
-            <label>일시</label>
-            <input id="meetDate" type="datetime-local" />
-          </div>
+  <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0">
+    <div class="topbar">
+      <div class="page-title" id="meetPageTitle">새 회의록</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn-ghost" id="copySummaryBtn">📋 복사</button>
+        <button class="btn-ghost" id="deleteMeetingBtn" style="display:none;color:var(--red);border-color:rgba(163,45,45,.3)">삭제</button>
+        <button class="btn-solid" id="saveMeetingBtn">💾 저장</button>
+      </div>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:1.5rem 24px;display:flex;flex-direction:column;gap:14px">
+      <div style="background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:1.25rem">
+        <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:12px">📋 회의 정보</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+          <div class="fg"><label>회의 제목</label><input id="meetTitle" placeholder="예: 4월 주간 팀 회의"/></div>
+          <div class="fg"><label>일시</label><input id="meetDate" type="datetime-local"/></div>
         </div>
-        <div class="fg" style="margin-bottom:.75rem">
-          <label>참석자</label>
-          <div class="attendee-wrap" id="attendeeWrap"></div>
-          <div class="member-btn-row" id="memberBtnRow"></div>
+        <div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:8px">참석자</div>
+          <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;min-height:28px" id="attendeeWrap"></div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px" id="memberBtnRow"></div>
         </div>
       </div>
-
-      <!-- 녹음 -->
-      <div class="card" id="recCard">
-        <div class="card-title"><span>🎙</span> 실시간 녹음</div>
+      <div style="background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:1.25rem">
+        <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:12px">🎙 실시간 녹음</div>
         <div id="recContent">
-          <div class="rec-area">
-            <div class="rec-timer" id="recTimer">00:00</div>
-            <button class="rec-btn" id="recBtn" onclick="toggleRec()">🎙</button>
-            <div class="rec-status" id="recStatus">버튼을 눌러 녹음을 시작하세요</div>
+          <div style="display:flex;align-items:center;gap:14px;padding:4px 0">
+            <button id="recBtn" style="width:48px;height:48px;border-radius:50%;border:none;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;background:var(--bg2);flex-shrink:0">🎙</button>
+            <div>
+              <div id="recStatus" style="font-size:12px;color:var(--text2);margin-bottom:2px">버튼을 눌러 녹음을 시작하세요</div>
+              <div id="recTimer" style="font-size:18px;font-weight:500;color:var(--text);font-variant-numeric:tabular-nums">00:00</div>
+            </div>
           </div>
-          <div class="transcript-hint">💡 녹음 중 실시간으로 텍스트가 변환돼요. 아래에서 직접 수정도 가능해요.</div>
         </div>
       </div>
-
-      <!-- 전사 텍스트 -->
-      <div class="card">
-        <div class="card-title"><span>📝</span> 전사 텍스트
-          <span style="font-size:11px;color:var(--text3);font-weight:400;margin-left:4px">직접 입력하거나 수정할 수 있어요</span>
+      <div style="background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:1.25rem">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="font-size:12px;font-weight:600;color:var(--text2)">📝 전사 텍스트</div>
+          <button class="btn-solid" id="summarizeBtn" style="font-size:11px;padding:4px 12px">✨ AI 요약 생성</button>
         </div>
-        <textarea class="transcript-area" id="transcriptArea" placeholder="녹음을 시작하거나 회의 내용을 직접 붙여넣으세요..."></textarea>
-        <div class="btn-row" style="margin-top:10px">
-          <button class="btn-primary" id="summarizeBtn" onclick="summarize()">✨ AI 요약 생성</button>
-          <button class="btn-secondary" onclick="clearTranscript()">전사 초기화</button>
-        </div>
+        <textarea id="transcriptArea" placeholder="녹음을 시작하거나 회의 내용을 직접 붙여넣으세요..." style="width:100%;min-height:100px;padding:10px;font-size:13px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:inherit;resize:vertical;outline:none"></textarea>
       </div>
-
-      <!-- AI 요약 -->
-      <div class="card">
-        <div class="card-title"><span>✅</span> 회의록 요약
-          <span id="savedBadge" style="display:none" class="badge badge-saved">저장됨</span>
+      <div style="background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:1.25rem">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+          <div style="font-size:12px;font-weight:600;color:var(--text2)">✅ 회의록 요약</div>
+          <span id="savedBadge" style="display:none;font-size:10px;font-weight:600;padding:2px 8px;border-radius:var(--pill);background:var(--green-bg);color:var(--green-t)">저장됨</span>
+          <span id="aiLoadingBadge" style="display:none;font-size:10px;color:var(--text3)">⏳ AI 요약 중...</span>
         </div>
-        <div id="aiLoading" style="display:none" class="ai-loading">
-          <div class="ai-spin"></div>
-          Claude AI가 회의록을 요약하고 있어요...
-        </div>
-        <textarea class="summary-area" id="summaryArea" placeholder="AI 요약 결과가 여기에 표시돼요. 직접 수정도 가능해요."></textarea>
-        <div class="btn-row" style="margin-top:10px">
-          <button class="btn-primary" onclick="saveMeeting()">💾 회의록 저장</button>
-          <button class="btn-secondary" onclick="copySummary()">📋 복사</button>
-          <button class="btn-danger" id="deleteBtn" style="display:none" onclick="deleteMeeting()">삭제</button>
-        </div>
-        <div class="cal-note" id="calNote" style="display:none">
-          📅 캘린더에도 자동으로 등록됐어요
-        </div>
+        <textarea id="summaryArea" placeholder="AI 요약 결과가 여기에 표시돼요. 직접 수정도 가능해요." style="width:100%;min-height:180px;padding:10px;font-size:13px;line-height:1.8;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:inherit;resize:vertical;outline:none"></textarea>
+        <div id="calNote" style="display:none;font-size:11px;color:var(--text3);margin-top:8px">▦ 캘린더에 자동 등록됐어요</div>
       </div>
-
     </div>
   </div>
 </div>
+</div>
 
-<!-- 삭제 확인 모달 -->
-<div class="overlay" id="delOverlay">
-  <div class="modal">
+<div class="overlay" id="delOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);align-items:center;justify-content:center;z-index:200">
+  <div class="modal" style="max-width:360px">
     <h3>회의록 삭제</h3>
-    <p>이 회의록을 삭제할까요? 캘린더에 등록된 일정도 함께 삭제돼요.</p>
-    <div class="modal-btns">
-      <button class="btn-secondary" onclick="closeOverlay()">취소</button>
-      <button class="btn-danger" onclick="confirmDelete()">삭제</button>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:1.25rem">이 회의록을 삭제할까요? 캘린더 일정도 함께 삭제돼요.</p>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn-cancel" id="delCancelBtn">취소</button>
+      <button class="btn-ok" id="delConfirmBtn" style="background:var(--red)">삭제</button>
     </div>
   </div>
 </div>
-
 <div class="toast" id="toast"></div>
-
+<script>
+(function() {
+  var sess = localStorage.getItem('tt_user');
+  if (!sess) { location.href = 'index.html'; return; }
+  var u = JSON.parse(sess);
+  var isMgr = u.role === 'manager' || u.role === 'admin';
+  var av = document.getElementById('sbAvatar');
+  var nm = document.getElementById('sbUserName');
+  var rl = document.getElementById('sbUserRole');
+  if (av) av.textContent = (u.displayName||'--').slice(0,2);
+  if (nm) nm.textContent = u.displayName||'';
+  if (rl) rl.textContent = isMgr ? '팀장' : '팀원';
+  // 팀원이면 내업무, 팀장이면 팀업무로 링크
+  var taskItem = document.getElementById('sbTaskItem');
+  var taskLabel = document.getElementById('sbTaskLabel');
+  if (taskItem && isMgr) { taskItem.dataset.nav = 'manager.html'; }
+  if (taskLabel && isMgr) { taskLabel.textContent = '팀 업무 현황'; }
+  // 어드민이면 관리메뉴 추가
+  if (u.role === 'admin' && !document.querySelector('[data-nav="admin.html"]')) {
+    var nav = document.getElementById('sbNav');
+    if (nav) {
+      var sec = document.createElement('div'); sec.className='sb-sec'; sec.textContent='관리';
+      var item = document.createElement('div'); item.className='sb-item'; item.dataset.nav='admin.html';
+      item.innerHTML='<div class="sb-icon">◯</div><div class="sb-label">계정 관리</div>';
+      nav.appendChild(sec); nav.appendChild(item);
+    }
+  }
+  document.getElementById('logoutBtn').onclick = function() {
+    localStorage.removeItem('tt_user'); location.href = 'index.html';
+  };
+  document.querySelectorAll('[data-nav]').forEach(function(el) {
+    el.addEventListener('click', function() { location.href = el.dataset.nav; });
+  });
+})();
+</script>
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getFirestore,collection,doc,onSnapshot,addDoc,updateDoc,deleteDoc,query,orderBy}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -246,7 +250,7 @@ const ME=JSON.parse(sess);
 if(!ME.id){location.href="index.html";throw""}
 document.getElementById("tbUser").textContent=ME.displayName;
 window.logout=()=>{localStorage.removeItem("tt_user");location.href="index.html"};
-window.goBack=()=>{location.href=ME.role==="member"?"member.html":"manager.html"};
+
 
 // ════════════════════════════════════════════
 // 상태
@@ -600,5 +604,6 @@ initSpeechRecognition();
 </div><!-- content -->
 </div><!-- main -->
 </div><!-- flex -->
+
 </body>
 </html>

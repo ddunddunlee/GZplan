@@ -70,29 +70,28 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 </style>
 </head>
 <body>
-<div style="display:flex;width:100%;min-height:100vh">
-<div style="width:220px;flex-shrink:0;background:#fff;border-right:0.5px solid #e5e5e3;display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100">
-  <div style="padding:20px 16px 16px;border-bottom:0.5px solid #f0f0ee">
-    <div style="font-size:15px;font-weight:600;color:#1a1a1a">GZ Plan</div>
-    <div style="font-size:11px;color:#a8a8a8;margin-top:2px">경영기획팀</div>
+<div class="app">
+<div class="sidebar">
+  <div class="sb-brand"><div class="sb-brand-name">GZ Plan</div><div class="sb-brand-sub">경영기획팀</div></div>
+  <div class="sb-user">
+    <div class="sb-avatar" id="sbAvatar">--</div>
+    <div><div class="sb-user-name" id="sbUserName"></div><div class="sb-user-role" id="sbUserRole"></div></div>
   </div>
-  <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:0.5px solid #f0f0ee">
-    <div id="sbAv" style="width:30px;height:30px;border-radius:50%;background:#1a1a1a;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;flex-shrink:0">--</div>
-    <div><div id="sbNm" style="font-size:13px;font-weight:500;color:#1a1a1a"></div><div id="sbRl" style="font-size:11px;color:#a8a8a8"></div></div>
+  <div class="sb-nav" id="sbNav">
+    <div class="sb-sec">업무</div>
+    <div class="sb-item" data-nav="member.html" id="sbTaskItem"><div class="sb-icon">☐</div><div class="sb-label" id="sbTaskLabel">내 업무</div></div>
+    <div class="sb-sec">도구</div>
+    <div class="sb-item" data-nav="calendar.html"><div class="sb-icon">▦</div><div class="sb-label">캘린더</div></div>
+    <div class="sb-item" data-nav="meeting.html"><div class="sb-icon">◈</div><div class="sb-label">회의록</div></div>
+    <div class="sb-item active" data-nav="memo.html"><div class="sb-icon">◉</div><div class="sb-label">메모장</div></div>
   </div>
-  <div style="flex:1;padding:8px 0;overflow-y:auto">
-    <div style="padding:4px 16px;font-size:10px;font-weight:600;color:#c0c0bc;letter-spacing:.08em;text-transform:uppercase;margin-top:10px">업무</div>
-    <div id="sbTask" onclick="" style="display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;margin:1px 8px;border-radius:6px" onmouseover="this.style.background='#f7f7f5'" onmouseout="this.style.background='transparent'"><span style="font-size:15px;width:20px;text-align:center;color:#888">☐</span><span style="font-size:13px;color:#6b6b6b">내 업무 / 팀 업무</span></div>
-    <div style="padding:4px 16px;font-size:10px;font-weight:600;color:#c0c0bc;letter-spacing:.08em;text-transform:uppercase;margin-top:10px">도구</div>
-    <div onclick="location.href='calendar.html'" style="display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;margin:1px 8px;border-radius:6px" onmouseover="this.style.background='#f7f7f5'" onmouseout="this.style.background='transparent'"><span style="font-size:15px;width:20px;text-align:center;color:#888">▦</span><span style="font-size:13px;color:#6b6b6b">캘린더</span></div>
-    <div onclick="location.href='meeting.html'" style="display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;margin:1px 8px;border-radius:6px" onmouseover="this.style.background='#f7f7f5'" onmouseout="this.style.background='transparent'"><span style="font-size:15px;width:20px;text-align:center;color:#888">◈</span><span style="font-size:13px;color:#6b6b6b">회의록</span></div>
-    <div style="display:flex;align-items:center;gap:10px;padding:9px 16px;margin:1px 8px;border-radius:6px;background:#f0f0ee"><span style="font-size:15px;width:20px;text-align:center;color:#1a1a1a">◉</span><span style="font-size:13px;color:#1a1a1a;font-weight:500">메모장</span></div>
-  </div>
-  <div style="padding:12px 16px;border-top:0.5px solid #f0f0ee">
-    <button onclick="logout()" style="font-size:11px;padding:5px 10px;border:0.5px solid #e5e5e3;border-radius:6px;background:transparent;color:#6b6b6b;cursor:pointer;width:100%">로그아웃</button>
+  <div class="sb-bottom">
+    <div class="sb-sync" style="display:none"></div>
+    <button class="btn-ghost" id="logoutBtn" style="width:100%;font-size:11px;padding:5px">로그아웃</button>
   </div>
 </div>
-<div style="margin-left:220px;flex:1;display:flex;flex-direction:column">
+<div class="main-wrap">
+  <div style="margin-left:220px;flex:1;display:flex;flex-direction:column">
 
 <div class="header">
   <div class="header-left">
@@ -142,6 +141,43 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
   </div>
 </div>
 <div class="toast" id="toast"></div>
+
+</div>
+</div>
+<script>
+(function() {
+  var sess = localStorage.getItem('tt_user');
+  if (!sess) { location.href = 'index.html'; return; }
+  var u = JSON.parse(sess);
+  var isMgr = u.role === 'manager' || u.role === 'admin';
+  var av = document.getElementById('sbAvatar');
+  var nm = document.getElementById('sbUserName');
+  var rl = document.getElementById('sbUserRole');
+  if (av) av.textContent = (u.displayName||'--').slice(0,2);
+  if (nm) nm.textContent = u.displayName||'';
+  if (rl) rl.textContent = isMgr ? '팀장' : '팀원';
+  var taskItem = document.getElementById('sbTaskItem');
+  var taskLabel = document.getElementById('sbTaskLabel');
+  if (taskItem && isMgr) taskItem.dataset.nav = 'manager.html';
+  if (taskLabel && isMgr) taskLabel.textContent = '팀 업무 현황';
+  if (u.role === 'admin' && !document.querySelector('[data-nav="admin.html"]')) {
+    var nav = document.getElementById('sbNav');
+    if (nav) {
+      var sec = document.createElement('div'); sec.className='sb-sec'; sec.textContent='관리';
+      var item = document.createElement('div'); item.className='sb-item'; item.dataset.nav='admin.html';
+      item.innerHTML='<div class="sb-icon">◯</div><div class="sb-label">계정 관리</div>';
+      item.addEventListener('click', function() { location.href = 'admin.html'; });
+      nav.appendChild(sec); nav.appendChild(item);
+    }
+  }
+  document.getElementById('logoutBtn').onclick = function() {
+    localStorage.removeItem('tt_user'); location.href = 'index.html';
+  };
+  document.querySelectorAll('[data-nav]').forEach(function(el) {
+    el.addEventListener('click', function() { location.href = el.dataset.nav; });
+  });
+})();
+</script>
 <script type="module">
 import{initializeApp}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import{getFirestore,collection,doc,onSnapshot,addDoc,updateDoc,deleteDoc,serverTimestamp,query,orderBy}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
@@ -150,16 +186,9 @@ const db=getFirestore(initializeApp(C));
 const sess=localStorage.getItem('tt_user');
 if(!sess)location.href='index.html';
 const ME=JSON.parse(sess||'{}');
-// 사이드바 초기화
-document.getElementById('sbNm').textContent = ME.displayName || ME.id || '';
-document.getElementById('sbAv').textContent = (ME.displayName || ME.id || '--').slice(0,2);
-document.getElementById('sbRl').textContent = (ME.role === 'manager' || ME.role === 'admin') ? '팀장' : '팀원';
-document.getElementById('sbTask').onclick = () => {
-  location.href = (ME.role === 'member') ? 'member.html' : 'manager.html';
-};
+document.querySelectorAll('[data-nav]').forEach(el=>el.addEventListener('click',()=>location.href=el.dataset.nav));
 if(ME.role!=='manager'&&ME.role!=='admin')location.href='index.html';
 document.getElementById('hUser').textContent=ME.displayName;
-window.logout=()=>{localStorage.removeItem('tt_user');location.href='index.html';};
 let memos=[],activeTag=null,editingId=null;
 const mRef=()=>collection(db,'memos');
 const mDoc=id=>doc(db,'memos',id);
@@ -241,5 +270,6 @@ document.getElementById('memoInput').addEventListener('keydown',e=>{if(e.key==='
 </script>
 </div><!-- main -->
 </div><!-- flex -->
+
 </body>
 </html>

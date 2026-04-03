@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8" />
-<link rel="manifest" href="./manifest.json" />
-<link rel="apple-touch-icon" href="./apple-touch-icon.png" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-title" content="GZ기획팀" />
-<meta name="theme-color" content="#ffffff" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8"/>
+<link rel="manifest" href="./manifest.json"/>
+<link rel="apple-touch-icon" href="./apple-touch-icon.png"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="GZ기획팀"/>
+<meta name="theme-color" content="#ffffff"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>GZ Plan</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#fff;--bg2:#f7f7f5;--text:#1a1a1a;--text2:#6b6b6b;--text3:#a8a8a8;--border:#e5e5e3;--border2:#d0d0cc;--radius:10px;--radius-sm:6px;--red:#A32D2D;--blue:#378ADD}
+:root{--bg:#fff;--bg2:#f7f7f5;--text:#1a1a1a;--text2:#6b6b6b;--text3:#a8a8a8;--border:#e5e5e3;--border2:#d0d0cc;--radius:10px;--radius-sm:6px;--red:#A32D2D}
 body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-serif;background:var(--bg2);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem}
 .box{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:2.5rem 2rem;width:100%;max-width:340px}
 .brand{margin-bottom:2rem}
@@ -19,11 +19,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 .brand-sub{font-size:13px;color:var(--text3)}
 .fg{margin-bottom:1rem}
 .fg label{font-size:11px;font-weight:600;color:var(--text3);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
-.fg input{width:100%;padding:10px 12px;font-size:14px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:inherit;outline:none;transition:border-color .15s}
+.fg input{width:100%;padding:10px 12px;font-size:14px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:inherit;outline:none}
 .fg input:focus{border-color:var(--border2);background:var(--bg)}
-.btn{width:100%;padding:11px;font-size:14px;font-weight:600;background:var(--text);color:var(--bg);border:none;border-radius:var(--radius-sm);cursor:pointer;margin-top:.5rem;transition:opacity .15s}
-.btn:hover{opacity:.82}
-.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn{width:100%;padding:11px;font-size:14px;font-weight:600;background:var(--text);color:var(--bg);border:none;border-radius:var(--radius-sm);cursor:pointer;margin-top:.5rem}
+.btn:hover{opacity:.82}.btn:disabled{opacity:.4;cursor:not-allowed}
 .err{font-size:12px;color:var(--red);margin-top:8px;min-height:18px;text-align:center}
 .spin-wrap{display:none;justify-content:center;margin-top:12px}
 .spin{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--text);border-radius:50%;animation:sp .7s linear infinite}
@@ -36,46 +35,45 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
     <div class="brand-name">GZ Plan</div>
     <div class="brand-sub">경영기획팀 업무 관리 시스템</div>
   </div>
-  <div class="fg"><label>아이디</label><input id="uid" type="text" placeholder="아이디 입력" autocomplete="username" /></div>
-  <div class="fg"><label>비밀번호</label><input id="upw" type="password" placeholder="비밀번호 입력" autocomplete="current-password" /></div>
-  <button class="btn" id="loginBtn" onclick="doLogin()">로그인</button>
+  <div class="fg"><label>아이디</label><input id="uid" type="text" placeholder="아이디 입력" autocomplete="username"/></div>
+  <div class="fg"><label>비밀번호</label><input id="upw" type="password" placeholder="비밀번호 입력" autocomplete="current-password"/></div>
+  <button class="btn" id="loginBtn">로그인</button>
   <div class="err" id="err"></div>
   <div class="spin-wrap" id="spin"><div class="spin"></div></div>
 </div>
 <script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-const firebaseConfig = {apiKey:"AIzaSyA7KylsSyT3_0oQvhBtcrPc-gcdfVq90IQ",authDomain:"gzplan.firebaseapp.com",projectId:"gzplan",storageBucket:"gzplan.firebasestorage.app",messagingSenderId:"186255862586",appId:"1:186255862586:web:f36d21f76012ca43b8fe03"};
-const ADMIN_ID="admin",ADMIN_PW_INIT="admin1234";
-const app=initializeApp(firebaseConfig);
-const db=getFirestore(app);
+import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import {getFirestore,doc,getDoc} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+const FC={apiKey:"AIzaSyA7KylsSyT3_0oQvhBtcrPc-gcdfVq90IQ",authDomain:"gzplan.firebaseapp.com",projectId:"gzplan",storageBucket:"gzplan.firebasestorage.app",messagingSenderId:"186255862586",appId:"1:186255862586:web:f36d21f76012ca43b8fe03"};
+const db=getFirestore(initializeApp(FC));
+const go=r=>{location.href=r==='admin'?'admin.html':r==='manager'?'manager.html':'member.html'};
 const sess=localStorage.getItem('tt_user');
-if(sess){try{const u=JSON.parse(sess);if(u&&u.id&&u.role&&['admin','manager','member'].includes(u.role))go(u.role);else localStorage.removeItem('tt_user')}catch(e){localStorage.removeItem('tt_user')}}
-function go(role){if(role==='admin')location.href='admin.html';else if(role==='manager')location.href='manager.html';else location.href='member.html'}
-window.doLogin=async()=>{
+if(sess){try{const u=JSON.parse(sess);if(u?.id&&u?.role)go(u.role);else localStorage.removeItem('tt_user')}catch{localStorage.removeItem('tt_user')}}
+async function doLogin(){
   const id=document.getElementById('uid').value.trim(),pw=document.getElementById('upw').value;
   const err=document.getElementById('err'),btn=document.getElementById('loginBtn');
   err.textContent='';
   if(!id||!pw){err.textContent='아이디와 비밀번호를 입력해주세요';return}
   btn.disabled=true;document.getElementById('spin').style.display='flex';
   try{
-    if(id===ADMIN_ID){
-      let adminPw=ADMIN_PW_INIT,disabled=false;
-      try{const snap=await getDoc(doc(db,'accounts',ADMIN_ID));if(snap.exists()){adminPw=snap.data().password??ADMIN_PW_INIT;disabled=snap.data().disabled??false}}catch(_){}
-      if(disabled){err.textContent='비활성화된 계정이에요';return}
-      if(pw!==adminPw){err.textContent='아이디 또는 비밀번호가 틀렸어요';return}
-      localStorage.removeItem('tt_user');localStorage.setItem('tt_user',JSON.stringify({id:ADMIN_ID,role:'admin',displayName:'admin'}));go('admin');return
+    if(id==='admin'){
+      let apw='admin1234',dis=false;
+      try{const s=await getDoc(doc(db,'accounts','admin'));if(s.exists()){apw=s.data().password??'admin1234';dis=s.data().disabled??false}}catch{}
+      if(dis){err.textContent='비활성화된 계정이에요';return}
+      if(pw!==apw){err.textContent='아이디 또는 비밀번호가 틀렸어요';return}
+      localStorage.setItem('tt_user',JSON.stringify({id:'admin',role:'admin',displayName:'admin'}));go('admin');return
     }
     const snap=await getDoc(doc(db,'accounts',id));
     if(!snap.exists()){err.textContent='아이디 또는 비밀번호가 틀렸어요';return}
     const d=snap.data();
     if(d.password!==pw){err.textContent='아이디 또는 비밀번호가 틀렸어요';return}
     if(d.disabled){err.textContent='비활성화된 계정이에요';return}
-    localStorage.removeItem('tt_user');localStorage.setItem('tt_user',JSON.stringify({id,role:d.role,displayName:d.displayName||id}));go(d.role)
-  }catch(e){err.textContent='오류: '+(e.code||e.message||String(e));console.error(e)}
+    localStorage.setItem('tt_user',JSON.stringify({id,role:d.role,displayName:d.displayName||id}));go(d.role)
+  }catch(e){err.textContent='오류: '+(e.message||String(e))}
   finally{btn.disabled=false;document.getElementById('spin').style.display='none'}
-};
-document.addEventListener('keydown',e=>{if(e.key==='Enter')window.doLogin()});
+}
+document.getElementById('loginBtn').addEventListener('click',doLogin);
+document.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
 </script>
 </body>
 </html>

@@ -262,7 +262,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
   <div class="topbar">
     <div class="page-title" id="pageTitle">내 업무</div>
     <div class="topbar-right">
-      <button class="btn-solid" onclick="openModal()">+ 업무 추가</button>
+      <button class="btn-solid" id="addTaskBtn">+ 업무 추가</button>
     </div>
   </div>
 
@@ -920,6 +920,8 @@ document.getElementById('overlay').addEventListener('click', e => {
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') window.closeModal();
 });
+// 업무 추가 버튼
+document.getElementById('addTaskBtn')?.addEventListener('click', () => window.openModal());
 
 // ════════════════════════════════════════════
 // 드래그 앤 드롭 정렬

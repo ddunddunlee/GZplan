@@ -61,14 +61,14 @@ async function doLogin(){
       try{const s=await getDoc(doc(db,'accounts','admin'));if(s.exists()){apw=s.data().password??'admin1234';dis=s.data().disabled??false}}catch{}
       if(dis){err.textContent='비활성화된 계정이에요';return}
       if(pw!==apw){err.textContent='아이디 또는 비밀번호가 틀렸어요';return}
-      localStorage.clear();sessionStorage.clear();localStorage.setItem('tt_user',JSON.stringify({id:'admin',role:'admin',displayName:'admin'}));go('admin');return
+      sessionStorage.clear();localStorage.setItem('tt_user',JSON.stringify({id:'admin',role:'admin',displayName:'admin'}));go('admin');return
     }
     const snap=await getDoc(doc(db,'accounts',id));
     if(!snap.exists()){err.textContent='아이디 또는 비밀번호가 틀렸어요';return}
     const d=snap.data();
     if(d.password!==pw){err.textContent='아이디 또는 비밀번호가 틀렸어요';return}
     if(d.disabled){err.textContent='비활성화된 계정이에요';return}
-    localStorage.clear();sessionStorage.clear();localStorage.setItem('tt_user',JSON.stringify({id,role:d.role,displayName:d.displayName||id}));go(d.role)
+    sessionStorage.clear();localStorage.setItem('tt_user',JSON.stringify({id,role:d.role,displayName:d.displayName||id}));go(d.role)
   }catch(e){err.textContent='오류: '+(e.message||String(e))}
   finally{btn.disabled=false;document.getElementById('spin').style.display='none'}
 }

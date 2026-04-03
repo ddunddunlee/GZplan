@@ -262,6 +262,40 @@ import {
   onSnapshot, addDoc, updateDoc, deleteDoc,
   serverTimestamp, query, orderBy
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const FIREBASE_CONFIG = {
+  apiKey:            "AIzaSyA7KylsSyT3_0oQvhBtcrPc-gcdfVq90IQ",
+  authDomain:        "gzplan.firebaseapp.com",
+  projectId:         "gzplan",
+  storageBucket:     "gzplan.firebasestorage.app",
+  messagingSenderId: "186255862586",
+  appId:             "1:186255862586:web:f36d21f76012ca43b8fe03",
+};
+const DAY_MS    = 86400000;
+const STALE_DAYS = 14;
+let REPORTERS   = [];
+
+const db  = getFirestore(initializeApp(FIREBASE_CONFIG));
+const sess = localStorage.getItem('tt_user');
+if (!sess) { location.href = 'index.html'; throw ''; }
+const ME = JSON.parse(sess);
+if (!ME.id) { location.href = 'index.html'; throw ''; }
+if (ME.role === 'manager' || ME.role === 'admin') { location.href = 'manager.html'; throw ''; }
+if (ME.role !== 'member') { location.href = 'index.html'; throw ''; }
+
+async function loadReporters() {
+  try {
+    const snap = await getDoc(doc(db, 'settings', 'reporters'));
+    REPORTERS = snap.exists() ? (snap.data().list || []) : ['CEO', '홀딩스', '본부장'];
+  } catch { REPORTERS = ['CEO', '홀딩스', '본부장']; }
+  const sel = document.getElementById('iReporter');
+  if (sel) sel.innerHTML = '<option value="">없음</option>' +
+    REPORTERS.map(r => `<option value="${r}">${r}</option>`).join('');
+}
+
+const col = ()     => collection(db, 'tasks', ME.id, 'items');
+const dr  = id     => doc(db, 'tasks', ME.id, 'items', id);
+
 const fsAdd = data   => addDoc(col(), { ...data, createdAt: serverTimestamp() });
 const fsUpd = (id, data) => updateDoc(dr(id), data);
 const fsDel = id     => deleteDoc(dr(id));
@@ -280,7 +314,7 @@ let dragId  = null;
 // 유틸 함수
 // ════════════════════════════════════════════
 const now   = ()  => new Date().toISOString();
-const setSync = v => const _sd=document.getElementById('syncDot');if(_sd)_sd.classList.toggle('syncing',v);
+const setSync = v => { const _sd=document.getElementById('syncDot');if(_sd)_sd.classList.toggle('syncing',v); };
 
 function toast(msg) {
   const el = document.getElementById('toast');
@@ -325,13 +359,7 @@ const isStale   = t => {
 };
 
 // 중요도 바 색상
-function priorityColor(p) {
-  return ['','#c0c0bc','#378ADD','#EF9F27','#E24B4A','#A32D2D'][p||3] || '#c0c0bc';
-}
 
-function priorityColor(p) {
-  return ['','#c0c0bc','#378ADD','#EF9F27','#E24B4A','#A32D2D'][p||3]||'#c0c0bc';
-}
 function priorityColor(p){return['','#c0c0bc','#378ADD','#EF9F27','#E24B4A','#A32D2D'][p||3]||'#c0c0bc'}
 // 중요도 배지 클래스
 function priorityCls(p) {
@@ -340,7 +368,7 @@ function priorityCls(p) {
 }
 
 // 상세패널 토글
-window.togglePriorityEdit = id =>; {
+window.togglePriorityEdit = id => {
   document.getElementById('dp-priority-row-' + id).style.display =
     document.getElementById('dp-priority-row-' + id).style.display === 'none' ? '' : 'none';
   const edit = document.getElementById('dp-priority-edit-' + id);
@@ -348,7 +376,7 @@ window.togglePriorityEdit = id =>; {
   if (edit.style.display !== 'none') edit.querySelector('select').focus();
 };
 
-window.toggleReporterEdit = id =>; {
+window.toggleReporterEdit = id => {
   document.getElementById('dp-reporter-row-' + id).style.display =
     document.getElementById('dp-reporter-row-' + id).style.display === 'none' ? '' : 'none';
   const edit = document.getElementById('dp-reporter-edit-' + id);
@@ -633,7 +661,7 @@ function renderDetail(t) {
 // ════════════════════════════════════════════
 // 이벤트 핸들러 — 필터
 // ════════════════════════════════════════════
-window.setFilter = (f, el) =>; {
+window.setFilter = (f, el) => {
   filter = f;
   document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
   el.classList.add('active');
@@ -643,7 +671,7 @@ window.setFilter = (f, el) =>; {
 // ════════════════════════════════════════════
 // 이벤트 핸들러 — 상세 패널
 // ════════════════════════════════════════════
-window.selTask = id =>; {
+window.selTask = id => {
   selId = id;
   const t = tasks.find(t => t._id === id);
   if (!t) return;
@@ -661,14 +689,14 @@ window.closeDetail = () => {
 // ════════════════════════════════════════════
 // 이벤트 핸들러 — 업무 CRUD
 // ════════════════════════════════════════════
-window.togglePin = async (id, e) =>; {
+window.togglePin = async (id, e) => {
   e.stopPropagation();
   setSync(true);
   const t = tasks.find(t => t._id === id);
   if (t) await fsUpd(id, { pinned: !t.pinned });
 };
 
-window.toggleDone = async (id, e) =>; {
+window.toggleDone = async (id, e) => {
   e.stopPropagation();
   setSync(true);
   const t = tasks.find(t => t._id === id);
@@ -681,7 +709,7 @@ window.toggleDone = async (id, e) =>; {
   await fsUpd(id, { status: newStatus, updated: ts, history: [...(t.history || []), histEntry] });
 };
 
-window.cycleStat = async (id, e) =>; {
+window.cycleStat = async (id, e) => {
   e.stopPropagation();
   setSync(true);
   const t = tasks.find(t => t._id === id);
@@ -700,7 +728,7 @@ window.cycleStat = async (id, e) =>; {
   });
 };
 
-window.deleteTask = async (id, e) =>; {
+window.deleteTask = async (id, e) => {
   e.stopPropagation();
   if (!confirm('이 업무를 삭제할까요?')) return;
   setSync(true);
@@ -715,7 +743,7 @@ window.deleteTask = async (id, e) =>; {
 // ════════════════════════════════════════════
 // 이벤트 핸들러 — 상세 패널 편집
 // ════════════════════════════════════════════
-window.changeTitle = async (id, val) =>; {
+window.changeTitle = async (id, val) => {
   if (!val.trim()) return;
   setSync(true);
   const t = tasks.find(t => t._id === id);
@@ -731,7 +759,7 @@ window.changeTitle = async (id, val) =>; {
   });
 };
 
-window.updatePriority = async (id, val) =>; {
+window.updatePriority = async (id, val) => {
   setSync(true);
   const t = tasks.find(t => t._id === id);
   if (!t) return;
@@ -747,7 +775,7 @@ window.updatePriority = async (id, val) =>; {
   });
 };
 
-window.updateReporter = async (id, val) =>; {
+window.updateReporter = async (id, val) => {
   setSync(true);
   const t = tasks.find(t => t._id === id);
   if (!t) return;
@@ -763,7 +791,7 @@ window.updateReporter = async (id, val) =>; {
   });
 };
 
-window.updateStartDate = async (id, val) =>; {
+window.updateStartDate = async (id, val) => {
   setSync(true);
   const t = tasks.find(t => t._id === id);
   if (!t) return;
@@ -778,7 +806,7 @@ window.updateStartDate = async (id, val) =>; {
   });
 };
 
-window.updateDue = async (id, val) =>; {
+window.updateDue = async (id, val) => {
   setSync(true);
   const t = tasks.find(t => t._id === id);
   if (!t) return;
@@ -808,7 +836,7 @@ window.addNote = async () => {
   });
 };
 
-window.deleteHistory = async (taskId, histId) =>; {
+window.deleteHistory = async (taskId, histId) => {
   setSync(true);
   const t = tasks.find(t => t._id === taskId);
   if (!t) return;
@@ -818,7 +846,7 @@ window.deleteHistory = async (taskId, histId) =>; {
 // ════════════════════════════════════════════
 // 모달 — 업무 추가
 // ════════════════════════════════════════════
-window.openModal = () =>; document.getElementById('overlay').classList.add('show');
+window.openModal = () => document.getElementById('overlay').classList.add('show');
 window.closeModal = () => {
   document.getElementById('overlay').classList.remove('show');
   ['iTitle', 'iDesc', 'iStart', 'iDue'].forEach(id => document.getElementById(id).value = '');
@@ -1022,6 +1050,8 @@ document.querySelectorAll('[data-filter]').forEach(btn => {
 });
 
 
+
+loadReporters();
 
 // ── 사이드바 초기화 ──
 document.getElementById('sbUserName').textContent = ME.displayName || '';

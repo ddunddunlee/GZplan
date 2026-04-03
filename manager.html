@@ -275,7 +275,7 @@ import {
 // ════════════════════════════════════════════
 // Firebase 설정
 // ════════════════════════════════════════════
-window.onerror = (msg, src, line, col, err) =>; {
+window.onerror = (msg, src, line, col, err) => {
   const box = document.getElementById('debugBox');
   if (box) {
     box.style.display = 'block';
@@ -411,7 +411,7 @@ window.priorityCls = function(p) {
   return 'priority-badge ' + ['','p1','p2','p3','p4','p5'][n];
 };
 
-window.togglePriorityEdit = id =>; {
+window.togglePriorityEdit = id => {
   const row  = document.getElementById('dp-priority-row-' + id);
   const edit = document.getElementById('dp-priority-edit-' + id);
   if (!row || !edit) return;
@@ -421,7 +421,7 @@ window.togglePriorityEdit = id =>; {
   if (!hide) edit.querySelector('select')?.focus();
 };
 
-window.toggleReporterEdit = id =>; {
+window.toggleReporterEdit = id => {
   const row  = document.getElementById('dp-reporter-row-' + id);
   const edit = document.getElementById('dp-reporter-edit-' + id);
   if (!row || !edit) return;
@@ -480,7 +480,23 @@ function getAllTasks() {
   return filterMember === 'all' ? all : all.filter(t => t._mid === filterMember);
 }
 
+function renderMemberTabs() {
+  const el = document.getElementById('memberTabs');
+  if (!el) return;
+  const allCnt = Object.values(mData).reduce((sum, m) => sum + (m.tasks||[]).filter(t=>t.status!=='done').length, 0);
+  let html = `<div class="member-tab${curTab==='__all__'?' active':''}" data-tab="__all__">전체 <span class="cnt">${allCnt}</span></div>`;
+  MEMBER_IDS.forEach(id => {
+    const cnt = (mData[id]?.tasks||[]).filter(t=>t.status!=='done').length;
+    html += `<div class="member-tab${curTab===id?' active':''}" data-tab="${id}">${id} <span class="cnt">${cnt}</span></div>`;
+  });
+  el.innerHTML = html;
+  // + 업무 추가 버튼 표시 (개인탭일 때만)
+  const addBtn = document.getElementById('addBtn');
+  if (addBtn) addBtn.style.display = curTab !== '__all__' ? '' : 'none';
+}
+
 function render() {
+  renderMemberTabs();
   renderMemberFilter();
   renderStats();
   renderTaskList();
@@ -713,7 +729,7 @@ function renderDetail(t) {
 // ════════════════════════════════════════════
 // 이벤트 핸들러 — 탭 & 필터
 // ════════════════════════════════════════════
-window.switchTab = id =>; {
+window.switchTab = id => {
   curTab = id;
   selDocId = null;
   selMId   = null;
@@ -726,7 +742,7 @@ window.switchTab = id =>; {
   render();
 };
 
-window.setFilter = (f, el) =>; {
+window.setFilter = (f, el) => {
   filter = f;
   document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
   el.classList.add('active');
@@ -736,7 +752,7 @@ window.setFilter = (f, el) =>; {
 // ════════════════════════════════════════════
 // 이벤트 핸들러 — 상세 패널
 // ════════════════════════════════════════════
-window.selTask = (docId, memberId) =>; {
+window.selTask = (docId, memberId) => {
   selDocId = docId;
   selMId   = memberId;
   const t = mData[memberId]?.tasks.find(t => t._id === docId);
@@ -756,13 +772,13 @@ window.closeDetail = () => {
 // ════════════════════════════════════════════
 // 이벤트 핸들러 — 업무 조작
 // ════════════════════════════════════════════
-window.togglePin = async (docId, memberId, e) =>; {
+window.togglePin = async (docId, memberId, e) => {
   e.stopPropagation();
   const t = mData[memberId]?.tasks.find(t => t._id === docId);
   if (t) await fsUpd(memberId, docId, { pinned: !t.pinned });
 };
 
-window.cycleStat = async (docId, memberId, e) =>; {
+window.cycleStat = async (docId, memberId, e) => {
   e.stopPropagation();
   const t = mData[memberId]?.tasks.find(t => t._id === docId);
   if (!t) return;
@@ -780,7 +796,7 @@ window.cycleStat = async (docId, memberId, e) =>; {
   });
 };
 
-window.deleteTask = async (docId, memberId, e) =>; {
+window.deleteTask = async (docId, memberId, e) => {
   e.stopPropagation();
   if (!confirm('이 업무를 삭제할까요?')) return;
   if (selDocId === docId) {
@@ -794,7 +810,7 @@ window.deleteTask = async (docId, memberId, e) =>; {
 // ════════════════════════════════════════════
 // 이벤트 핸들러 — 상세 편집 (팀장 권한)
 // ════════════════════════════════════════════
-window.changeTitle = async (docId, memberId, val) =>; {
+window.changeTitle = async (docId, memberId, val) => {
   if (!val.trim() || !docId || !memberId) return;
   const t = mData[memberId]?.tasks.find(t => t._id === docId);
   if (!t) return;
@@ -809,7 +825,7 @@ window.changeTitle = async (docId, memberId, val) =>; {
   });
 };
 
-window.updatePriority = async (docId, memberId, val) =>; {
+window.updatePriority = async (docId, memberId, val) => {
   const t = mData[memberId]?.tasks.find(t => t._id === docId);
   if (!t) return;
   const ts = now();
@@ -823,7 +839,7 @@ window.updatePriority = async (docId, memberId, val) =>; {
   });
 };
 
-window.updateReporter = async (docId, memberId, val) =>; {
+window.updateReporter = async (docId, memberId, val) => {
   const t = mData[memberId]?.tasks.find(t => t._id === docId);
   if (!t) return;
   const ts = now();
@@ -837,7 +853,7 @@ window.updateReporter = async (docId, memberId, val) =>; {
   });
 };
 
-window.updateStartDate = async (docId, memberId, val) =>; {
+window.updateStartDate = async (docId, memberId, val) => {
   const t = mData[memberId]?.tasks.find(t => t._id === docId);
   if (!t) return;
   const ts = now();
@@ -851,7 +867,7 @@ window.updateStartDate = async (docId, memberId, val) =>; {
   });
 };
 
-window.updateDue = async (docId, memberId, val) =>; {
+window.updateDue = async (docId, memberId, val) => {
   const t = mData[memberId]?.tasks.find(t => t._id === docId);
   if (!t) return;
   const ts = now();
@@ -882,7 +898,7 @@ window.addNote = async () => {
   });
 };
 
-window.deleteHistory = async (docId, memberId, histId) =>; {
+window.deleteHistory = async (docId, memberId, histId) => {
   const t = mData[memberId]?.tasks.find(t => t._id === docId);
   if (!t) return;
   await fsUpd(memberId, docId, { history: (t.history || []).filter(h => h.id !== histId) });
@@ -975,7 +991,7 @@ document.getElementById('addBtn')?.addEventListener('click', () => window.openMo
 
 // 상세패널 팀원 표시
 const origSelTask = window.selTask;
-window.selTask = (docId, memberId) =>; {
+window.selTask = (docId, memberId) => {
   origSelTask(docId, memberId);
   const dpMember = document.getElementById('dpMember');
   if (dpMember) dpMember.textContent = memberId;
@@ -1021,8 +1037,11 @@ document.getElementById('memberTabs').addEventListener('click', e => {
 });
 // 팀원 필터칩 이벤트 위임
 document.getElementById('memberFilterRow').addEventListener('click', e => {
-  const b = e.target.closest('[data-mf]');
-  if (b) window.setMemberFilter(b.dataset.mf);
+  const b = e.target.closest('[data-m]');
+  if (b) {
+    filterMember = b.dataset.m;
+    render();
+  }
 });
 // 사이드바 네비
 document.querySelectorAll('[data-nav]').forEach(el => {

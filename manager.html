@@ -1102,11 +1102,10 @@ function renderTaskList() {
         </div>
         <div class="card-right">
           ${flag}
-          ${!isAll ? `
-            <button class="pin-btn${t.pinned ? ' on' : ''}" onclick="togglePin('${t._id}','${t._mid}',event)">
+          ${!`<button class="pin-btn${t.pinned ? ' on' : ''}" onclick="togglePin('${t._id}','${t._mid}',event)">
               ${t.pinned ? '📌' : '☆'}
             </button>
-            <button class="del-btn" onclick="deleteTask('${t._id}','${t._mid}',event)">✕</button>` : ''}
+            <button class="del-btn" onclick="deleteTask('${t._id}','${t._mid}',event)">✕</button>`}
         </div>
       </div>`;
   });
@@ -1116,7 +1115,7 @@ function renderTaskList() {
     chk.addEventListener('click', e => {
       e.stopPropagation();
       const isAll = chk.dataset.isall === 'true';
-      if (!isAll) cycleStat(chk.dataset.id, chk.dataset.mid, e);
+      cycleStat(chk.dataset.id, chk.dataset.mid, e);
     });
   });
 }
@@ -1168,23 +1167,19 @@ function renderDetail(t) {
     ${descRow}
     <div class="dp-row" id="dp-priority-row-${t._id}">
       <span class="dp-lbl">중요도</span>
-      ${isAll
-        ? `<span class="${priorityCls(t.priority)}">${{5:'매우 긴급',4:'긴급',3:'보통',2:'낮음',1:'매우 낮음'}[t.priority||3]}</span>`
-        : `<span class="${priorityCls(t.priority)}" onclick="togglePriorityEdit('${t._id}')">${{5:'매우 긴급',4:'긴급',3:'보통',2:'낮음',1:'매우 낮음'}[t.priority||3]} ✎</span>`}
+      <span class="${priorityCls(t.priority)}" onclick="togglePriorityEdit('${t._id}')">${{5:'매우 긴급',4:'긴급',3:'보통',2:'낮음',1:'매우 낮음'}[t.priority||3]} ✎</span>
     </div>
-    ${!isAll ? `<div class="dp-row" id="dp-priority-edit-${t._id}" style="display:none">
+    <div class="dp-row" id="dp-priority-edit-${t._id}" style="display:none">
       <span class="dp-lbl">중요도</span>
       <select class="dp-edit" style="width:160px;text-align:right"
         onchange="updatePriority('${t._id}','${t._mid}',this.value);togglePriorityEdit('${t._id}')">${priorityOpts}</select>
-    </div>` : ''}
+    </div>
     <div class="dp-row">
       <span class="dp-lbl">업무 발생일</span>
       <span class="dp-val" style="display:flex;align-items:center;gap:6px;justify-content:flex-end">
-        ${isAll
-          ? `<span>${t.occurredDate ? fmtDate(t.occurredDate) : '-'}</span>`
-          : `<input class="dp-edit" type="date" value="${t.occurredDate || ''}"
+        <input class="dp-edit" type="date" value="${t.occurredDate || ''}"
                onchange="updateOccurredDate('${t._id}','${t._mid}',this.value)"
-               style="width:120px;text-align:right" />`}
+               style="width:120px;text-align:right" />
         ${t.occurredDate && daysElapsed(t.occurredDate) > 0
           ? `<span style="font-size:10px;color:var(--orange);font-weight:600">${daysElapsed(t.occurredDate)}일 경과</span>`
           : ''}
@@ -1192,19 +1187,15 @@ function renderDetail(t) {
     </div>
     <div class="dp-row">
       <span class="dp-lbl">업무 시작일</span>
-      ${isAll
-        ? `<span class="dp-val">${t.startDate ? fmtDate(t.startDate) : '-'}</span>`
-        : `<input class="dp-edit" type="date" value="${t.startDate || ''}"
+      <input class="dp-edit" type="date" value="${t.startDate || ''}"
              onchange="updateStartDate('${t._id}','${t._mid}',this.value)"
-             style="width:140px;text-align:right" />`}
+             style="width:140px;text-align:right" />
     </div>
     <div class="dp-row">
       <span class="dp-lbl">업무 타겟일</span>
-      ${isAll
-        ? `<span class="dp-val">${t.due ? fmtDate(t.due) : '-'}</span>`
-        : `<input class="dp-edit" type="date" value="${t.due || ''}"
+      <input class="dp-edit" type="date" value="${t.due || ''}"
              onchange="updateDue('${t._id}','${t._mid}',this.value)"
-             style="width:140px;text-align:right" />`}
+             style="width:140px;text-align:right" />
     </div>
     <div class="dp-row">
       <span class="dp-lbl">마지막 업데이트</span>
@@ -1217,15 +1208,13 @@ function renderDetail(t) {
     </div>
     <div class="dp-row" id="dp-reporter-row-${t._id}">
       <span class="dp-lbl">최종보고자</span>
-      ${isAll
-        ? `<span class="reporter-badge">${t.reporter || '-'}</span>`
-        : `<span class="reporter-badge" onclick="toggleReporterEdit('${t._id}')">${t.reporter || '없음'} ✎</span>`}
+      <span class="reporter-badge" onclick="toggleReporterEdit('${t._id}')">${t.reporter || '없음'} ✎</span>
     </div>
-    ${!isAll ? `<div class="dp-row" id="dp-reporter-edit-${t._id}" style="display:none">
+    <div class="dp-row" id="dp-reporter-edit-${t._id}" style="display:none">
       <span class="dp-lbl">최종보고자</span>
       <select class="dp-edit" style="width:160px;text-align:right"
         onchange="updateReporter('${t._id}','${t._mid}',this.value);toggleReporterEdit('${t._id}')">${reporterOpts}</select>
-    </div>` : ''}
+    </div>
     <div class="dp-row">
       <span class="dp-lbl">팀원</span>
       <span class="dp-val">${t._mid}</span>
@@ -1242,7 +1231,7 @@ function renderDetail(t) {
             ${h.author ? `<span class="tl-author">${h.author}</span>` : ''}
             ${h.text}
           </div>
-          ${!isAll ? `<button class="tl-del" onclick="deleteHistory('${t._id}','${t._mid}','${h.id}')">✕</button>` : ''}
+          ${!`<button class="tl-del" onclick="deleteHistory('${t._id}','${t._mid}','${h.id}')">✕</button>`}
         </div>
         <div class="tl-date">${fmtDate(h.date)}</div>
       </div>

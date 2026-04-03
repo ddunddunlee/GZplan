@@ -389,6 +389,34 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
 
 /* ── 페이지 고유 CSS ── */
 
+/* ── 회의록 모바일 레이아웃 ── */
+@media(max-width:767px) {
+  .meet-layout {
+    flex-direction: column !important;
+  }
+  .meet-sidebar {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 200px;
+    border-right: none !important;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .meet-main {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+  .meet-topbar {
+    flex-wrap: wrap;
+    gap: 6px;
+    height: auto !important;
+    padding: 10px 14px !important;
+  }
+  .meet-topbar .page-title {
+    width: 100%;
+  }
+}
+
+
 /* ── 회의록 전용 ── */
 .sb-meeting-item{padding:10px 14px;cursor:pointer;border-bottom:0.5px solid var(--bg3);transition:background .12s}
 .sb-meeting-item:hover{background:var(--bg2)}
@@ -442,8 +470,8 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
     <button class="btn-ghost" id="logoutBtn" style="width:100%;font-size:11px;padding:5px">로그아웃</button>
   </div>
 </div>
-<div class="main-wrap" style="flex-direction:row;overflow:hidden">
-  <div style="width:220px;flex-shrink:0;border-right:0.5px solid var(--border);background:var(--bg);display:flex;flex-direction:column;overflow:hidden">
+<div class="main-wrap meet-layout" style="flex-direction:row;overflow:hidden">
+  <div class="meet-sidebar" style="width:220px;flex-shrink:0;border-right:0.5px solid var(--border);background:var(--bg);display:flex;flex-direction:column;overflow:hidden">
     <div style="padding:14px 16px;border-bottom:0.5px solid var(--bg3);display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
       <span style="font-size:13px;font-weight:600;color:var(--text)">회의록</span>
       <button class="btn-solid" id="newMeetingBtn" onclick="if(window.newMeeting)window.newMeeting()" style="font-size:11px;padding:4px 10px;touch-action:manipulation">+ 새 회의</button>
@@ -457,7 +485,7 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
       <div style="padding:2rem;text-align:center;color:var(--text3);font-size:13px;line-height:1.6">저장된 회의록이 없어요<br>새 회의를 시작해주세요</div>
     </div>
   </div>
-  <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0">
+  <div class="meet-main" style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0">
     <div class="topbar">
   <button class="hamburger" id="hamburgerBtn" aria-label="메뉴">
     <span></span><span></span><span></span>

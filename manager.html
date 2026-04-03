@@ -389,6 +389,35 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
 
 /* ── 페이지 고유 CSS ── */
 
+@media(max-width:767px){
+  /* 콘텐츠 패딩 */
+  #viewWork > div:last-child {
+    padding: 14px 14px 80px !important;
+  }
+  /* 팀원 필터 스크롤 */
+  #memberFilterRow {
+    flex-wrap: nowrap !important;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+  }
+  #memberFilterRow::-webkit-scrollbar { display:none }
+  /* 업무 카드 */
+  .task-card { padding: 10px 12px; gap: 8px; }
+  .task-title { font-size: 12px; }
+  /* 뷰 탭 */
+  #viewTabWork, #viewTabPool {
+    font-size: 11px;
+    padding: 8px 12px;
+  }
+}
+
+.flag{font-size:10px;padding:2px 7px;border-radius:var(--pill);font-weight:500;white-space:nowrap}
+.flag-pinned{background:var(--blue-bg);color:var(--blue-t)}
+.flag-stale{background:var(--amber-bg);color:var(--amber-t)}
+.flag-overdue{background:var(--red-bg);color:var(--red)}
+
+
 /* ── 팀원 탭 ── */
 .member-tabs{display:flex;overflow-x:auto;border-bottom:0.5px solid var(--border);background:var(--bg);padding:0 24px;flex-shrink:0;-webkit-overflow-scrolling:touch}
 .member-tabs::-webkit-scrollbar{display:none}
@@ -469,7 +498,6 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
 
   <!-- 팀원 업무 현황 뷰 -->
   <div id="viewWork">
-    <div class="member-tabs" id="memberTabs"></div>
     <div style="flex:1;padding:20px 24px 80px;display:flex;gap:16px;align-items:flex-start">
       <div style="flex:1;min-width:0">
         <div class="stats" id="statsRow"></div>
@@ -746,6 +774,10 @@ const isStale   = t => {
   return Date.now() - new Date(t.updated).getTime() >= STALE_DAYS * DAY_MS;
 };
 
+function priorityColor(p) {
+  return ['','#c0c0bc','#378ADD','#EF9F27','#E24B4A','#A32D2D'][p||3] || '#c0c0bc';
+}
+
 window.priorityCls = function(p) {
   const n = p || 3;
   return 'priority-badge ' + ['','p1','p2','p3','p4','p5'][n];
@@ -970,16 +1002,7 @@ function getAllTasks() {
 }
 
 function renderMemberTabs() {
-  const el = document.getElementById('memberTabs');
-  if (!el) return;
-  const allCnt = Object.values(mData).reduce((sum, m) => sum + (m.tasks||[]).filter(t=>t.status!=='done').length, 0);
-  let html = `<div class="member-tab${curTab==='__all__'?' active':''}" data-tab="__all__">전체 <span class="cnt">${allCnt}</span></div>`;
-  MEMBER_IDS.forEach(id => {
-    const cnt = (mData[id]?.tasks||[]).filter(t=>t.status!=='done').length;
-    html += `<div class="member-tab${curTab===id?' active':''}" data-tab="${id}">${id} <span class="cnt">${cnt}</span></div>`;
-  });
-  el.innerHTML = html;
-  // + 업무 추가 버튼 표시 (개인탭일 때만)
+  // 업무 추가 버튼: 개인 탭일 때만 표시
   const addBtn = document.getElementById('addBtn');
   if (addBtn) addBtn.style.display = curTab !== '__all__' ? '' : 'none';
 }
@@ -994,19 +1017,17 @@ function render() {
 function renderMemberFilter() {
   const el = document.getElementById('memberFilterRow');
   if (!el) return;
+  // 전체 탭일 때 팀원 필터, 개인탭일 때 숨김
   if (curTab !== '__all__') { el.innerHTML = ''; return; }
-  let html = `<span style="font-size:12px;color:var(--text3);margin-right:4px">팀원</span>`;
-  html += `<button class="chip achip${filterMember==='all'?' active':''}" data-m="all">전체</button>`;
+  let html = `<button class="chip${filterMember==='all'?' active':''}" data-m="all">전체</button>`;
   MEMBER_IDS.forEach(id => {
     const cnt = (mData[id]?.tasks||[]).filter(t => t.status !== 'done').length;
-    html += `<button class="chip achip${filterMember===id?' active':''}" data-m="${id}">${id} <span style="font-size:10px">${cnt}</span></button>`;
+    html += `<button class="chip${filterMember===id?' active':''}" data-m="${id}">${id}<span style="font-size:10px;margin-left:3px;opacity:.7">${cnt}</span></button>`;
   });
   el.innerHTML = html;
-  el.querySelectorAll('.achip').forEach(btn => {
+  el.querySelectorAll('[data-m]').forEach(btn => {
     btn.addEventListener('click', function() {
       filterMember = this.dataset.m;
-      el.querySelectorAll('.achip').forEach(b => b.classList.remove('active'));
-      this.classList.add('active');
       render();
     });
   });

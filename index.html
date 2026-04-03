@@ -26,7 +26,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Pretendard","Segoe UI",sans-s
 .spin-wrap{display:none;justify-content:center;margin-top:12px}
 .spin{width:20px;height:20px;border:2px solid #e5e5e3;border-top-color:#1a1a1a;border-radius:50%;animation:sp .7s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
-.debug{font-size:11px;color:#a8a8a8;margin-top:12px;padding:8px;background:#f0f0ee;border-radius:6px;white-space:pre-wrap;display:none}
 </style>
 </head>
 <body>
@@ -40,19 +39,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Pretendard","Segoe UI",sans-s
   <button class="btn" id="loginBtn">로그인</button>
   <div class="err" id="err"></div>
   <div class="spin-wrap" id="spin"><div class="spin"></div></div>
-  <div class="debug" id="debug"></div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script>
-var dbg = document.getElementById('debug');
-function log(msg) {
-  console.log('[GZPlan]', msg);
-  dbg.style.display = 'block';
-  dbg.textContent += msg + '\n';
-}
-
 // 진입 시 현재 localStorage 상태 확인
 var existing = localStorage.getItem('tt_user');
 log('진입 - 기존 tt_user: ' + (existing ? JSON.stringify(existing).slice(0,60) : 'null'));
@@ -60,7 +51,6 @@ log('진입 - 기존 tt_user: ' + (existing ? JSON.stringify(existing).slice(0,6
 // 기존 세션 초기화
 localStorage.removeItem('tt_user');
 sessionStorage.clear();
-log('세션 초기화 완료');
 
 firebase.initializeApp({
   apiKey:            "AIzaSyA7KylsSyT3_0oQvhBtcrPc-gcdfVq90IQ",
@@ -71,7 +61,6 @@ firebase.initializeApp({
   appId:             "1:186255862586:web:f36d21f76012ca43b8fe03"
 });
 var db = firebase.firestore();
-log('Firebase 초기화 완료');
 
 function go(role) {
   var dest = role === 'admin' ? 'admin.html' : role === 'manager' ? 'manager.html' : 'member.html';
@@ -86,8 +75,7 @@ async function doLogin() {
   var err = document.getElementById('err');
   var btn = document.getElementById('loginBtn');
   err.textContent = '';
-  log('로그인 시도: id=' + id);
-
+  
   if (!id || !pw) { err.textContent = '아이디와 비밀번호를 입력해주세요'; return; }
 
   btn.disabled = true;
@@ -106,13 +94,10 @@ async function doLogin() {
       if (pw !== apw) { err.textContent = '아이디 또는 비밀번호가 틀렸어요'; return; }
       userData = { id: 'admin', role: 'admin', displayName: 'admin' };
     } else {
-      log('Firestore 조회 중...');
-      var snap = await db.collection('accounts').doc(id).get();
-      log('조회 결과: exists=' + snap.exists);
-      if (!snap.exists) { err.textContent = '아이디 또는 비밀번호가 틀렸어요'; return; }
+            var snap = await db.collection('accounts').doc(id).get();
+            if (!snap.exists) { err.textContent = '아이디 또는 비밀번호가 틀렸어요'; return; }
       var d = snap.data();
-      log('계정 데이터: role=' + d.role + ' displayName=' + d.displayName);
-      if (d.password !== pw) { err.textContent = '아이디 또는 비밀번호가 틀렸어요'; return; }
+            if (d.password !== pw) { err.textContent = '아이디 또는 비밀번호가 틀렸어요'; return; }
       if (d.disabled) { err.textContent = '비활성화된 계정이에요'; return; }
       userData = { id: id, role: d.role, displayName: d.displayName || id };
     }
@@ -124,8 +109,7 @@ async function doLogin() {
 
   } catch(e) {
     err.textContent = '오류: ' + (e.message || String(e));
-    log('오류: ' + e.message);
-    console.error(e);
+        console.error(e);
   } finally {
     btn.disabled = false;
     document.getElementById('spin').style.display = 'none';

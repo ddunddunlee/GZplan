@@ -484,8 +484,9 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
         <option value="4">4 — 긴급</option><option value="2">2 — 낮음</option><option value="1">1 — 매우 낮음</option>
       </select>
     </div>
-    <div class="fg"><label>시작일</label><input id="iStart" type="date"/></div>
-    <div class="fg"><label>마감일</label><input id="iDue" type="date"/></div>
+    <div class="fg"><label>업무 발생일</label><input id="iOccurred" type="date"/></div>
+    <div class="fg"><label>업무 시작일</label><input id="iStart" type="date"/></div>
+    <div class="fg"><label>업무 타겟일</label><input id="iDue" type="date"/></div>
     <div class="fg"><label>최종보고자 (선택)</label><select id="iReporter"><option value="">없음</option></select></div>
     <div class="modal-btns">
       <button class="btn-cancel" id="modalCancelBtn" onclick="if(window.closeModal)window.closeModal()" style="touch-action:manipulation">취소</button>
@@ -609,6 +610,12 @@ function toast(msg) {
   setTimeout(() => el.classList.remove('show'), 2200);
 }
 
+
+function daysElapsed(dateStr) {
+  if (!dateStr) return null;
+  const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 86400000);
+  return diff;
+}
 // 날짜 포맷: "2026. 3. 31. 14:30" 형식
 function fmtDate(s) {
   if (!s) return '-';
@@ -885,12 +892,22 @@ function renderDetail(t) {
         onchange="updatePriority('${t._id}',this.value);togglePriorityEdit('${t._id}')">${priorityOpts}</select>
     </div>
     <div class="dp-row">
-      <span class="dp-lbl">시작일</span>
+      <span class="dp-lbl">업무 발생일</span>
+      <span class="dp-val" style="display:flex;align-items:center;gap:6px">
+        <input class="dp-edit" type="date" value="${t.occurredDate || ''}"
+          onchange="updateOccurredDate('${t._id}', this.value)" style="width:120px;text-align:right" />
+        ${t.occurredDate && daysElapsed(t.occurredDate) > 0
+          ? `<span style="font-size:10px;color:var(--orange);font-weight:600">${daysElapsed(t.occurredDate)}일 경과</span>`
+          : ''}
+      </span>
+    </div>
+    <div class="dp-row">
+      <span class="dp-lbl">업무 시작일</span>
       <input class="dp-edit" type="date" value="${t.startDate || ''}"
         onchange="updateStartDate('${t._id}', this.value)" style="width:140px;text-align:right" />
     </div>
     <div class="dp-row">
-      <span class="dp-lbl">마감일</span>
+      <span class="dp-lbl">업무 타겟일</span>
       <input class="dp-edit" type="date" value="${t.due || ''}"
         onchange="updateDue('${t._id}', this.value)" style="width:140px;text-align:right" />
     </div>
@@ -1072,6 +1089,16 @@ window.updateReporter = async (id, val) => {
   });
 };
 
+
+window.updateOccurredDate = async (id, val) => {
+  const ts = new Date().toISOString();
+  const t = tasks.find(t=>t._id===id);
+  if(!t) return;
+  await fsUpd(id, { occurredDate: val, updated: ts,
+    history: [...(t.history||[]), { id: Date.now()+'', type:'status', text:'업무 발생일: '+val, date: ts }]
+  });
+};
+
 window.updateStartDate = async (id, val) => {
   setSync(true);
   const t = tasks.find(t => t._id === id);
@@ -1130,7 +1157,7 @@ window.deleteHistory = async (taskId, histId) => {
 window.openModal = () => document.getElementById('overlay').classList.add('show');
 window.closeModal = () => {
   document.getElementById('overlay').classList.remove('show');
-  ['iTitle', 'iDesc', 'iStart', 'iDue'].forEach(id => document.getElementById(id).value = '');
+  ['iTitle', 'iDesc', 'iOccurred', 'iStart', 'iDue'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
   document.getElementById('iPriority').value = '3';
   document.getElementById('iReporter').value = '';
 };
@@ -1144,6 +1171,7 @@ window.addTask = async () => {
     title,
     desc:    document.getElementById('iDesc').value.trim(),
     assignee: ME.id,
+    occurredDate: document.getElementById('iOccurred').value || '',
     startDate: document.getElementById('iStart').value || '',
     due:      document.getElementById('iDue').value || '',
     status:   'todo',

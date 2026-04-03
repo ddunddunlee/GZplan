@@ -279,13 +279,18 @@ button, [onclick], [data-nav], .sb-item, .task-card, .chip {
 
   <!-- 업무 관리 뷰 -->
   <div id="viewPool" style="display:none;padding:20px 24px 80px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
       <div>
-        <div style="font-size:15px;font-weight:600;color:var(--text)">업무 관리</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:3px">담당자 없이 업무를 등록하고, 팀원에게 배정하세요</div>
+        <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:4px">업무 관리</div>
+        <div style="font-size:12px;color:var(--text3)">담당자 없이 업무를 등록하고, 팀원에게 배정하세요</div>
       </div>
-      <button class="btn-solid" onclick="if(window.openPoolModal)window.openPoolModal()" style="touch-action:manipulation">+ 업무 추가</button>
+      <button onclick="if(window.openPoolModal)window.openPoolModal()"
+        style="padding:8px 18px;font-size:13px;font-weight:600;border:none;border-radius:var(--radius-sm);background:var(--text);color:var(--bg);cursor:pointer;touch-action:manipulation;display:flex;align-items:center;gap:5px">
+        + 업무 추가
+      </button>
     </div>
+    <!-- 미배정 업무 수 -->
+    <div id="poolSummary" style="margin-bottom:14px"></div>
     <div id="taskPoolList"><div class="empty">등록된 업무가 없어요</div></div>
   </div>
 
@@ -623,35 +628,45 @@ onSnapshot(query(collection(db,'taskPool'), orderBy('createdAt','desc')), snap =
 function renderTaskPool() {
   const el = document.getElementById('taskPoolList');
   if (!el) return;
+  // 미배정 수 업데이트
+  const ps = document.getElementById('poolSummary');
+  if (ps) ps.innerHTML = poolTasks.length > 0
+    ? `<span style="font-size:13px;color:var(--text2)">미배정 업무 <strong style="color:var(--text)">${poolTasks.length}건</strong></span>`
+    : '';
+
   if (!poolTasks.length) {
-    el.innerHTML = '<div class="empty">등록된 업무가 없어요<br><span style="font-size:12px">업무를 추가하고 팀원에게 배정해보세요</span></div>';
+    el.innerHTML = `<div style="text-align:center;padding:4rem 1rem;color:var(--text3)">
+      <div style="font-size:32px;margin-bottom:12px">📋</div>
+      <div style="font-size:14px;font-weight:500;margin-bottom:6px">등록된 업무가 없어요</div>
+      <div style="font-size:12px">위의 + 업무 추가 버튼으로 업무를 등록하고<br>팀원에게 배정해보세요</div>
+    </div>`;
     return;
   }
   const PL = {5:'매우 긴급',4:'긴급',3:'보통',2:'낮음',1:'매우 낮음'};
-  el.innerHTML = poolTasks.map(t => {
+  el.innerHTML = `<div style="display:flex;flex-direction:column;gap:8px">` + poolTasks.map(t => {
     const daysSince = t.occurredDate ? Math.floor((Date.now()-new Date(t.occurredDate).getTime())/86400000) : null;
-    return `<div class="task-pool-card">
-      <div class="priority-bar" style="background:${priorityColor(t.priority)}"></div>
-      <div class="tc-body">
-        <div class="tc-title">${t.title}</div>
-        <div class="tc-meta">
-          <span class="${priorityCls(t.priority)}">${PL[t.priority||3]}</span>
-          ${t.occurredDate ? `<span class="task-date">발생 ${fmtShort(t.occurredDate)}${daysSince>0?` · ${daysSince}일 경과`:''}</span>` : ''}
-          ${t.due ? `<span class="task-date">타겟 ${fmtShort(t.due)}</span>` : ''}
+    return `<div style="background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:16px 18px;display:flex;align-items:center;gap:14px">
+      <div style="width:4px;border-radius:var(--pill);align-self:stretch;flex-shrink:0;background:${priorityColor(t.priority)}"></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.title}</div>
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+          <span class="${priorityCls(t.priority)}" style="font-size:11px">${PL[t.priority||3]}</span>
+          ${t.occurredDate ? `<span style="font-size:11px;color:var(--text3)">📅 발생 ${fmtShort(t.occurredDate)}${daysSince>0?` <span style="color:var(--orange);font-weight:600">${daysSince}일 경과</span>`:''}</span>` : ''}
+          ${t.due ? `<span style="font-size:11px;color:var(--text3)">🎯 타겟 ${fmtShort(t.due)}</span>` : ''}
+          ${t.reporter ? `<span class="reporter-badge" style="font-size:10px">${t.reporter}</span>` : ''}
         </div>
+        ${t.desc ? `<div style="font-size:12px;color:var(--text3);margin-top:5px">${t.desc}</div>` : ''}
       </div>
-      <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;flex-shrink:0">
-        <select class="assign-select" id="asel_${t._id}">
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+        <select class="assign-select" id="asel_${t._id}" style="min-width:100px">
           <option value="">담당자 선택</option>
           ${MEMBER_IDS.map(id=>`<option value="${id}">${id}</option>`).join('')}
         </select>
-        <div style="display:flex;gap:5px">
-          <button class="assign-btn" onclick="window.assignTask('${t._id}')">배정</button>
-          <button class="del-btn" onclick="window.deletePoolTask('${t._id}',event)" style="border:0.5px solid var(--border);border-radius:var(--radius-sm)">✕</button>
-        </div>
+        <button onclick="window.assignTask('${t._id}')" style="padding:6px 14px;font-size:12px;font-weight:600;border:none;border-radius:var(--radius-sm);background:var(--text);color:var(--bg);cursor:pointer;white-space:nowrap;touch-action:manipulation">배정</button>
+        <button onclick="window.deletePoolTask('${t._id}',event)" style="width:28px;height:28px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--text3);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center">✕</button>
       </div>
     </div>`;
-  }).join('');
+  }).join('') + '</div>';
 }
 
 window.openPoolModal = () => {
@@ -736,7 +751,17 @@ window.setMemberFilter = function(m) {
 function renderMemberFilter() {
   const el = document.getElementById('memberFilterRow');
   if (!el) return;
-  if (curTab !== '__all__') { el.innerHTML = ''; return; }
+  if (curTab !== '__all__') {
+    // 개인 탭: 팀원명 + 업무 추가 버튼
+    el.innerHTML = `
+      <button class="chip active" onclick="if(window.switchTab)window.switchTab('__all__')" style="cursor:pointer">← 전체</button>
+      <button onclick="if(window.openModal)window.openModal()"
+        style="padding:5px 14px;font-size:12px;font-weight:600;border:none;border-radius:var(--pill);background:var(--text);color:var(--bg);cursor:pointer;touch-action:manipulation;display:inline-flex;align-items:center;gap:4px">
+        + ${curTab}에게 업무 추가
+      </button>`;
+    return;
+  }
+  // 전체 탭: 팀원 필터 칩 + 각 팀원별 업무 추가 버튼
   let html = `<button class="chip${filterMember==='all'?' active':''}" data-m="all">전체</button>`;
   MEMBER_IDS.forEach(id => {
     const cnt = (mData[id]?.tasks||[]).filter(t => t.status !== 'done').length;
@@ -780,7 +805,7 @@ function renderTaskList() {
     return 0;
   });
   const list = [...filtered.filter(t => t.pinned), ...filtered.filter(t => !t.pinned)];
-  const isAll = curTab === '__all__';
+  const isAll = false; // 팀장은 항상 편집 가능
 
   const el = document.getElementById('taskList');
   if (!list.length) { el.innerHTML = '<div class="empty">업무가 없습니다</div>'; return; }
@@ -841,8 +866,14 @@ function renderTaskList() {
 
 function renderDetail(t) {
   document.getElementById('dpTitle').value = t.title;
+  const dpTitleEl = document.getElementById('dpTitle');
+  dpTitleEl.dataset.id = t._id;
+  dpTitleEl.dataset.mid = t._mid;
+  dpTitleEl.onblur = function() {
+    if(window.changeTitle) window.changeTitle(this.dataset.id, this.dataset.mid, this.value);
+  };
 
-  const isAll = curTab === '__all__';
+  const isAll = false; // 팀장은 항상 편집 가능
   const statusLabel = { todo: '대기', inprogress: '진행 중', done: '완료' };
   const descRow = t.desc
     ? `<div class="dp-row" style="align-items:flex-start;gap:8px">
@@ -1179,11 +1210,14 @@ window.addTask = async () => {
     const ts = now();
     await fsAdd(curTab, {
       title,
-      desc:     document.getElementById('iDesc').value.trim(),
-      assignee: '',
-      startDate: document.getElementById('iStart').value || '',
-    due:      document.getElementById('iDue').value || '',
-      status:   'todo',
+      desc:        document.getElementById('iDesc').value.trim(),
+      assignee:    curTab,
+      occurredDate: document.getElementById('iOccurred')?.value || '',
+      startDate:   document.getElementById('iStart').value || '',
+      due:         document.getElementById('iDue').value || '',
+      priority:    Number(document.getElementById('iPriority')?.value) || 3,
+      reporter:    document.getElementById('iReporter')?.value || '',
+      status:      'todo',
       updated:  ts,
       pinned:   false,
       order:    Date.now(),

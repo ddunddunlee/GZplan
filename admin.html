@@ -586,10 +586,6 @@ async function init(){
 
 async function loadAccounts(){
   try{const snap=await getDocs(collection(db,'accounts'));accounts=snap.docs.map(d=>{return {docId:d.id,...d.data()}});accounts.sort((a,b)=>{const o={admin:0,manager:1,member:2};return(o[a.role]??3)-(o[b.role]??3)||a.docId.localeCompare(b.docId,'ko')})}catch{accounts=[]}
-  const mc=accounts.filter(a=>a.role==='member').length;
-  const ib=document.getElementById('initBox'),it=document.getElementById('initText'),ibt=document.getElementById('initBtn');
-  if(mc>=INIT_MEMBERS.length){ib.classList.add('done');it.innerHTML=`<strong>팀원 계정 등록 완료</strong><br>팀원 ${mc}명이 등록되어 있어요.`;ibt.textContent='재등록';}
-  else{ib.classList.remove('done');it.innerHTML='<strong>초기 계정 미등록</strong><br>팀원 7명의 계정을 등록해주세요.';ibt.textContent='팀원 계정 일괄 등록';}
   renderStats();renderList();
 }
 
@@ -635,7 +631,7 @@ function renderList(){
 }
 
 // 계정 목록 이벤트 위임
-document.getElementById('accountList').addEventListener('click',e=>{
+document.getElementById('accountList')?.addEventListener('click',e=>{
   const btn=e.target.closest('[data-action]');if(!btn)return;
   const {action,id,name,role,disabled}=btn.dataset;
   if(action==='pw'){editingId=id;document.getElementById('pwTargetLabel').textContent=`대상: ${name} (@${id})`;document.getElementById('newPw').value='';document.getElementById('pwOverlay').classList.add('show');}
@@ -644,13 +640,6 @@ document.getElementById('accountList').addEventListener('click',e=>{
   else if(action==='del'){if(id===currentUser?.id){toast('자신의 계정은 삭제할 수 없어요');return;}if(!confirm(`"${name}" 계정을 삭제할까요?`))return;deleteDoc(doc(db,'accounts',id)).then(()=>{toast('삭제됐어요');loadAccounts();});}
 });
 
-// 일괄 등록
-document.getElementById('initBtn').addEventListener('click',async()=>{
-  const btn=document.getElementById('initBtn');btn.disabled=true;btn.textContent='등록 중...';
-  let added=0;
-  for(const m of INIT_MEMBERS){if(accounts.find(a=>a.docId===m.id))continue;try{await setDoc(doc(db,'accounts',m.id),{displayName:m.name,password:'1234',role:'member',disabled:false,createdAt:new Date().toISOString()});added++;}catch{}}
-  btn.disabled=false;toast(added?`${added}명 등록 완료 ✓`:'새로 등록할 계정이 없어요');loadAccounts();
-});
 
 // admin 비번 변경
 window._changePw = async () => {
@@ -725,7 +714,7 @@ function renderReporters(){
       <button data-ri="${i}" style="padding:3px 10px;font-size:12px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--red);cursor:pointer">삭제</button>
     </div>`).join('');
 }
-document.getElementById('reporterList').addEventListener('click',async e=>{
+document.getElementById('reporterList')?.addEventListener('click',async e=>{
   const btn=e.target.closest('[data-ri]');if(!btn)return;
   const i=parseInt(btn.dataset.ri);const name=reporters[i];
   if(!confirm(`"${name}"을 삭제할까요?`))return;

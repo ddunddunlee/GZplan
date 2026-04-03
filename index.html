@@ -5,162 +5,77 @@
 <link rel="manifest" href="./manifest.json" />
 <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="GZ기획팀" />
-<meta name="theme-color" content="#185FA5" />
+<meta name="theme-color" content="#ffffff" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>업무 트래커 — 로그인</title>
+<title>GZ Plan</title>
 <style>
-*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
-:root {
-  --bg:#ffffff; --bg2:#f5f5f3; --bg3:#eaeae8;
-  --text:#1a1a1a; --text2:#6b6b6b; --text3:#a8a8a8;
-  --border:rgba(0,0,0,0.09); --border2:rgba(0,0,0,0.16);
-  --radius:12px; --radius-sm:8px; --accent:#378ADD;
-  --red:#a32d2d;
-}
-@media (prefers-color-scheme:dark) { :root {
-  --bg:#1c1c1e; --bg2:#2c2c2e; --bg3:#111110;
-  --text:#f2f2f7; --text2:#aeaeb2; --text3:#636366;
-  --border:rgba(255,255,255,0.08); --border2:rgba(255,255,255,0.15);
-}}
-body { font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-serif; background:var(--bg3); color:var(--text); min-height:100vh; display:flex; align-items:center; justify-content:center; padding:1rem; }
-.box { background:var(--bg); border:0.5px solid var(--border2); border-radius:var(--radius); padding:2.2rem 2rem; width:100%; max-width:340px; }
-.brand { font-size:22px; font-weight:700; letter-spacing:-0.4px; margin-bottom:0.3rem; }
-.brand-sub { font-size:13px; color:var(--text2); margin-bottom:2rem; }
-.fg { margin-bottom:1rem; }
-.fg label { font-size:12px; color:var(--text2); display:block; margin-bottom:5px; }
-.fg input { width:100%; padding:10px 12px; font-size:14px; border:0.5px solid var(--border2); border-radius:var(--radius-sm); background:var(--bg2); color:var(--text); font-family:inherit; outline:none; transition:border-color .15s; }
-.fg input:focus { border-color:var(--accent); }
-.btn { width:100%; padding:11px; font-size:14px; font-weight:700; background:var(--text); color:var(--bg); border:none; border-radius:var(--radius-sm); cursor:pointer; margin-top:0.5rem; transition:opacity .15s; }
-.btn:hover { opacity:0.82; }
-.btn:disabled { opacity:0.4; cursor:not-allowed; }
-.err { font-size:12px; color:var(--red); margin-top:10px; min-height:18px; text-align:center; }
-.spin-wrap { display:none; justify-content:center; margin-top:14px; }
-.spin { width:22px; height:22px; border:2.5px solid var(--border2); border-top-color:var(--text); border-radius:50%; animation:sp .7s linear infinite; }
-@keyframes sp { to { transform:rotate(360deg); } }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#fff;--bg2:#f7f7f5;--text:#1a1a1a;--text2:#6b6b6b;--text3:#a8a8a8;--border:#e5e5e3;--border2:#d0d0cc;--radius:10px;--radius-sm:6px;--red:#A32D2D;--blue:#378ADD}
+body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-serif;background:var(--bg2);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem}
+.box{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:2.5rem 2rem;width:100%;max-width:340px}
+.brand{margin-bottom:2rem}
+.brand-name{font-size:22px;font-weight:700;color:var(--text);letter-spacing:-.4px;margin-bottom:4px}
+.brand-sub{font-size:13px;color:var(--text3)}
+.fg{margin-bottom:1rem}
+.fg label{font-size:11px;font-weight:600;color:var(--text3);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
+.fg input{width:100%;padding:10px 12px;font-size:14px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:inherit;outline:none;transition:border-color .15s}
+.fg input:focus{border-color:var(--border2);background:var(--bg)}
+.btn{width:100%;padding:11px;font-size:14px;font-weight:600;background:var(--text);color:var(--bg);border:none;border-radius:var(--radius-sm);cursor:pointer;margin-top:.5rem;transition:opacity .15s}
+.btn:hover{opacity:.82}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.err{font-size:12px;color:var(--red);margin-top:8px;min-height:18px;text-align:center}
+.spin-wrap{display:none;justify-content:center;margin-top:12px}
+.spin{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--text);border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
 <div class="box">
-  <div class="brand">업무 트래커</div>
-  <div class="brand-sub">아이디와 비밀번호를 입력해주세요</div>
-  <div class="fg">
-    <label>아이디</label>
-    <input id="uid" type="text" placeholder="아이디" autocomplete="username" />
+  <div class="brand">
+    <div class="brand-name">GZ Plan</div>
+    <div class="brand-sub">경영기획팀 업무 관리 시스템</div>
   </div>
-  <div class="fg">
-    <label>비밀번호</label>
-    <input id="upw" type="password" placeholder="비밀번호" autocomplete="current-password" />
-  </div>
+  <div class="fg"><label>아이디</label><input id="uid" type="text" placeholder="아이디 입력" autocomplete="username" /></div>
+  <div class="fg"><label>비밀번호</label><input id="upw" type="password" placeholder="비밀번호 입력" autocomplete="current-password" /></div>
   <button class="btn" id="loginBtn" onclick="doLogin()">로그인</button>
   <div class="err" id="err"></div>
   <div class="spin-wrap" id="spin"><div class="spin"></div></div>
 </div>
-
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-
-// ════════════════════════════════════════════
-// ★ firebaseConfig 붙여넣기
-const firebaseConfig = {
-  apiKey: "AIzaSyA7KylsSyT3_0oQvhBtcrPc-gcdfVq90IQ",
-  authDomain: "gzplan.firebaseapp.com",
-  projectId: "gzplan",
-  storageBucket: "gzplan.firebasestorage.app",
-  messagingSenderId: "186255862586",
-  appId: "1:186255862586:web:f36d21f76012ca43b8fe03",
-};
-// ════════════════════════════════════════════
-
-// ★ admin 초기 비밀번호
-//   Firebase 세팅 전에도 admin으로 로그인할 수 있도록 하드코딩 유지
-//   admin.html에서 비밀번호 변경 시 Firestore에 저장되며, 이후엔 Firestore 우선 적용
-const ADMIN_ID      = "admin";
-const ADMIN_PW_INIT = "admin1234";
-
-const app = initializeApp(firebaseConfig);
-const db  = getFirestore(app);
-
-// 이미 로그인된 경우 바로 이동 (role 검증 포함)
-const sess = localStorage.getItem('tt_user');
-if (sess) {
-  try {
-    const u = JSON.parse(sess);
-    const validRoles = ['admin', 'manager', 'member'];
-    if (u && u.id && u.role && validRoles.includes(u.role)) {
-      go(u.role);
-    } else {
-      // 잘못된 세션이면 삭제
-      localStorage.removeItem('tt_user');
+const firebaseConfig = {apiKey:"AIzaSyA7KylsSyT3_0oQvhBtcrPc-gcdfVq90IQ",authDomain:"gzplan.firebaseapp.com",projectId:"gzplan",storageBucket:"gzplan.firebasestorage.app",messagingSenderId:"186255862586",appId:"1:186255862586:web:f36d21f76012ca43b8fe03"};
+const ADMIN_ID="admin",ADMIN_PW_INIT="admin1234";
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
+const sess=localStorage.getItem('tt_user');
+if(sess){try{const u=JSON.parse(sess);if(u&&u.id&&u.role&&['admin','manager','member'].includes(u.role))go(u.role);else localStorage.removeItem('tt_user')}catch(e){localStorage.removeItem('tt_user')}}
+function go(role){if(role==='admin')location.href='admin.html';else if(role==='manager')location.href='manager.html';else location.href='member.html'}
+window.doLogin=async()=>{
+  const id=document.getElementById('uid').value.trim(),pw=document.getElementById('upw').value;
+  const err=document.getElementById('err'),btn=document.getElementById('loginBtn');
+  err.textContent='';
+  if(!id||!pw){err.textContent='아이디와 비밀번호를 입력해주세요';return}
+  btn.disabled=true;document.getElementById('spin').style.display='flex';
+  try{
+    if(id===ADMIN_ID){
+      let adminPw=ADMIN_PW_INIT,disabled=false;
+      try{const snap=await getDoc(doc(db,'accounts',ADMIN_ID));if(snap.exists()){adminPw=snap.data().password??ADMIN_PW_INIT;disabled=snap.data().disabled??false}}catch(_){}
+      if(disabled){err.textContent='비활성화된 계정이에요';return}
+      if(pw!==adminPw){err.textContent='아이디 또는 비밀번호가 틀렸어요';return}
+      localStorage.removeItem('tt_user');localStorage.setItem('tt_user',JSON.stringify({id:ADMIN_ID,role:'admin',displayName:'admin'}));go('admin');return
     }
-  } catch(e) {
-    localStorage.removeItem('tt_user');
-  }
-}
-
-function go(role) {
-  if      (role === 'admin')   location.href = 'admin.html';
-  else if (role === 'manager') location.href = 'manager.html';
-  else                         location.href = 'member.html';
-}
-
-window.doLogin = async () => {
-  const id  = document.getElementById('uid').value.trim();
-  const pw  = document.getElementById('upw').value;
-  const err = document.getElementById('err');
-  const btn = document.getElementById('loginBtn');
-  err.textContent = '';
-  if (!id || !pw) { err.textContent = '아이디와 비밀번호를 입력해주세요'; return; }
-
-  btn.disabled = true;
-  document.getElementById('spin').style.display = 'flex';
-
-  try {
-    // ── admin 계정: Firestore 우선, 없으면 하드코딩 ──
-    if (id === ADMIN_ID) {
-      let adminPw = ADMIN_PW_INIT;
-      let disabled = false;
-      try {
-        const snap = await getDoc(doc(db, 'accounts', ADMIN_ID));
-        if (snap.exists()) {
-          adminPw  = snap.data().password ?? ADMIN_PW_INIT;
-          disabled = snap.data().disabled ?? false;
-        }
-      } catch(_) { /* Firestore 미설정 상태면 하드코딩값 사용 */ }
-
-      if (disabled)       { err.textContent = '비활성화된 계정이에요'; return; }
-      if (pw !== adminPw) { err.textContent = '아이디 또는 비밀번호가 틀렸어요'; return; }
-      localStorage.removeItem('tt_user');
-      localStorage.setItem('tt_user', JSON.stringify({ id: ADMIN_ID, role: 'admin', displayName: 'admin' }));
-      go('admin');
-      return;
-    }
-
-    // ── 일반 계정: Firestore에서 검증 ──
-    const snap = await getDoc(doc(db, 'accounts', id));
-    if (!snap.exists())             { err.textContent = '아이디 또는 비밀번호가 틀렸어요'; return; }
-    const d = snap.data();
-    if (d.password !== pw)          { err.textContent = '아이디 또는 비밀번호가 틀렸어요'; return; }
-    if (d.disabled)                 { err.textContent = '비활성화된 계정이에요'; return; }
-
-    localStorage.removeItem('tt_user');
-    localStorage.setItem('tt_user', JSON.stringify({
-      id, role: d.role, displayName: d.displayName || id
-    }));
-    go(d.role);
-
-  } catch(e) {
-    err.textContent = '오류: ' + (e.code || e.message || String(e));
-    console.error(e);
-  } finally {
-    btn.disabled = false;
-    document.getElementById('spin').style.display = 'none';
-  }
+    const snap=await getDoc(doc(db,'accounts',id));
+    if(!snap.exists()){err.textContent='아이디 또는 비밀번호가 틀렸어요';return}
+    const d=snap.data();
+    if(d.password!==pw){err.textContent='아이디 또는 비밀번호가 틀렸어요';return}
+    if(d.disabled){err.textContent='비활성화된 계정이에요';return}
+    localStorage.removeItem('tt_user');localStorage.setItem('tt_user',JSON.stringify({id,role:d.role,displayName:d.displayName||id}));go(d.role)
+  }catch(e){err.textContent='오류: '+(e.code||e.message||String(e));console.error(e)}
+  finally{btn.disabled=false;document.getElementById('spin').style.display='none'}
 };
-
-document.addEventListener('keydown', e => { if (e.key === 'Enter') window.doLogin(); });
+document.addEventListener('keydown',e=>{if(e.key==='Enter')window.doLogin()});
 </script>
 </body>
 </html>

@@ -833,15 +833,11 @@ function highlightSidebar(id){
 // 참석자 UI
 // ════════════════════════════════════════════
 function renderAttendees(){
-  // 선택된 참석자 칩
-  document.getElementById("attendeeWrap").innerHTML=attendees.map(a=>`
-    <span class="attendee-chip">${a}
-      <button onclick="removeAttendee('${a}')">✕</button>
-    </span>`).join("");
-  // 팀원 버튼
-  document.getElementById("memberBtnRow").innerHTML=MEMBER_IDS.map(id=>`
-    <button class="member-btn${attendees.includes(id)?" on":""}" onclick="toggleAttendee('${id}')">${id}</button>`
-  ).join("");
+  // 텍스트 입력 방식으로 변경됨 - attendeeInput에서 직접 읽음
+  const aw = document.getElementById("attendeeWrap");
+  const mb = document.getElementById("memberBtnRow");
+  if(aw) aw.innerHTML = '';
+  if(mb) mb.innerHTML = '';
 }
 
 window.toggleAttendee=id=>{

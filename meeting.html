@@ -569,13 +569,13 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
     </div>
   </div>
 </div>
-<div class="overlay" id="delOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);align-items:center;justify-content:center;z-index:200">
+<div class="overlay" id="delOverlay">
   <div class="modal" style="max-width:360px">
     <h3>회의록 삭제</h3>
     <p style="font-size:13px;color:var(--text2);margin-bottom:1.25rem">이 회의록을 삭제할까요? 캘린더 일정도 함께 삭제돼요.</p>
     <div style="display:flex;gap:8px;justify-content:flex-end">
-      <button class="btn-cancel" id="delCancelBtn">취소</button>
-      <button class="btn-ok" id="delConfirmBtn" style="background:var(--red)">삭제</button>
+      <button class="btn-cancel" id="delCancelBtn" onclick="if(window.closeOverlay)window.closeOverlay()" style="touch-action:manipulation">취소</button>
+      <button class="btn-ok" id="delConfirmBtn" onclick="if(window.confirmDelete)window.confirmDelete()" style="background:var(--red);touch-action:manipulation">삭제</button>
     </div>
   </div>
 </div>
@@ -1122,9 +1122,9 @@ window.confirmDelete=async()=>{
   await deleteDoc(curMode==='shared'
       ? doc(db,'meetings_shared',pendingDeleteId)
       : doc(db,'meetings',ME.id,'items',pendingDeleteId));
-  closeOverlay();
-  newMeeting();
-  toast("회의록을 삭제했어요");
+  window.closeOverlay();
+  window.newMeeting();
+  toast('회의록을 삭제했어요');
 };
 
 window.closeOverlay=()=>document.getElementById("delOverlay").classList.remove("show");
@@ -1148,7 +1148,25 @@ window.saveTagSetting=()=>{
   toast('태그 설정 저장됐어요 ✓');
 };
 
-window._setCurMode=(mode)=>{ curMode=mode; renderSidebar(); window.newMeeting(); };
+window._setCurMode=(mode)=>{
+  curMode=mode;
+  curId=null;
+  renderSidebar();
+  // 탭 전환 시 새 회의록 상태로
+  const pt=document.getElementById('meetPageTitle');
+  if(pt) pt.textContent = mode==='shared' ? '🌐 공통 회의록' : '새 회의록';
+  // 녹음 영역은 새 회의일 때만 표시
+  const recWrap=document.getElementById('recWrap');
+  if(recWrap) recWrap.style.display = mode==='personal' ? '' : 'none';
+  // 입력 필드 초기화
+  ['meetTitle','transcriptArea','summaryArea','userNoteArea'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  const attI=document.getElementById('attendeeInput'); if(attI) attI.value='';
+  const sc=document.getElementById('shareChk'); if(sc) sc.checked=(mode==='shared');
+  document.getElementById('savedBadge').style.display='none';
+  document.getElementById('deleteMeetingBtn').style.display='none';
+};
 window.newMeeting();
 renderQuickTags();
 initSpeechRecognition();

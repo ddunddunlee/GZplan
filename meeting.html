@@ -518,7 +518,7 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
         <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:12px">🎙 실시간 녹음</div>
         <div id="recContent">
           <div style="display:flex;align-items:center;gap:14px;padding:4px 0">
-            <button id="recBtn" style="width:48px;height:48px;border-radius:50%;border:none;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;background:var(--bg2);flex-shrink:0;touch-action:manipulation;-webkit-tap-highlight-color:transparent">🎙</button>
+            <button id="recBtn" onclick="if(window.toggleRec)window.toggleRec()" style="width:60px;height:60px;border-radius:50%;border:2px solid var(--border);cursor:pointer;font-size:24px;display:flex;align-items:center;justify-content:center;background:var(--bg);flex-shrink:0;touch-action:manipulation;-webkit-tap-highlight-color:transparent;box-shadow:0 2px 8px rgba(0,0,0,.1)">🎙</button>
             <div>
               <div id="recStatus" style="font-size:12px;color:var(--text2);margin-bottom:2px">버튼을 눌러 녹음을 시작하세요</div>
               <div id="recTimer" style="font-size:18px;font-weight:500;color:var(--text);font-variant-numeric:tabular-nums">00:00</div>
@@ -622,20 +622,9 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
     function bind(id, fn) {
       var el = document.getElementById(id);
       if (!el) return;
-      var _touched = false;
-      function run() {
+      el.addEventListener('click', function() {
         if (typeof fn === 'function') fn();
         else if (window[fn]) window[fn]();
-      }
-      el.addEventListener('touchend', function(e) {
-        e.preventDefault(); // click 이벤트 중복 방지
-        _touched = true;
-        setTimeout(function() { _touched = false; }, 600);
-        run();
-      }, {passive: false});
-      el.addEventListener('click', function() {
-        if (_touched) return; // touchend 이미 처리됨
-        run();
       });
     }
     bind('newMeetingBtn',   'newMeeting');
@@ -643,7 +632,7 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
     bind('copySummaryBtn',  'copySummary');
     bind('deleteMeetingBtn','deleteMeeting');
     bind('summarizeBtn',    'summarize');
-    bind('recBtn',          'toggleRec');
+    // recBtn은 onclick으로 처리
     bind('delConfirmBtn',   'confirmDelete');
     bind('tagSettingBtn',   'openTagSetting');
     bind('tagSettingOkBtn', 'saveTagSetting');

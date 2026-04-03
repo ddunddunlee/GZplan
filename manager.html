@@ -966,6 +966,7 @@ document.getElementById('overlay').addEventListener('click', e => {
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') window.closeModal();
 });
+document.getElementById('addBtn')?.addEventListener('click', () => window.openModal());
 
 // ════════════════════════════════════════════
 // 상세 패널 리사이즈

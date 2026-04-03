@@ -1107,10 +1107,10 @@ function renderTaskList() {
         </div>
         <div class="card-right">
           ${flag}
-          ${!`<button class="pin-btn${t.pinned ? ' on' : ''}" onclick="togglePin('${t._id}','${t._mid}',event)">
+          ${!isAll ? `<button class="pin-btn${t.pinned ? ' on' : ''}" onclick="togglePin('${t._id}','${t._mid}',event)">
               ${t.pinned ? '📌' : '☆'}
             </button>
-            <button class="del-btn" onclick="deleteTask('${t._id}','${t._mid}',event)">✕</button>`}
+            <button class="del-btn" onclick="deleteTask('${t._id}','${t._mid}',event)">✕</button>` : ''}
         </div>
       </div>`;
   });
@@ -1236,7 +1236,7 @@ function renderDetail(t) {
             ${h.author ? `<span class="tl-author">${h.author}</span>` : ''}
             ${h.text}
           </div>
-          ${!`<button class="tl-del" onclick="deleteHistory('${t._id}','${t._mid}','${h.id}')">✕</button>`}
+          ${!isAll ? `<button class="tl-del" onclick="deleteHistory('${t._id}','${t._mid}','${h.id}')">✕</button>`}
         </div>
         <div class="tl-date">${fmtDate(h.date)}</div>
       </div>

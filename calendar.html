@@ -639,7 +639,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('todayBtn').addEventListener('click', function() { if(window.goToday) window.goToday(); });
   document.getElementById('addPersonalBtn').addEventListener('click', function() { if(window.openAddModal) window.openAddModal('personal'); });
   document.getElementById('addCommonBtnTop').addEventListener('click', function() { if(window.openAddModal) window.openAddModal('common'); });
-  document.getElementById('addCommonBtn').addEventListener('click', function() { if(window.openAddModal) window.openAddModal('common'); });
+  document.getElementById('addCommonBtn')?.addEventListener('click', function() { if(window.openAddModal) window.openAddModal('common'); });
   document.getElementById('addCatBtn').addEventListener('click', function() { if(window.addCategory) window.addCategory(); });
   document.getElementById('addCancelBtn').addEventListener('click', function() { if(window.closeModal) window.closeModal('addOverlay'); });
   document.getElementById('addSubmitBtn').addEventListener('click', function() { if(window.submitEvent) window.submitEvent(); });
@@ -699,9 +699,7 @@ const isMgr=ME.role==='manager'||ME.role==='admin';
   // 공통 일정 버튼
   if (isMgr) {
     var cb1 = document.getElementById('addCommonBtnTop');
-    var cb2 = document.getElementById('addCommonBtn');
     if (cb1) cb1.style.display = '';
-    if (cb2) cb2.style.display = '';
   }
   // 어드민이면 계정관리 메뉴 표시
   if (ME.role === 'admin') {
@@ -751,7 +749,7 @@ const isMgr=ME.role==='manager'||ME.role==='admin';
 
 // logout: 일반 script에서 처리
 window.goBack=()=>{location.href=isMgr?'manager.html':'member.html'};
-if(isMgr)document.getElementById('addCommonBtn').style.display='';
+if(isMgr)
 
 const DEMO_SCHEDULES=[
   {id:'__d1',title:'월간 업무 보고',category:'report',startDate:'2026-04-06',endDate:'2026-04-06',type:'common',author:'관리자',authorId:'admin',memo:'4월 월간 업무 현황 보고',repeat:{type:'none'},_demo:true},

@@ -1014,6 +1014,11 @@ function render() {
   renderTaskList();
 }
 
+window.setMemberFilter = function(m) {
+  filterMember = m;
+  render();
+};
+
 function renderMemberFilter() {
   const el = document.getElementById('memberFilterRow');
   if (!el) return;

@@ -531,7 +531,7 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
           <div style="font-size:12px;font-weight:600;color:var(--text2)">📝 전사 텍스트</div>
 
         </div>
-        <textarea id="transcriptArea" placeholder="녹음 전사 텍스트를 붙여넣거나 회의 내용을 직접 입력하세요..." style="width:100%;min-height:100px;padding:10px;font-size:13px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:inherit;resize:vertical;outline:none"></textarea>
+        <textarea id="transcriptArea" placeholder="녹음 시작 후 말씀하시면 자동으로 텍스트가 입력됩니다. [] 안의 내용은 인식 중인 텍스트예요." style="width:100%;min-height:100px;padding:10px;font-size:13px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:inherit;resize:vertical;outline:none"></textarea>
       </div>
       <!-- 내 메모 카드 -->
       <div style="background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:1.25rem">
@@ -1052,13 +1052,14 @@ function initSpeechRecognition(){
   recognition.lang="ko-KR";
   recognition.continuous=true;
   recognition.interimResults=true;
+  recognition.maxAlternatives=1;
   recognition.onstart=()=>{
     isRecording=true;
     recSeconds=0;
     const btn=document.getElementById("recBtn");
     if(btn){btn.textContent="⏹";btn.disabled=false;btn.classList.add("recording");}
     const st=document.getElementById("recStatus");
-    if(st){st.textContent="녹음 중...";st.className="rec-status active";}
+    if(st){st.textContent="녹음 중... (조용한 환경에서 명확하게 말씀해주세요)";st.className="rec-status active";}
     recInterval=setInterval(()=>{
       recSeconds++;
       const m=Math.floor(recSeconds/60),s=recSeconds%60;
@@ -1069,15 +1070,21 @@ function initSpeechRecognition(){
   recognition.onresult=e=>{
     let interim="",final="";
     for(let i=e.resultIndex;i<e.results.length;i++){
-      if(e.results[i].isFinal)final+=e.results[i][0].transcript;
-      else interim+=e.results[i][0].transcript;
+      const result=e.results[i];
+      if(result.isFinal){
+        // confidence 0.5 이상인 결과만 사용
+        if(result[0].confidence>0.3||result[0].confidence===0){
+          final+=result[0].transcript;
+        }
+      } else {
+        interim+=result[0].transcript;
+      }
     }
     if(final){
       transcript+=final+" ";
-      document.getElementById("transcriptArea").value=transcript+interim;
-    }else{
-      document.getElementById("transcriptArea").value=transcript+interim;
     }
+    const ta=document.getElementById("transcriptArea");
+    if(ta) ta.value=transcript+(interim?'['+interim+']':'');
   };
   recognition.onerror=e=>{
     if(e.error==="no-speech")return;
@@ -1167,24 +1174,24 @@ ${noteSection}
 위 내용을 바탕으로 아래 형식으로 회의록을 작성해주세요. 각 항목이 없으면 "없음"으로 표시하세요.
 내 메모에 포함된 #태그는 요약 끝에 그대로 포함해주세요.
 
-📅 일시: (회의 일시)
-👥 참석자: (참석자 목록)
+[일시]: (회의 일시)
+[참석자]: (참석자 목록)
 
-📝 주요 안건
-• (안건 1)
+[주요 안건]
+- (안건 1)
 
-✅ 결정 사항
-• (결정된 내용)
+[결정 사항]
+- (결정된 내용)
 
-💬 기타 논의 사항
-• (기타 내용)
+[기타 논의 사항]
+- (기타 내용)
 
-🏷 태그: (내 메모의 #태그들, 없으면 생략)`;
+[태그]: (내 메모의 #태그들, 없으면 생략)`;
 
   try{
     const GEMINI_KEY="AIzaSyDzCuEiKG0XFTJ9eX59l3tkBAGL4QrLba8";
     const res=await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`,
       {
         method:"POST",
         headers:{"Content-Type":"application/json"},
@@ -1195,11 +1202,28 @@ ${noteSection}
       }
     );
     const data=await res.json();
-    const summary=data.candidates?.[0]?.content?.parts?.[0]?.text||"요약 생성에 실패했어요";
+    // API 오류 체크
+    if(data.error){
+      throw new Error(data.error.message||"API 오류: "+JSON.stringify(data.error));
+    }
+    // 안전 필터로 블록된 경우
+    if(data.candidates?.[0]?.finishReason==="SAFETY"){
+      throw new Error("안전 필터에 의해 차단됐어요");
+    }
+    if(data.promptFeedback?.blockReason){
+      throw new Error("요청이 차단됐어요: "+data.promptFeedback.blockReason);
+    }
+    const summary=data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if(!summary){
+      const reason = data.candidates?.[0]?.finishReason || "알 수 없음";
+      throw new Error("응답 없음 (이유: "+reason+")");
+    }
     document.getElementById("summaryArea").value=summary;
     toast("요약이 완료됐어요 ✓");
   }catch(e){
-    toast("오류: "+e.message);
+    console.error("요약 오류:", e);
+    toast("요약 실패: "+e.message);
+    document.getElementById("summaryArea").value="";
   }finally{
     btn.disabled=false;
     document.getElementById("aiLoadingBadge").style.display="none";

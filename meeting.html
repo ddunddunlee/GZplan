@@ -518,7 +518,7 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
         <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:12px">🎙 실시간 녹음</div>
         <div id="recContent">
           <div style="display:flex;align-items:center;gap:14px;padding:4px 0">
-            <button id="recBtn" onclick="if(window.toggleRec)window.toggleRec()" style="width:60px;height:60px;border-radius:50%;border:2px solid var(--border);cursor:pointer;font-size:24px;display:flex;align-items:center;justify-content:center;background:var(--bg);flex-shrink:0;touch-action:manipulation;-webkit-tap-highlight-color:transparent;box-shadow:0 2px 8px rgba(0,0,0,.1)">🎙</button>
+            <button id="recBtn" style="width:64px;height:64px;border-radius:50%;border:2px solid var(--border);cursor:pointer;font-size:26px;display:flex;align-items:center;justify-content:center;background:var(--bg);flex-shrink:0;-webkit-tap-highlight-color:transparent;box-shadow:0 2px 8px rgba(0,0,0,.1)">🎙</button>
             <div>
               <div id="recStatus" style="font-size:12px;color:var(--text2);margin-bottom:2px">버튼을 눌러 녹음을 시작하세요</div>
               <div id="recTimer" style="font-size:18px;font-weight:500;color:var(--text);font-variant-numeric:tabular-nums">00:00</div>
@@ -632,7 +632,23 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
     bind('copySummaryBtn',  'copySummary');
     bind('deleteMeetingBtn','deleteMeeting');
     bind('summarizeBtn',    'summarize');
-    // recBtn은 onclick으로 처리
+    // recBtn - touchstart + click 둘 다 바인딩
+    (function() {
+      var rb = document.getElementById('recBtn');
+      if (!rb) return;
+      var fired = false;
+      rb.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        if (fired) return;
+        fired = true;
+        setTimeout(function() { fired = false; }, 500);
+        if (window.toggleRec) window.toggleRec();
+      }, { passive: false });
+      rb.addEventListener('click', function() {
+        if (fired) return;
+        if (window.toggleRec) window.toggleRec();
+      });
+    })();
     bind('delConfirmBtn',   'confirmDelete');
     bind('tagSettingBtn',   'openTagSetting');
     bind('tagSettingOkBtn', 'saveTagSetting');
@@ -894,6 +910,68 @@ window.loadMeeting=id=>{
 };
 
 window.toggleRec=()=>{isRecording?stopRec():startRec()};
+
+function initSpeechRecognition(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){
+    document.getElementById("recContent").innerHTML=`
+      <div style="padding:1rem;text-align:center;color:var(--text2)">
+        <p style="font-size:14px;font-weight:500;margin-bottom:8px">🚫 녹음 기능 미지원</p>
+        <p style="font-size:13px">이 브라우저는 녹음을 지원하지 않아요.<br>Chrome 또는 Edge를 사용해주세요.</p>
+      </div>`;
+    return false;
+  }
+  recognition=new SR();
+  recognition.lang="ko-KR";
+  recognition.continuous=true;
+  recognition.interimResults=true;
+  recognition.onstart=()=>{
+    isRecording=true;
+    recSeconds=0;
+    const btn=document.getElementById("recBtn");
+    if(btn){btn.textContent="⏹";btn.disabled=false;btn.classList.add("recording");}
+    const st=document.getElementById("recStatus");
+    if(st){st.textContent="녹음 중...";st.className="rec-status active";}
+    recInterval=setInterval(()=>{
+      recSeconds++;
+      const m=Math.floor(recSeconds/60),s=recSeconds%60;
+      const rt=document.getElementById("recTimer");
+      if(rt)rt.textContent=String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");
+    },1000);
+  };
+  recognition.onresult=e=>{
+    let interim="",final="";
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal)final+=e.results[i][0].transcript;
+      else interim+=e.results[i][0].transcript;
+    }
+    if(final){
+      transcript+=final+" ";
+      document.getElementById("transcriptArea").value=transcript+interim;
+    }else{
+      document.getElementById("transcriptArea").value=transcript+interim;
+    }
+  };
+  recognition.onerror=e=>{
+    if(e.error==="no-speech")return;
+    if(e.error==="not-allowed"){
+      toast("마이크 권한이 필요해요. 브라우저 설정에서 허용해주세요.");
+      const btn=document.getElementById("recBtn");
+      if(btn){btn.textContent="🎙";btn.disabled=false;}
+      const st=document.getElementById("recStatus");
+      if(st)st.textContent="마이크 권한이 거부됐어요";
+      isRecording=false;return;
+    }
+    toast("녹음 오류: "+e.error);
+    stopRec();
+  };
+  recognition.onend=()=>{
+    if(isRecording){
+      try{recognition.start();}catch(e){}
+    }
+  };
+  return true;
+}
 
 function startRec(){
   if(!recognition&&!initSpeechRecognition())return;

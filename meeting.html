@@ -529,7 +529,7 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
       <div style="background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:1.25rem">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
           <div style="font-size:12px;font-weight:600;color:var(--text2)">📝 전사 텍스트</div>
-          <button class="btn-solid" id="summarizeBtn" onclick="if(window.summarize)window.summarize()" style="font-size:11px;padding:4px 12px;touch-action:manipulation">✨ AI 요약 생성</button>
+
         </div>
         <textarea id="transcriptArea" placeholder="녹음 전사 텍스트를 붙여넣거나 회의 내용을 직접 입력하세요..." style="width:100%;min-height:100px;padding:10px;font-size:13px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:inherit;resize:vertical;outline:none"></textarea>
       </div>
@@ -546,11 +546,15 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
         <div id="noteTagChips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:8px"></div>
       </div>
       <div style="background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:1.25rem">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-          <div style="font-size:12px;font-weight:600;color:var(--text2)">✅ 회의록 요약</div>
-          <span id="savedBadge" style="display:none;font-size:10px;font-weight:600;padding:2px 8px;border-radius:var(--pill);background:var(--green-bg);color:var(--green-t)">저장됨</span>
-          <span id="aiLoadingBadge" style="display:none;font-size:10px;color:var(--text3)">⏳ AI 요약 중...</span>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px">
+          <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
+            <div style="font-size:12px;font-weight:600;color:var(--text2)">✅ 회의록 요약</div>
+            <span id="savedBadge" style="display:none;font-size:10px;font-weight:600;padding:2px 8px;border-radius:var(--pill);background:var(--green-bg);color:var(--green-t)">저장됨</span>
+            <span id="aiLoadingBadge" style="display:none;font-size:10px;color:var(--text3)">⏳ AI 요약 중...</span>
+          </div>
+          <button id="summarizeBtn" onclick="if(window.summarize)window.summarize()" style="padding:6px 14px;font-size:12px;font-weight:600;border:none;border-radius:var(--radius-sm);background:var(--text);color:var(--bg);cursor:pointer;white-space:nowrap;touch-action:manipulation;flex-shrink:0">✨ AI 요약</button>
         </div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:10px">전사 텍스트 + 내 메모를 합쳐서 요약해요</div>
         <textarea id="summaryArea" placeholder="AI 요약 결과가 여기에 표시돼요. 직접 수정도 가능해요." style="width:100%;min-height:180px;padding:10px;font-size:13px;line-height:1.8;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:inherit;resize:vertical;outline:none"></textarea>
         <div id="calNote" style="display:none;font-size:11px;color:var(--text3);margin-top:8px">▦ 캘린더에 자동 등록됐어요</div>
       </div>
@@ -682,30 +686,120 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
 (function() {
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
   const isSpeechSupported = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+  const GEMINI_KEY = "AIzaSyDzCuEiKG0XFTJ9eX59l3tkBAGL4QrLba8";
 
   if (isIOS || !isSpeechSupported) {
-    // iOS 또는 미지원 브라우저: 녹음 영역 숨기고 안내 표시
+    // iOS: MediaRecorder로 녹음 → Gemini로 전사
     const recWrap = document.getElementById('recWrap');
-    if (recWrap) {
-      recWrap.innerHTML = `
-        <div style="display:flex;align-items:flex-start;gap:12px;padding:4px 0">
-          <div style="font-size:28px;flex-shrink:0">📱</div>
-          <div>
-            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px">
-              ${isIOS ? 'iOS에서는 자동 전사가 지원되지 않아요' : '이 브라우저는 녹음을 지원하지 않아요'}
-            </div>
-            <div style="font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:10px">
-              ${isIOS
-                ? '아래 앱으로 전사 후 텍스트를 붙여넣으세요:<br>• <strong>클로바 노트</strong> — 네이버 무료 앱<br>• <strong>VITO</strong> — 회의 전문 전사 앱<br>• <strong>Google 문서</strong> — 음성 입력 기능'
-                : 'Android Chrome 또는 PC Chrome에서 접속하면<br>실시간 자동 전사를 사용할 수 있어요'}
-            </div>
-            ${isIOS ? `<a href="https://apps.apple.com/kr/app/%ED%81%B4%EB%A1%9C%EB%B0%94-%EB%85%B8%ED%8A%B8/id1197944965" target="_blank"
-              style="display:inline-flex;align-items:center;gap:5px;padding:6px 14px;font-size:12px;font-weight:600;border-radius:var(--pill);background:var(--green-bg);color:var(--green-t);text-decoration:none">
-              클로바 노트 열기 →
-            </a>` : ''}
-          </div>
-        </div>`;
+    if (!recWrap) return;
+
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let recInterval = null;
+    let recSeconds = 0;
+    let isRec = false;
+
+    recWrap.innerHTML = `
+      <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:12px">🎙 음성 녹음</div>
+      <div style="display:flex;align-items:center;gap:14px;padding:4px 0">
+        <button id="iosRecBtn" style="width:64px;height:64px;border-radius:50%;border:2px solid var(--border);cursor:pointer;font-size:26px;display:flex;align-items:center;justify-content:center;background:var(--bg);flex-shrink:0;touch-action:manipulation;box-shadow:0 2px 8px rgba(0,0,0,.1)">🎙</button>
+        <div>
+          <div id="iosRecStatus" style="font-size:12px;color:var(--text2);margin-bottom:2px">버튼을 눌러 녹음을 시작하세요</div>
+          <div id="iosRecTimer" style="font-size:18px;font-weight:500;color:var(--text);font-variant-numeric:tabular-nums">00:00</div>
+        </div>
+      </div>
+      <div id="iosTranscribing" style="display:none;margin-top:10px;font-size:12px;color:var(--text3)">⏳ Gemini AI가 전사 중...</div>`;
+
+    function updateTimer() {
+      recSeconds++;
+      const m = Math.floor(recSeconds/60), s = recSeconds%60;
+      const el = document.getElementById('iosRecTimer');
+      if(el) el.textContent = String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
     }
+
+    async function transcribeAudio(blob) {
+      const st = document.getElementById('iosRecStatus');
+      const tr = document.getElementById('iosTranscribing');
+      if(st) st.textContent = 'Gemini AI 전사 중...';
+      if(tr) tr.style.display = '';
+      try {
+        // base64 변환
+        const reader = new FileReader();
+        const b64 = await new Promise((res, rej) => {
+          reader.onload = () => res(reader.result.split(',')[1]);
+          reader.onerror = rej;
+          reader.readAsDataURL(blob);
+        });
+        const mimeType = blob.type || 'audio/webm';
+        const resp = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`,
+          {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+              contents: [{
+                parts: [
+                  {text: '다음 음성을 한국어로 전사해주세요. 발언 내용만 그대로 텍스트로 변환해주세요.'},
+                  {inline_data: {mime_type: mimeType, data: b64}}
+                ]
+              }]
+            })
+          }
+        );
+        const data = await resp.json();
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        if(text) {
+          const ta = document.getElementById('transcriptArea');
+          if(ta) ta.value = (ta.value ? ta.value + '\n' : '') + text;
+          if(st) st.textContent = '✓ 전사 완료!';
+        } else {
+          if(st) st.textContent = '전사 결과가 없어요';
+        }
+      } catch(e) {
+        if(st) st.textContent = '전사 오류: ' + e.message;
+      } finally {
+        if(tr) tr.style.display = 'none';
+      }
+    }
+
+    async function toggleIOSRec() {
+      const btn = document.getElementById('iosRecBtn');
+      const st = document.getElementById('iosRecStatus');
+      if (!isRec) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({audio: true});
+          audioChunks = [];
+          const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' :
+                           MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : 'audio/ogg';
+          mediaRecorder = new MediaRecorder(stream, {mimeType});
+          mediaRecorder.ondataavailable = e => { if(e.data.size > 0) audioChunks.push(e.data); };
+          mediaRecorder.onstop = async () => {
+            stream.getTracks().forEach(t => t.stop());
+            const blob = new Blob(audioChunks, {type: mimeType});
+            await transcribeAudio(blob);
+          };
+          mediaRecorder.start(1000);
+          isRec = true;
+          recSeconds = 0;
+          recInterval = setInterval(updateTimer, 1000);
+          if(btn) { btn.textContent = '⏹'; btn.style.background = 'var(--red-bg)'; btn.style.borderColor = 'var(--red)'; }
+          if(st) st.textContent = '녹음 중...';
+        } catch(e) {
+          if(st) st.textContent = '마이크 권한이 필요해요';
+        }
+      } else {
+        isRec = false;
+        clearInterval(recInterval);
+        if(mediaRecorder) mediaRecorder.stop();
+        if(btn) { btn.textContent = '🎙'; btn.style.background = 'var(--bg)'; btn.style.borderColor = 'var(--border)'; }
+        if(st) st.textContent = '녹음 중지됨 - 전사 중...';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      var btn = document.getElementById('iosRecBtn');
+      if(btn) btn.addEventListener('click', toggleIOSRec);
+    });
   }
 })();
 
@@ -1047,7 +1141,8 @@ window.clearTranscript=()=>{
 // ════════════════════════════════════════════
 window.summarize=async()=>{
   const text=document.getElementById("transcriptArea").value.trim();
-  if(!text){toast("전사 텍스트를 먼저 입력해주세요");return}
+  const userNote=document.getElementById("userNoteArea")?.value.trim()||"";
+  if(!text && !userNote){toast("전사 텍스트 또는 메모를 먼저 입력해주세요");return}
   const btn=document.getElementById("summarizeBtn");
   btn.disabled=true;
   document.getElementById("aiLoadingBadge").style.display="flex";
@@ -1056,10 +1151,11 @@ window.summarize=async()=>{
   const title=document.getElementById("meetTitle").value.trim()||"회의";
   const date=document.getElementById("meetDate").value;
   const atts=attendees.join(", ")||"미기록";
+  // userNote는 위에서 이미 읽음
   const noteSection = userNote ? `
 [내 메모 및 보충 내용]
 ${userNote}` : '';
-  const combinedText = text || '(녹음 전사 없음)';
+  const combinedText = text || '(전사 없음)';
   const prompt=`다음은 "${title}" 회의 내용입니다.
 일시: ${date?new Date(date).toLocaleString("ko-KR"):"미기록"}
 참석자: ${atts}

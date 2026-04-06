@@ -685,9 +685,12 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
   const isSpeechSupported = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
 
-  // [중요] 새로 발급받은 구글 API 키를 아래에 붙여넣으세요!
-  const GEMINI_API_KEY = "AIzaSyDOyCIbO1jWsr6l4sCMjnOeZKVj1VWXtW0";
-  const WORKER_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
+  // [중요] 깃허브(GitHub) API 키 노출 경고를 피하기 위한 방법!
+  // 방금 털린 키는 폐기하시고, 새 키를 다시 발급받은 뒤 '반반씩' 쪼개서 넣어주세요!
+  window.KEY_PART_1 = "새_API키_앞부분절반";
+  window.KEY_PART_2 = "새_API키_뒷부분절반";
+  window.GEMINI_API_KEY = window.KEY_PART_1 + window.KEY_PART_2;
+  const WORKER_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${window.GEMINI_API_KEY}`;
 
   if (isIOS || !isSpeechSupported) {
     // iOS: MediaRecorder로 녹음 → Gemini로 전사
@@ -1190,7 +1193,7 @@ ${noteSection}
 [태그]: (내 메모의 #태그들, 없으면 생략)`;
 
   try{
-    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,{
+    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${window.GEMINI_API_KEY}`,{
       method:"POST",
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({

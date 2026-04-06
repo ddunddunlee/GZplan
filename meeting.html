@@ -1861,8 +1861,8 @@
 
       // [중요] 새로 발급받은 Groq API 키를 반반씩 쪼개서 넣어주세요!
       // (예: gsk_XXXX... 형태의 키)
-      window.GROQ_KEY_PART_1 = "여기에_gsk_부터_앞부분절반";
-      window.GROQ_KEY_PART_2 = "나머지뒷부분";
+      window.GROQ_KEY_PART_1 = "gsk_lZeabYWkSbITuRpU0Ze9WGdyb";
+      window.GROQ_KEY_PART_2 = "3FYGiwDQUz9r2kbsYiHo0n5tlhm";
       window.GROQ_API_KEY = window.GROQ_KEY_PART_1 + window.GROQ_KEY_PART_2;
 
       if (isIOS || !isSpeechSupported) {
@@ -1908,19 +1908,20 @@
             formData.append('language', 'ko');
             formData.append('response_format', 'json');
 
+            const cleanKey = window.GROQ_API_KEY.trim().replace(/[^\x20-\x7E]/g, '');
             const resp = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
               method: 'POST',
               headers: {
-                'Authorization': `Bearer ${window.GROQ_API_KEY}`
+                'Authorization': `Bearer ${cleanKey}`
               },
               body: formData
             });
             const data = await resp.json();
-            
+
             if (!resp.ok) {
               throw new Error(data.error?.message || 'Groq Audio API 에러');
             }
-            
+
             const text = data.text || '';
             if (text) {
               const ta = document.getElementById('transcriptArea');
@@ -2363,11 +2364,12 @@ ${noteSection}
 [태그]: (내 메모의 #태그들, 없으면 생략)`;
 
       try {
+        const cleanKey = window.GROQ_API_KEY.trim().replace(/[^\x20-\x7E]/g, '');
         const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${window.GROQ_API_KEY}`
+            "Authorization": `Bearer ${cleanKey}`
           },
           body: JSON.stringify({
             model: "llama-3.3-70b-versatile",

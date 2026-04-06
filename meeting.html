@@ -1655,11 +1655,12 @@
             style="flex:1;padding:10px;font-size:13px;font-weight:500;border:none;border-bottom:2px solid transparent;background:transparent;color:var(--text2);cursor:pointer;touch-action:manipulation">공통
             🌐</button>
         </div>
-        <div style="flex:1;overflow-y:auto;padding:1.5rem 24px;display:flex;flex-direction:column;gap:14px">
+        <div style="flex:1;overflow-y:auto;padding:1.5rem 24px;display:flex;flex-direction:column;align-items:center">
+          <div style="width:100%;max-width:860px;display:flex;flex-direction:column;gap:14px">
           <div
             style="background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:1.25rem">
             <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:12px">📋 회의 정보</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:12px;margin-bottom:12px">
               <div class="fg"><label>회의 제목</label><input id="meetTitle" placeholder="예: 4월 주간 팀 회의" /></div>
               <div class="fg"><label>일시</label><input id="meetDate" type="datetime-local" /></div>
             </div>
@@ -1727,6 +1728,7 @@
               style="width:100%;min-height:180px;padding:10px;font-size:13px;line-height:1.8;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:inherit;resize:vertical;outline:none"></textarea>
             <div id="calNote" style="display:none;font-size:11px;color:var(--text3);margin-top:8px">▦ 캘린더에 자동 등록됐어요
             </div>
+          </div>
           </div>
         </div>
       </div>
@@ -2374,10 +2376,10 @@ ${noteSection}
           body: JSON.stringify({
             model: "llama-3.3-70b-versatile",
             messages: [
-              { role: "system", content: "당신은 매우 유능하고 스마트한 회의록 전문 AI입니다." },
+              { role: "system", content: "당신은 세계 최고 수준의 회의록 작성 전문가입니다. 사용자의 입력 내용을 절대 축약하거나 생략하지 말고, 회의의 배경, 오고간 질의응답, 논의된 안건들의 세부 수치와 맥락까지 아주 상세하고 풍부하게 풀어서 기록해주세요." },
               { role: "user", content: prompt }
             ],
-            max_tokens: 1500,
+            max_tokens: 3000,
             temperature: 0.3
           })
         });

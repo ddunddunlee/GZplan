@@ -686,7 +686,7 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
   const isSpeechSupported = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
 
   // [중요] 새로 발급받은 구글 API 키를 아래에 붙여넣으세요!
-  const GEMINI_API_KEY = "새_구글_API키_붙여넣기";
+  const GEMINI_API_KEY = "AIzaSyDOyCIbO1jWsr6l4sCMjnOeZKVj1VWXtW0";
   const WORKER_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
 
   if (isIOS || !isSpeechSupported) {

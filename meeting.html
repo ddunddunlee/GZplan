@@ -531,7 +531,7 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
           <div style="font-size:12px;font-weight:600;color:var(--text2)">📝 전사 텍스트</div>
           <button class="btn-solid" id="summarizeBtn" onclick="if(window.summarize)window.summarize()" style="font-size:11px;padding:4px 12px;touch-action:manipulation">✨ AI 요약 생성</button>
         </div>
-        <textarea id="transcriptArea" placeholder="녹음을 시작하거나 회의 내용을 직접 붙여넣으세요..." style="width:100%;min-height:100px;padding:10px;font-size:13px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:inherit;resize:vertical;outline:none"></textarea>
+        <textarea id="transcriptArea" placeholder="녹음 전사 텍스트를 붙여넣거나 회의 내용을 직접 입력하세요..." style="width:100%;min-height:100px;padding:10px;font-size:13px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:inherit;resize:vertical;outline:none"></textarea>
       </div>
       <!-- 내 메모 카드 -->
       <div style="background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:1.25rem">
@@ -676,6 +676,38 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
   });
 })();
 
+
+
+// ── iOS 감지 및 녹음 UI 분기 ──
+(function() {
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  const isSpeechSupported = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+
+  if (isIOS || !isSpeechSupported) {
+    // iOS 또는 미지원 브라우저: 녹음 영역 숨기고 안내 표시
+    const recWrap = document.getElementById('recWrap');
+    if (recWrap) {
+      recWrap.innerHTML = `
+        <div style="display:flex;align-items:flex-start;gap:12px;padding:4px 0">
+          <div style="font-size:28px;flex-shrink:0">📱</div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px">
+              ${isIOS ? 'iOS에서는 자동 전사가 지원되지 않아요' : '이 브라우저는 녹음을 지원하지 않아요'}
+            </div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:10px">
+              ${isIOS
+                ? '아래 앱으로 전사 후 텍스트를 붙여넣으세요:<br>• <strong>클로바 노트</strong> — 네이버 무료 앱<br>• <strong>VITO</strong> — 회의 전문 전사 앱<br>• <strong>Google 문서</strong> — 음성 입력 기능'
+                : 'Android Chrome 또는 PC Chrome에서 접속하면<br>실시간 자동 전사를 사용할 수 있어요'}
+            </div>
+            ${isIOS ? `<a href="https://apps.apple.com/kr/app/%ED%81%B4%EB%A1%9C%EB%B0%94-%EB%85%B8%ED%8A%B8/id1197944965" target="_blank"
+              style="display:inline-flex;align-items:center;gap:5px;padding:6px 14px;font-size:12px;font-weight:600;border-radius:var(--pill);background:var(--green-bg);color:var(--green-t);text-decoration:none">
+              클로바 노트 열기 →
+            </a>` : ''}
+          </div>
+        </div>`;
+    }
+  }
+})();
 
 // ── 모바일 햄버거 ──
 (function() {
@@ -916,8 +948,9 @@ function initSpeechRecognition(){
   if(!SR){
     document.getElementById("recContent").innerHTML=`
       <div style="padding:1rem;text-align:center;color:var(--text2)">
-        <p style="font-size:14px;font-weight:500;margin-bottom:8px">🚫 녹음 기능 미지원</p>
-        <p style="font-size:13px">이 브라우저는 녹음을 지원하지 않아요.<br>Chrome 또는 Edge를 사용해주세요.</p>
+        <p style="font-size:16px;margin-bottom:8px">🌐</p>
+        <p style="font-size:14px;font-weight:600;margin-bottom:6px;color:var(--text)">Chrome에서 접속해주세요</p>
+        <p style="font-size:12px;line-height:1.7;color:var(--text3)">녹음 기능은 Chrome 브라우저에서만 작동해요.<br>iOS는 App Store에서 Chrome 앱을 설치 후 접속해주세요.</p>
       </div>`;
     return false;
   }
@@ -1053,17 +1086,20 @@ ${noteSection}
 🏷 태그: (내 메모의 #태그들, 없으면 생략)`;
 
   try{
-    const res=await fetch("https://api.anthropic.com/v1/messages",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        model:"claude-sonnet-4-20250514",
-        max_tokens:1500,
-        messages:[{role:"user",content:prompt}]
-      })
-    });
+    const GEMINI_KEY="AIzaSyDzCuEiKG0XFTJ9eX59l3tkBAGL4QrLba8";
+    const res=await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`,
+      {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+          contents:[{parts:[{text:prompt}]}],
+          generationConfig:{maxOutputTokens:1500,temperature:0.3}
+        })
+      }
+    );
     const data=await res.json();
-    const summary=data.content?.[0]?.text||"요약 생성에 실패했어요";
+    const summary=data.candidates?.[0]?.content?.parts?.[0]?.text||"요약 생성에 실패했어요";
     document.getElementById("summaryArea").value=summary;
     toast("요약이 완료됐어요 ✓");
   }catch(e){

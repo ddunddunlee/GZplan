@@ -1,709 +1,1882 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
-<meta charset="UTF-8" />
-<link rel="manifest" href="./manifest.json" />
-<link rel="apple-touch-icon" href="./apple-touch-icon.png" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-title" content="GZ기획팀" />
-<meta name="theme-color" content="#185FA5" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>회의록 — GZ 경영기획팀</title>
-<style>
-/* ════════════════════════════════════════════
+  <meta charset="UTF-8" />
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="GZ기획팀" />
+  <meta name="theme-color" content="#185FA5" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>회의록 — GZ 경영기획팀</title>
+  <style>
+    /* ════════════════════════════════════════════
    GZ Plan — 공통 반응형 CSS
    PC(1024+) / Tablet(768-1023) / Mobile(~767)
 ════════════════════════════════════════════ */
 
-/* ── Reset & 변수 ── */
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#fff;--bg2:#f7f7f5;--bg3:#f0f0ee;
-  --text:#1a1a1a;--text2:#6b6b6b;--text3:#a8a8a8;
-  --border:#e5e5e3;--border2:#d0d0cc;
-  --radius:10px;--radius-sm:6px;--pill:999px;
-  --blue:#378ADD;--blue-bg:#E6F1FB;--blue-t:#0C447C;
-  --amber-bg:#FAEEDA;--amber-t:#633806;
-  --green:#639922;--green-bg:#EAF3DE;--green-t:#27500A;
-  --red:#A32D2D;--red-bg:#FCEBEB;--red-t:#791F1F;
-  --orange:#EF9F27;
-  --purple-bg:#EEEDFE;--purple-t:#3C3489;
-  --sw:220px;
-  --topbar-h:52px;
-  --touch-min:44px;
-}
+    /* ── Reset & 변수 ── */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
 
-/* ── 기본 ── */
-html,body{height:100%}
-body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-serif;
-  background:var(--bg2);color:var(--text);min-height:100vh;font-size:14px;
-  -webkit-text-size-adjust:100%}
-.app{display:flex;min-height:100vh}
+    :root {
+      --bg: #fff;
+      --bg2: #f7f7f5;
+      --bg3: #f0f0ee;
+      --text: #1a1a1a;
+      --text2: #6b6b6b;
+      --text3: #a8a8a8;
+      --border: #e5e5e3;
+      --border2: #d0d0cc;
+      --radius: 10px;
+      --radius-sm: 6px;
+      --pill: 999px;
+      --blue: #378ADD;
+      --blue-bg: #E6F1FB;
+      --blue-t: #0C447C;
+      --amber-bg: #FAEEDA;
+      --amber-t: #633806;
+      --green: #639922;
+      --green-bg: #EAF3DE;
+      --green-t: #27500A;
+      --red: #A32D2D;
+      --red-bg: #FCEBEB;
+      --red-t: #791F1F;
+      --orange: #EF9F27;
+      --purple-bg: #EEEDFE;
+      --purple-t: #3C3489;
+      --sw: 220px;
+      --topbar-h: 52px;
+      --touch-min: 44px;
+    }
 
-/* ── 사이드바 ── */
-.sidebar{
-  width:var(--sw);flex-shrink:0;
-  background:var(--bg);border-right:0.5px solid var(--border);
-  display:flex;flex-direction:column;
-  position:fixed;top:0;left:0;height:100vh;z-index:300;
-  transition:transform .25s ease;overflow:hidden;
-}
-.sb-brand{padding:18px 16px 14px;border-bottom:0.5px solid var(--bg3);flex-shrink:0}
-.sb-brand-name{font-size:15px;font-weight:600;color:var(--text);letter-spacing:-.3px}
-.sb-brand-sub{font-size:11px;color:var(--text3);margin-top:2px}
-.sb-user{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:0.5px solid var(--bg3);flex-shrink:0}
-.sb-avatar{width:30px;height:30px;border-radius:50%;background:var(--text);
-  display:flex;align-items:center;justify-content:center;
-  font-size:11px;font-weight:600;color:var(--bg);flex-shrink:0}
-.sb-user-name{font-size:13px;font-weight:500;color:var(--text);
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sb-user-role{font-size:11px;color:var(--text3)}
-.sb-nav{flex:1;padding:8px 0;overflow-y:auto;overflow-x:hidden}
-.sb-sec{padding:4px 16px;font-size:10px;font-weight:600;color:var(--text3);
-  letter-spacing:.08em;text-transform:uppercase;margin-top:10px}
-.sb-item{display:flex;align-items:center;gap:10px;padding:9px 16px;
-  cursor:pointer;margin:1px 8px;border-radius:var(--radius-sm);
-  transition:background .12s;min-height:var(--touch-min)}
-.sb-item:hover{background:var(--bg2)}
-.sb-item.active{background:var(--bg3)}
-.sb-item.active .sb-label,.sb-item.active .sb-icon{color:var(--text);font-weight:500}
-.sb-icon{font-size:15px;width:22px;text-align:center;color:var(--text2);flex-shrink:0}
-.sb-label{font-size:13px;color:var(--text2);flex:1;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sb-badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:var(--pill);
-  background:var(--red-bg);color:var(--red);flex-shrink:0}
-.sb-bottom{padding:12px 16px;border-top:0.5px solid var(--bg3);display:flex;flex-direction:column;gap:8px;flex-shrink:0}
-.sb-sync{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text3)}
-.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0}
-.sync-dot.syncing{background:var(--orange);animation:blink .8s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+    /* ── 기본 ── */
+    html,
+    body {
+      height: 100%
+    }
 
-/* ── 메인 ── */
-.main-wrap{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;min-height:100vh;min-width:0}
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Segoe UI', sans-serif;
+      background: var(--bg2);
+      color: var(--text);
+      min-height: 100vh;
+      font-size: 14px;
+      -webkit-text-size-adjust: 100%
+    }
 
-/* ── 탑바 ── */
-.topbar{
-  background:var(--bg);border-bottom:0.5px solid var(--border);
-  padding:0 24px;height:var(--topbar-h);
-  display:flex;align-items:center;justify-content:space-between;
-  position:sticky;top:0;z-index:50;flex-shrink:0;gap:12px;
-}
-.page-title{font-size:15px;font-weight:600;color:var(--text);
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0}
-.topbar-right{display:flex;gap:8px;align-items:center;flex-shrink:0;flex-wrap:wrap}
+    .app {
+      display: flex;
+      min-height: 100vh
+    }
 
-/* ── 햄버거 ── */
-.hamburger{
-  display:none;width:36px;height:36px;border:none;background:transparent;
-  cursor:pointer;flex-direction:column;align-items:center;justify-content:center;
-  gap:5px;padding:4px;border-radius:var(--radius-sm);flex-shrink:0;
-}
-.hamburger span{display:block;width:20px;height:2px;background:var(--text);border-radius:2px}
-.hamburger:hover{background:var(--bg2)}
-.sidebar-dim{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:290}
-.sidebar-dim.show{display:block}
+    /* ── 사이드바 ── */
+    .sidebar {
+      width: var(--sw);
+      flex-shrink: 0;
+      background: var(--bg);
+      border-right: 0.5px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      z-index: 300;
+      transition: transform .25s ease;
+      overflow: hidden;
+    }
 
-/* ── 버튼 ── */
-.btn-ghost{
-  padding:0 14px;height:34px;border-radius:var(--radius-sm);font-size:12px;
-  border:0.5px solid var(--border);background:transparent;color:var(--text2);
-  cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;
-}
-.btn-ghost:hover{border-color:var(--border2);color:var(--text)}
-.btn-solid{
-  padding:0 16px;height:34px;border-radius:var(--radius-sm);font-size:12px;
-  font-weight:600;border:none;background:var(--text);color:var(--bg);
-  cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;
-}
-.btn-solid:hover{opacity:.82}
+    .sb-brand {
+      padding: 18px 16px 14px;
+      border-bottom: 0.5px solid var(--bg3);
+      flex-shrink: 0
+    }
 
-/* ── 모달/오버레이 ── */
-.overlay{
-  display:none;position:fixed;inset:0;
-  background:rgba(0,0,0,.45);
-  align-items:center;justify-content:center;
-  z-index:400;padding:1rem;overflow-y:auto;
-}
-.overlay.show{display:flex}
-.modal{
-  background:var(--bg);border-radius:var(--radius);border:0.5px solid var(--border);
-  padding:1.5rem;width:100%;max-width:440px;
-  max-height:calc(100vh - 2rem);overflow-y:auto;
-  position:relative;
-}
-.modal h3{font-size:15px;font-weight:600;margin-bottom:1.25rem}
-.modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem;flex-wrap:wrap}
-.btn-cancel{
-  padding:0 16px;height:34px;font-size:12px;
-  border:0.5px solid var(--border);border-radius:var(--radius-sm);
-  background:transparent;color:var(--text2);cursor:pointer;
-}
-.btn-ok{
-  padding:0 18px;height:34px;font-size:12px;font-weight:600;
-  border:none;border-radius:var(--radius-sm);
-  background:var(--text);color:var(--bg);cursor:pointer;
-}
-.btn-danger{
-  padding:0 16px;height:34px;font-size:12px;
-  border:none;border-radius:var(--radius-sm);
-  background:var(--red);color:#fff;cursor:pointer;margin-right:auto;
-}
-.fg{margin-bottom:1rem}
-.fg label{font-size:11px;color:var(--text3);display:block;margin-bottom:5px;
-  font-weight:600;text-transform:uppercase;letter-spacing:.04em}
-.fg input,.fg select,.fg textarea{
-  width:100%;padding:8px 10px;font-size:13px;
-  border:0.5px solid var(--border);border-radius:var(--radius-sm);
-  background:var(--bg2);color:var(--text);font-family:inherit;outline:none;
-}
-.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--border2)}
+    .sb-brand-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -.3px
+    }
 
-/* ── 토스트 ── */
-.toast{
-  position:fixed;bottom:2rem;left:50%;
-  transform:translateX(-50%) translateY(10px);
-  background:var(--text);color:var(--bg);
-  font-size:12px;font-weight:500;padding:8px 18px;
-  border-radius:var(--pill);opacity:0;transition:all .25s;
-  pointer-events:none;z-index:500;white-space:nowrap;
-  max-width:calc(100vw - 2rem);text-overflow:ellipsis;overflow:hidden;
-}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    .sb-brand-sub {
+      font-size: 11px;
+      color: var(--text3);
+      margin-top: 2px
+    }
 
-/* ── 통계 카드 ── */
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
-.stat{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px 16px}
-.stat-label{font-size:11px;color:var(--text3);margin-bottom:6px;white-space:nowrap}
-.stat-value{font-size:22px;font-weight:600;color:var(--text);line-height:1}
-.stat-value.warn{color:#BA7517}.stat-value.danger{color:var(--red)}
+    .sb-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      border-bottom: 0.5px solid var(--bg3);
+      flex-shrink: 0
+    }
 
-/* ── 필터 칩 ── */
-.filter-row{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;align-items:center}
-.chip{
-  padding:5px 12px;border-radius:var(--pill);font-size:12px;
-  border:0.5px solid var(--border);background:var(--bg);color:var(--text2);
-  cursor:pointer;white-space:nowrap;min-height:30px;
-  display:inline-flex;align-items:center;
-}
-.chip:hover{border-color:var(--border2);color:var(--text)}
-.chip.active{background:var(--text);color:var(--bg);border-color:var(--text)}
+    .sb-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--bg);
+      flex-shrink: 0
+    }
 
-/* ── 업무 카드 ── */
-.task-list{display:flex;flex-direction:column;gap:6px}
-.empty{text-align:center;padding:3rem 1rem;color:var(--text3);font-size:13px}
-.task-card{
-  background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);
-  padding:12px 14px;display:flex;align-items:center;gap:10px;
-  cursor:pointer;transition:border-color .12s;position:relative;
-  min-height:var(--touch-min);
-}
-.task-card:hover{border-color:var(--border2)}.task-card.selected{border-color:var(--text)}
-.task-card.pinned{border-left:3px solid var(--blue)}
-.task-card.overdue{border-left:3px solid var(--red)}
-.task-card.stale{border-left:3px solid var(--orange)}
-.priority-bar{width:3px;border-radius:var(--pill);align-self:stretch;flex-shrink:0;min-height:32px}
-.drag-handle{color:var(--text3);font-size:14px;cursor:grab;user-select:none;flex-shrink:0}
-.task-check{
-  width:18px;height:18px;border-radius:50%;
-  border:1.5px solid var(--border2);flex-shrink:0;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;
-}
-.task-check:hover{border-color:var(--text)}
-.task-check.done{background:var(--text);border-color:var(--text)}
-.task-check.done::after{content:'';width:5px;height:3px;
-  border-left:1.5px solid var(--bg);border-bottom:1.5px solid var(--bg);
-  transform:rotate(-45deg) translateY(-1px)}
-.task-body{flex:1;min-width:0}
-.task-title{
-  font-size:13px;font-weight:500;color:var(--text);margin-bottom:4px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-.task-title.done-text{text-decoration:line-through;color:var(--text3)}
-.task-meta{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
-.badge{font-size:10px;padding:2px 7px;border-radius:var(--pill);font-weight:600;white-space:nowrap}
-.badge-todo{background:var(--blue-bg);color:var(--blue-t)}
-.badge-inprogress{background:var(--amber-bg);color:var(--amber-t)}
-.badge-done{background:var(--green-bg);color:var(--green-t)}
-.badge-status{cursor:pointer;user-select:none}.badge-status:hover{opacity:.75}
-.badge-reporter{background:var(--purple-bg);color:var(--purple-t)}
-.member-badge{font-size:10px;padding:2px 7px;border-radius:var(--pill);font-weight:600;background:var(--bg3);color:var(--text2)}
-.task-date{font-size:11px;color:var(--text3);white-space:nowrap}
-.task-date.ov{color:var(--red);font-weight:600}
-.card-right{position:absolute;top:10px;right:12px;display:flex;gap:4px;align-items:center}
-.pin-btn,.del-btn{
-  width:28px;height:28px;border-radius:var(--radius-sm);
-  border:none;background:transparent;cursor:pointer;
-  font-size:13px;color:var(--text3);
-  display:flex;align-items:center;justify-content:center;
-}
-.pin-btn:hover{background:var(--bg3);color:var(--text)}.pin-btn.on{color:var(--blue)}
-.del-btn:hover{background:var(--red-bg);color:var(--red)}
+    .sb-user-name {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
 
-/* ── 중요도/보고자 배지 ── */
-.priority-badge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:var(--pill);cursor:pointer;display:inline-block;white-space:nowrap}
-.priority-badge.p1{background:#f0f0ee;color:#888}
-.priority-badge.p2{background:var(--blue-bg);color:var(--blue-t)}
-.priority-badge.p3{background:var(--amber-bg);color:var(--amber-t)}
-.priority-badge.p4{background:var(--red-bg);color:var(--red)}
-.priority-badge.p5{background:var(--red);color:#fff}
-.reporter-badge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:var(--pill);cursor:pointer;display:inline-block;background:var(--purple-bg);color:var(--purple-t);white-space:nowrap}
+    .sb-user-role {
+      font-size: 11px;
+      color: var(--text3)
+    }
 
-/* ── 상세 패널 ── */
-.resizer{width:12px;flex-shrink:0;cursor:col-resize;display:flex;align-items:center;justify-content:center}
-.resizer::after{content:'';width:3px;height:30px;background:var(--border);border-radius:var(--pill)}
-.resizer:hover::after{background:var(--border2);height:46px}
-.detail-panel{
-  width:300px;min-width:260px;flex-shrink:0;
-  background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);
-  display:none;position:sticky;top:calc(var(--topbar-h) + 20px);
-  max-height:calc(100vh - var(--topbar-h) - 40px);overflow-y:auto;
-}
-.detail-panel.open{display:block}
-.dp-head{
-  padding:14px 16px;border-bottom:0.5px solid var(--bg3);
-  display:flex;align-items:flex-start;justify-content:space-between;gap:8px;
-  position:sticky;top:0;background:var(--bg);z-index:1;
-}
-.dp-member{font-size:11px;color:var(--blue);font-weight:600;margin-bottom:3px}
-.dp-title-input{
-  font-size:14px;font-weight:500;border:none;background:transparent;
-  color:var(--text);font-family:inherit;padding:2px 4px;
-  border-radius:4px;border:0.5px solid transparent;outline:none;
-  width:100%;line-height:1.45;
-}
-.dp-title-input:hover{border-color:var(--border);background:var(--bg2)}
-.dp-title-input:focus{border-color:var(--border2);background:var(--bg2)}
-.dp-close{
-  width:28px;height:28px;border-radius:var(--radius-sm);
-  border:none;background:transparent;color:var(--text3);
-  cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
-}
-.dp-close:hover{background:var(--bg2);color:var(--text)}
-.dp-meta{padding:10px 16px;display:flex;flex-direction:column}
-.dp-row{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:7px 0;border-bottom:0.5px solid var(--bg3);gap:8px;
-}
-.dp-row:last-child{border-bottom:none}
-.dp-lbl{font-size:11px;color:var(--text3);flex-shrink:0}
-.dp-val{font-size:12px;font-weight:500;color:var(--text);text-align:right;word-break:break-word}
-.dp-edit{
-  font-size:12px;font-weight:500;border:none;background:transparent;
-  color:var(--text);font-family:inherit;padding:2px 5px;
-  border-radius:4px;border:0.5px solid transparent;outline:none;
-  max-width:150px;text-align:right;width:auto;
-}
-.dp-edit:hover{border-color:var(--border);background:var(--bg2)}
-.dp-edit:focus{border-color:var(--border2);background:var(--bg2)}
-.dp-sec{font-size:10px;font-weight:600;color:var(--text3);padding:12px 16px 6px;letter-spacing:.06em;text-transform:uppercase}
-.progress-wrap{padding:0 16px 12px}
-.progress-label{display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:5px}
-.progress-bar-bg{height:4px;background:var(--bg3);border-radius:var(--pill);overflow:hidden}
-.progress-bar-fill{height:100%;border-radius:var(--pill);background:var(--text)}
-.progress-bar-fill.done-bar{background:var(--green)}.progress-bar-fill.over-bar{background:var(--red)}
-.timeline{padding:0 16px 12px;display:flex;flex-direction:column}
-.tl-item{display:flex;gap:8px;position:relative}
-.tl-line{position:absolute;left:5px;top:13px;bottom:-2px;width:1px;background:var(--border)}
-.tl-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0;margin-top:2px;border:1.5px solid var(--border);background:var(--bg);position:relative;z-index:1}
-.tl-dot.create{background:var(--blue);border-color:var(--blue)}
-.tl-dot.status{background:var(--orange);border-color:var(--orange)}
-.tl-dot.done{background:var(--green);border-color:var(--green)}
-.tl-body{flex:1;padding-bottom:12px;min-width:0}
-.tl-row{display:flex;align-items:flex-start;justify-content:space-between;gap:4px}
-.tl-del{width:16px;height:16px;border-radius:3px;border:none;background:transparent;color:var(--text3);cursor:pointer;font-size:11px;flex-shrink:0;opacity:0;display:flex;align-items:center;justify-content:center}
-.tl-item:hover .tl-del{opacity:1}.tl-del:hover{background:var(--red-bg);color:var(--red)}
-.tl-author{font-size:10px;font-weight:600;padding:1px 5px;border-radius:var(--pill);background:var(--purple-bg);color:var(--purple-t);margin-right:4px}
-.tl-text{font-size:12px;line-height:1.5;color:var(--text2);word-break:break-word}
-.tl-date{font-size:10px;color:var(--text3);margin-top:2px;white-space:nowrap}
-.dp-note{padding:12px 16px}
-.note-input{width:100%;padding:8px 10px;font-size:12px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:inherit;resize:none;height:58px}
-.note-input:focus{outline:none;border-color:var(--border2)}
-.note-submit{width:100%;margin-top:6px;padding:0;height:34px;font-size:12px;font-weight:600;border:none;border-radius:var(--radius-sm);background:var(--text);color:var(--bg);cursor:pointer}
-.note-submit:hover{opacity:.82}
-.divider{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:8px;padding:4px 0 6px}
-.divider::before,.divider::after{content:'';flex:1;height:0.5px;background:var(--border)}
+    .sb-nav {
+      flex: 1;
+      padding: 8px 0;
+      overflow-y: auto;
+      overflow-x: hidden
+    }
 
-/* ── 터치 지원 ── */
-button,[onclick],[data-nav],.sb-item,.task-card,.chip{
-  -webkit-tap-highlight-color:transparent;touch-action:manipulation;
-}
+    .sb-sec {
+      padding: 4px 16px;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text3);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-top: 10px
+    }
 
-/* ══════════════════════════════════════════
+    .sb-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 16px;
+      cursor: pointer;
+      margin: 1px 8px;
+      border-radius: var(--radius-sm);
+      transition: background .12s;
+      min-height: var(--touch-min)
+    }
+
+    .sb-item:hover {
+      background: var(--bg2)
+    }
+
+    .sb-item.active {
+      background: var(--bg3)
+    }
+
+    .sb-item.active .sb-label,
+    .sb-item.active .sb-icon {
+      color: var(--text);
+      font-weight: 500
+    }
+
+    .sb-icon {
+      font-size: 15px;
+      width: 22px;
+      text-align: center;
+      color: var(--text2);
+      flex-shrink: 0
+    }
+
+    .sb-label {
+      font-size: 13px;
+      color: var(--text2);
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .sb-badge {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: var(--pill);
+      background: var(--red-bg);
+      color: var(--red);
+      flex-shrink: 0
+    }
+
+    .sb-bottom {
+      padding: 12px 16px;
+      border-top: 0.5px solid var(--bg3);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex-shrink: 0
+    }
+
+    .sb-sync {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--text3)
+    }
+
+    .sync-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      flex-shrink: 0
+    }
+
+    .sync-dot.syncing {
+      background: var(--orange);
+      animation: blink .8s infinite
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: .3
+      }
+    }
+
+    /* ── 메인 ── */
+    .main-wrap {
+      margin-left: var(--sw);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      min-width: 0
+    }
+
+    /* ── 탑바 ── */
+    .topbar {
+      background: var(--bg);
+      border-bottom: 0.5px solid var(--border);
+      padding: 0 24px;
+      height: var(--topbar-h);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      flex-shrink: 0;
+      gap: 12px;
+    }
+
+    .page-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
+      min-width: 0
+    }
+
+    .topbar-right {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-shrink: 0;
+      flex-wrap: wrap
+    }
+
+    /* ── 햄버거 ── */
+    .hamburger {
+      display: none;
+      width: 36px;
+      height: 36px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      padding: 4px;
+      border-radius: var(--radius-sm);
+      flex-shrink: 0;
+    }
+
+    .hamburger span {
+      display: block;
+      width: 20px;
+      height: 2px;
+      background: var(--text);
+      border-radius: 2px
+    }
+
+    .hamburger:hover {
+      background: var(--bg2)
+    }
+
+    .sidebar-dim {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .45);
+      z-index: 290
+    }
+
+    .sidebar-dim.show {
+      display: block
+    }
+
+    /* ── 버튼 ── */
+    .btn-ghost {
+      padding: 0 14px;
+      height: 34px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      border: 0.5px solid var(--border);
+      background: transparent;
+      color: var(--text2);
+      cursor: pointer;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--border2);
+      color: var(--text)
+    }
+
+    .btn-solid {
+      padding: 0 16px;
+      height: 34px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 600;
+      border: none;
+      background: var(--text);
+      color: var(--bg);
+      cursor: pointer;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .btn-solid:hover {
+      opacity: .82
+    }
+
+    /* ── 모달/오버레이 ── */
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .45);
+      align-items: center;
+      justify-content: center;
+      z-index: 400;
+      padding: 1rem;
+      overflow-y: auto;
+    }
+
+    .overlay.show {
+      display: flex
+    }
+
+    .modal {
+      background: var(--bg);
+      border-radius: var(--radius);
+      border: 0.5px solid var(--border);
+      padding: 1.5rem;
+      width: 100%;
+      max-width: 440px;
+      max-height: calc(100vh - 2rem);
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .modal h3 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 1.25rem
+    }
+
+    .modal-btns {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      margin-top: 1.25rem;
+      flex-wrap: wrap
+    }
+
+    .btn-cancel {
+      padding: 0 16px;
+      height: 34px;
+      font-size: 12px;
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: transparent;
+      color: var(--text2);
+      cursor: pointer;
+    }
+
+    .btn-ok {
+      padding: 0 18px;
+      height: 34px;
+      font-size: 12px;
+      font-weight: 600;
+      border: none;
+      border-radius: var(--radius-sm);
+      background: var(--text);
+      color: var(--bg);
+      cursor: pointer;
+    }
+
+    .btn-danger {
+      padding: 0 16px;
+      height: 34px;
+      font-size: 12px;
+      border: none;
+      border-radius: var(--radius-sm);
+      background: var(--red);
+      color: #fff;
+      cursor: pointer;
+      margin-right: auto;
+    }
+
+    .fg {
+      margin-bottom: 1rem
+    }
+
+    .fg label {
+      font-size: 11px;
+      color: var(--text3);
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .04em
+    }
+
+    .fg input,
+    .fg select,
+    .fg textarea {
+      width: 100%;
+      padding: 8px 10px;
+      font-size: 13px;
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg2);
+      color: var(--text);
+      font-family: inherit;
+      outline: none;
+    }
+
+    .fg input:focus,
+    .fg select:focus,
+    .fg textarea:focus {
+      border-color: var(--border2)
+    }
+
+    /* ── 토스트 ── */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      background: var(--text);
+      color: var(--bg);
+      font-size: 12px;
+      font-weight: 500;
+      padding: 8px 18px;
+      border-radius: var(--pill);
+      opacity: 0;
+      transition: all .25s;
+      pointer-events: none;
+      z-index: 500;
+      white-space: nowrap;
+      max-width: calc(100vw - 2rem);
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0)
+    }
+
+    /* ── 통계 카드 ── */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 16px
+    }
+
+    .stat {
+      background: var(--bg);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--text3);
+      margin-bottom: 6px;
+      white-space: nowrap
+    }
+
+    .stat-value {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1
+    }
+
+    .stat-value.warn {
+      color: #BA7517
+    }
+
+    .stat-value.danger {
+      color: var(--red)
+    }
+
+    /* ── 필터 칩 ── */
+    .filter-row {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+      align-items: center
+    }
+
+    .chip {
+      padding: 5px 12px;
+      border-radius: var(--pill);
+      font-size: 12px;
+      border: 0.5px solid var(--border);
+      background: var(--bg);
+      color: var(--text2);
+      cursor: pointer;
+      white-space: nowrap;
+      min-height: 30px;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .chip:hover {
+      border-color: var(--border2);
+      color: var(--text)
+    }
+
+    .chip.active {
+      background: var(--text);
+      color: var(--bg);
+      border-color: var(--text)
+    }
+
+    /* ── 업무 카드 ── */
+    .task-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px
+    }
+
+    .empty {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text3);
+      font-size: 13px
+    }
+
+    .task-card {
+      background: var(--bg);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: border-color .12s;
+      position: relative;
+      min-height: var(--touch-min);
+    }
+
+    .task-card:hover {
+      border-color: var(--border2)
+    }
+
+    .task-card.selected {
+      border-color: var(--text)
+    }
+
+    .task-card.pinned {
+      border-left: 3px solid var(--blue)
+    }
+
+    .task-card.overdue {
+      border-left: 3px solid var(--red)
+    }
+
+    .task-card.stale {
+      border-left: 3px solid var(--orange)
+    }
+
+    .priority-bar {
+      width: 3px;
+      border-radius: var(--pill);
+      align-self: stretch;
+      flex-shrink: 0;
+      min-height: 32px
+    }
+
+    .drag-handle {
+      color: var(--text3);
+      font-size: 14px;
+      cursor: grab;
+      user-select: none;
+      flex-shrink: 0
+    }
+
+    .task-check {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border2);
+      flex-shrink: 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .task-check:hover {
+      border-color: var(--text)
+    }
+
+    .task-check.done {
+      background: var(--text);
+      border-color: var(--text)
+    }
+
+    .task-check.done::after {
+      content: '';
+      width: 5px;
+      height: 3px;
+      border-left: 1.5px solid var(--bg);
+      border-bottom: 1.5px solid var(--bg);
+      transform: rotate(-45deg) translateY(-1px)
+    }
+
+    .task-body {
+      flex: 1;
+      min-width: 0
+    }
+
+    .task-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .task-title.done-text {
+      text-decoration: line-through;
+      color: var(--text3)
+    }
+
+    .task-meta {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+      flex-wrap: wrap
+    }
+
+    .badge {
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: var(--pill);
+      font-weight: 600;
+      white-space: nowrap
+    }
+
+    .badge-todo {
+      background: var(--blue-bg);
+      color: var(--blue-t)
+    }
+
+    .badge-inprogress {
+      background: var(--amber-bg);
+      color: var(--amber-t)
+    }
+
+    .badge-done {
+      background: var(--green-bg);
+      color: var(--green-t)
+    }
+
+    .badge-status {
+      cursor: pointer;
+      user-select: none
+    }
+
+    .badge-status:hover {
+      opacity: .75
+    }
+
+    .badge-reporter {
+      background: var(--purple-bg);
+      color: var(--purple-t)
+    }
+
+    .member-badge {
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: var(--pill);
+      font-weight: 600;
+      background: var(--bg3);
+      color: var(--text2)
+    }
+
+    .task-date {
+      font-size: 11px;
+      color: var(--text3);
+      white-space: nowrap
+    }
+
+    .task-date.ov {
+      color: var(--red);
+      font-weight: 600
+    }
+
+    .card-right {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      display: flex;
+      gap: 4px;
+      align-items: center
+    }
+
+    .pin-btn,
+    .del-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-sm);
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--text3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pin-btn:hover {
+      background: var(--bg3);
+      color: var(--text)
+    }
+
+    .pin-btn.on {
+      color: var(--blue)
+    }
+
+    .del-btn:hover {
+      background: var(--red-bg);
+      color: var(--red)
+    }
+
+    /* ── 중요도/보고자 배지 ── */
+    .priority-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: var(--pill);
+      cursor: pointer;
+      display: inline-block;
+      white-space: nowrap
+    }
+
+    .priority-badge.p1 {
+      background: #f0f0ee;
+      color: #888
+    }
+
+    .priority-badge.p2 {
+      background: var(--blue-bg);
+      color: var(--blue-t)
+    }
+
+    .priority-badge.p3 {
+      background: var(--amber-bg);
+      color: var(--amber-t)
+    }
+
+    .priority-badge.p4 {
+      background: var(--red-bg);
+      color: var(--red)
+    }
+
+    .priority-badge.p5 {
+      background: var(--red);
+      color: #fff
+    }
+
+    .reporter-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: var(--pill);
+      cursor: pointer;
+      display: inline-block;
+      background: var(--purple-bg);
+      color: var(--purple-t);
+      white-space: nowrap
+    }
+
+    /* ── 상세 패널 ── */
+    .resizer {
+      width: 12px;
+      flex-shrink: 0;
+      cursor: col-resize;
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    .resizer::after {
+      content: '';
+      width: 3px;
+      height: 30px;
+      background: var(--border);
+      border-radius: var(--pill)
+    }
+
+    .resizer:hover::after {
+      background: var(--border2);
+      height: 46px
+    }
+
+    .detail-panel {
+      width: 300px;
+      min-width: 260px;
+      flex-shrink: 0;
+      background: var(--bg);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      display: none;
+      position: sticky;
+      top: calc(var(--topbar-h) + 20px);
+      max-height: calc(100vh - var(--topbar-h) - 40px);
+      overflow-y: auto;
+    }
+
+    .detail-panel.open {
+      display: block
+    }
+
+    .dp-head {
+      padding: 14px 16px;
+      border-bottom: 0.5px solid var(--bg3);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      z-index: 1;
+    }
+
+    .dp-member {
+      font-size: 11px;
+      color: var(--blue);
+      font-weight: 600;
+      margin-bottom: 3px
+    }
+
+    .dp-title-input {
+      font-size: 14px;
+      font-weight: 500;
+      border: none;
+      background: transparent;
+      color: var(--text);
+      font-family: inherit;
+      padding: 2px 4px;
+      border-radius: 4px;
+      border: 0.5px solid transparent;
+      outline: none;
+      width: 100%;
+      line-height: 1.45;
+    }
+
+    .dp-title-input:hover {
+      border-color: var(--border);
+      background: var(--bg2)
+    }
+
+    .dp-title-input:focus {
+      border-color: var(--border2);
+      background: var(--bg2)
+    }
+
+    .dp-close {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-sm);
+      border: none;
+      background: transparent;
+      color: var(--text3);
+      cursor: pointer;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .dp-close:hover {
+      background: var(--bg2);
+      color: var(--text)
+    }
+
+    .dp-meta {
+      padding: 10px 16px;
+      display: flex;
+      flex-direction: column
+    }
+
+    .dp-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 7px 0;
+      border-bottom: 0.5px solid var(--bg3);
+      gap: 8px;
+    }
+
+    .dp-row:last-child {
+      border-bottom: none
+    }
+
+    .dp-lbl {
+      font-size: 11px;
+      color: var(--text3);
+      flex-shrink: 0
+    }
+
+    .dp-val {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text);
+      text-align: right;
+      word-break: break-word
+    }
+
+    .dp-edit {
+      font-size: 12px;
+      font-weight: 500;
+      border: none;
+      background: transparent;
+      color: var(--text);
+      font-family: inherit;
+      padding: 2px 5px;
+      border-radius: 4px;
+      border: 0.5px solid transparent;
+      outline: none;
+      max-width: 150px;
+      text-align: right;
+      width: auto;
+    }
+
+    .dp-edit:hover {
+      border-color: var(--border);
+      background: var(--bg2)
+    }
+
+    .dp-edit:focus {
+      border-color: var(--border2);
+      background: var(--bg2)
+    }
+
+    .dp-sec {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text3);
+      padding: 12px 16px 6px;
+      letter-spacing: .06em;
+      text-transform: uppercase
+    }
+
+    .progress-wrap {
+      padding: 0 16px 12px
+    }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text3);
+      margin-bottom: 5px
+    }
+
+    .progress-bar-bg {
+      height: 4px;
+      background: var(--bg3);
+      border-radius: var(--pill);
+      overflow: hidden
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: var(--pill);
+      background: var(--text)
+    }
+
+    .progress-bar-fill.done-bar {
+      background: var(--green)
+    }
+
+    .progress-bar-fill.over-bar {
+      background: var(--red)
+    }
+
+    .timeline {
+      padding: 0 16px 12px;
+      display: flex;
+      flex-direction: column
+    }
+
+    .tl-item {
+      display: flex;
+      gap: 8px;
+      position: relative
+    }
+
+    .tl-line {
+      position: absolute;
+      left: 5px;
+      top: 13px;
+      bottom: -2px;
+      width: 1px;
+      background: var(--border)
+    }
+
+    .tl-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 2px;
+      border: 1.5px solid var(--border);
+      background: var(--bg);
+      position: relative;
+      z-index: 1
+    }
+
+    .tl-dot.create {
+      background: var(--blue);
+      border-color: var(--blue)
+    }
+
+    .tl-dot.status {
+      background: var(--orange);
+      border-color: var(--orange)
+    }
+
+    .tl-dot.done {
+      background: var(--green);
+      border-color: var(--green)
+    }
+
+    .tl-body {
+      flex: 1;
+      padding-bottom: 12px;
+      min-width: 0
+    }
+
+    .tl-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 4px
+    }
+
+    .tl-del {
+      width: 16px;
+      height: 16px;
+      border-radius: 3px;
+      border: none;
+      background: transparent;
+      color: var(--text3);
+      cursor: pointer;
+      font-size: 11px;
+      flex-shrink: 0;
+      opacity: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    .tl-item:hover .tl-del {
+      opacity: 1
+    }
+
+    .tl-del:hover {
+      background: var(--red-bg);
+      color: var(--red)
+    }
+
+    .tl-author {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 1px 5px;
+      border-radius: var(--pill);
+      background: var(--purple-bg);
+      color: var(--purple-t);
+      margin-right: 4px
+    }
+
+    .tl-text {
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--text2);
+      word-break: break-word
+    }
+
+    .tl-date {
+      font-size: 10px;
+      color: var(--text3);
+      margin-top: 2px;
+      white-space: nowrap
+    }
+
+    .dp-note {
+      padding: 12px 16px
+    }
+
+    .note-input {
+      width: 100%;
+      padding: 8px 10px;
+      font-size: 12px;
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg2);
+      color: var(--text);
+      font-family: inherit;
+      resize: none;
+      height: 58px
+    }
+
+    .note-input:focus {
+      outline: none;
+      border-color: var(--border2)
+    }
+
+    .note-submit {
+      width: 100%;
+      margin-top: 6px;
+      padding: 0;
+      height: 34px;
+      font-size: 12px;
+      font-weight: 600;
+      border: none;
+      border-radius: var(--radius-sm);
+      background: var(--text);
+      color: var(--bg);
+      cursor: pointer
+    }
+
+    .note-submit:hover {
+      opacity: .82
+    }
+
+    .divider {
+      font-size: 11px;
+      color: var(--text3);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 0 6px
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 0.5px;
+      background: var(--border)
+    }
+
+    /* ── 터치 지원 ── */
+    button,
+    [onclick],
+    [data-nav],
+    .sb-item,
+    .task-card,
+    .chip {
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    /* ══════════════════════════════════════════
    반응형 — 태블릿 (768px ~ 1023px)
 ══════════════════════════════════════════ */
-@media(max-width:1023px){
-  :root{--sw:200px}
-  .stats{grid-template-columns:repeat(2,1fr)}
-  .detail-panel{width:280px;min-width:240px}
-}
+    @media(max-width:1023px) {
+      :root {
+        --sw: 200px
+      }
 
-/* ══════════════════════════════════════════
+      .stats {
+        grid-template-columns: repeat(2, 1fr)
+      }
+
+      .detail-panel {
+        width: 280px;
+        min-width: 240px
+      }
+    }
+
+    /* ══════════════════════════════════════════
    반응형 — 모바일 (~ 767px)
 ══════════════════════════════════════════ */
-@media(max-width:767px){
-  :root{--sw:240px;--topbar-h:48px}
+    @media(max-width:767px) {
+      :root {
+        --sw: 240px;
+        --topbar-h: 48px
+      }
 
-  /* 사이드바 슬라이드 */
-  .sidebar{transform:translateX(-100%)}
-  .sidebar.open{transform:translateX(0)}
+      /* 사이드바 슬라이드 */
+      .sidebar {
+        transform: translateX(-100%)
+      }
 
-  /* 햄버거 표시 */
-  .hamburger{display:flex}
+      .sidebar.open {
+        transform: translateX(0)
+      }
 
-  /* 메인 영역 */
-  .main-wrap{margin-left:0}
-  .topbar{padding:0 14px;gap:8px}
-  .page-title{font-size:14px}
+      /* 햄버거 표시 */
+      .hamburger {
+        display: flex
+      }
 
-  /* 통계 2열 */
-  .stats{grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
-  .stat{padding:12px}
-  .stat-value{font-size:18px}
+      /* 메인 영역 */
+      .main-wrap {
+        margin-left: 0
+      }
 
-  /* 필터 스크롤 */
-  .filter-row{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
-  .filter-row::-webkit-scrollbar{display:none}
+      .topbar {
+        padding: 0 14px;
+        gap: 8px
+      }
 
-  /* 카드 */
-  .task-card{padding:10px 12px;gap:8px}
-  .task-title{font-size:12px}
-  .card-right{position:static;margin-left:auto;flex-shrink:0}
+      .page-title {
+        font-size: 14px
+      }
 
-  /* 상세 패널 전체화면 */
-  .detail-panel{
-    position:fixed;inset:0;width:100%;max-width:100%;
-    border-radius:0;z-index:350;max-height:100vh;
-    top:0!important;
-  }
-  .resizer{display:none}
+      /* 통계 2열 */
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        margin-bottom: 12px
+      }
 
-  /* 모달 */
-  .modal{max-width:100%;margin:0;border-radius:var(--radius) var(--radius) 0 0;
-    position:fixed;bottom:0;left:0;right:0;max-height:90vh;}
-  .overlay{align-items:flex-end;padding:0}
+      .stat {
+        padding: 12px
+      }
 
-  /* 버튼 크기 */
-  .btn-ghost,.btn-solid,.btn-ok,.btn-cancel{height:38px;font-size:13px}
-  .chip{min-height:34px;padding:5px 12px}
-}
+      .stat-value {
+        font-size: 18px
+      }
 
-/* ── 페이지 고유 CSS ── */
+      /* 필터 스크롤 */
+      .filter-row {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding-bottom: 4px;
+        -webkit-overflow-scrolling: touch
+      }
 
-/* ── 회의록 모바일 레이아웃 ── */
-@media(max-width:767px) {
-  .meet-layout {
-    flex-direction: column !important;
-  }
-  .meet-sidebar {
-    width: 100% !important;
-    height: auto !important;
-    max-height: 200px;
-    border-right: none !important;
-    border-bottom: 0.5px solid var(--border);
-  }
-  .meet-main {
-    width: 100% !important;
-    min-width: 0 !important;
-  }
-  .meet-topbar {
-    flex-wrap: wrap;
-    gap: 6px;
-    height: auto !important;
-    padding: 10px 14px !important;
-  }
-  .meet-topbar .page-title {
-    width: 100%;
-  }
-}
+      .filter-row::-webkit-scrollbar {
+        display: none
+      }
+
+      /* 카드 */
+      .task-card {
+        padding: 10px 12px;
+        gap: 8px
+      }
+
+      .task-title {
+        font-size: 12px
+      }
+
+      .card-right {
+        position: static;
+        margin-left: auto;
+        flex-shrink: 0
+      }
+
+      /* 상세 패널 전체화면 */
+      .detail-panel {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        max-width: 100%;
+        border-radius: 0;
+        z-index: 350;
+        max-height: 100vh;
+        top: 0 !important;
+      }
+
+      .resizer {
+        display: none
+      }
+
+      /* 모달 */
+      .modal {
+        max-width: 100%;
+        margin: 0;
+        border-radius: var(--radius) var(--radius) 0 0;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        max-height: 90vh;
+      }
+
+      .overlay {
+        align-items: flex-end;
+        padding: 0
+      }
+
+      /* 버튼 크기 */
+      .btn-ghost,
+      .btn-solid,
+      .btn-ok,
+      .btn-cancel {
+        height: 38px;
+        font-size: 13px
+      }
+
+      .chip {
+        min-height: 34px;
+        padding: 5px 12px
+      }
+    }
+
+    /* ── 페이지 고유 CSS ── */
+
+    /* ── 회의록 모바일 레이아웃 ── */
+    @media(max-width:767px) {
+      .meet-layout {
+        flex-direction: column !important;
+      }
+
+      .meet-sidebar {
+        width: 100% !important;
+        height: auto !important;
+        max-height: 200px;
+        border-right: none !important;
+        border-bottom: 0.5px solid var(--border);
+      }
+
+      .meet-main {
+        width: 100% !important;
+        min-width: 0 !important;
+      }
+
+      .meet-topbar {
+        flex-wrap: wrap;
+        gap: 6px;
+        height: auto !important;
+        padding: 10px 14px !important;
+      }
+
+      .meet-topbar .page-title {
+        width: 100%;
+      }
+    }
 
 
-/* ── 회의록 전용 ── */
-.sb-meeting-item{padding:10px 14px;cursor:pointer;border-bottom:0.5px solid var(--bg3);transition:background .12s}
-.sb-meeting-item:hover{background:var(--bg2)}
-.sb-meeting-item.active{background:var(--blue-bg)}
-.sb-item-title{font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px}
-.sb-item-meta{font-size:11px;color:var(--text3)}
-.rec-status{font-size:12px;color:var(--text2)}
-.rec-status.active{color:var(--red);font-weight:500}
-.recording{background:var(--red-bg)!important;color:var(--red)!important}
-.no-support{padding:1rem;text-align:center;color:var(--text2)}
-.sb-empty{padding:2rem;text-align:center;color:var(--text3);font-size:13px;line-height:1.6}
-.meet-section{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:12px}
-.meet-section-title{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
-.meet-textarea{width:100%;padding:10px;font-size:13px;line-height:1.7;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:inherit;resize:vertical;outline:none;min-height:90px}
-.meet-textarea:focus{border-color:var(--border2)}
-@media(max-width:767px){
-  .sb-meeting-item{padding:10px 12px}
-  .sb-item-title{font-size:12px}
-}
+    /* ── 회의록 전용 ── */
+    .sb-meeting-item {
+      padding: 10px 14px;
+      cursor: pointer;
+      border-bottom: 0.5px solid var(--bg3);
+      transition: background .12s
+    }
 
-/* ── 메인 ── */
-.main-wrap{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;min-height:100vh}
-.pin-btn,.del-btn{width:24px;height:24px;border-radius:var(--radius-sm);border:none;background:transparent;cursor:pointer;font-size:13px;color:var(--text3);display:flex;align-items:center;justify-content:center}
-.pin-btn:hover{background:var(--bg3);color:var(--text)}
-.pin-btn.on{color:var(--blue)}
-</style>
+    .sb-meeting-item:hover {
+      background: var(--bg2)
+    }
+
+    .sb-meeting-item.active {
+      background: var(--blue-bg)
+    }
+
+    .sb-item-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 3px
+    }
+
+    .sb-item-meta {
+      font-size: 11px;
+      color: var(--text3)
+    }
+
+    .rec-status {
+      font-size: 12px;
+      color: var(--text2)
+    }
+
+    .rec-status.active {
+      color: var(--red);
+      font-weight: 500
+    }
+
+    .recording {
+      background: var(--red-bg) !important;
+      color: var(--red) !important
+    }
+
+    .no-support {
+      padding: 1rem;
+      text-align: center;
+      color: var(--text2)
+    }
+
+    .sb-empty {
+      padding: 2rem;
+      text-align: center;
+      color: var(--text3);
+      font-size: 13px;
+      line-height: 1.6
+    }
+
+    .meet-section {
+      background: var(--bg);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      margin-bottom: 12px
+    }
+
+    .meet-section-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text2);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+
+    .meet-textarea {
+      width: 100%;
+      padding: 10px;
+      font-size: 13px;
+      line-height: 1.7;
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg2);
+      color: var(--text);
+      font-family: inherit;
+      resize: vertical;
+      outline: none;
+      min-height: 90px
+    }
+
+    .meet-textarea:focus {
+      border-color: var(--border2)
+    }
+
+    @media(max-width:767px) {
+      .sb-meeting-item {
+        padding: 10px 12px
+      }
+
+      .sb-item-title {
+        font-size: 12px
+      }
+    }
+
+    /* ── 메인 ── */
+    .main-wrap {
+      margin-left: var(--sw);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh
+    }
+
+    .pin-btn,
+    .del-btn {
+      width: 24px;
+      height: 24px;
+      border-radius: var(--radius-sm);
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--text3);
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    .pin-btn:hover {
+      background: var(--bg3);
+      color: var(--text)
+    }
+
+    .pin-btn.on {
+      color: var(--blue)
+    }
+  </style>
 </head>
+
 <body>
-<!-- 모바일 딤 -->
-<div class="sidebar-dim" id="sidebarDim" onclick="var s=document.querySelector('.sidebar');if(s){s.classList.remove('open');this.classList.remove('show');document.body.style.overflow='';}"></div>
-<div class="app">
-<div class="sidebar">
-  <div class="sb-brand"><div class="sb-brand-name">GZ Plan</div><div class="sb-brand-sub">경영기획팀</div></div>
-  <div class="sb-user">
-    <div class="sb-avatar" id="sbAvatar">--</div>
-    <div><div class="sb-user-name" id="sbUserName"></div><div class="sb-user-role" id="sbUserRole"></div></div>
+  <!-- 모바일 딤 -->
+  <div class="sidebar-dim" id="sidebarDim"
+    onclick="var s=document.querySelector('.sidebar');if(s){s.classList.remove('open');this.classList.remove('show');document.body.style.overflow='';}">
   </div>
-  <div class="sb-nav" id="sbNav">
-    <div class="sb-sec">업무</div>
-    <div class="sb-item" data-nav="member.html" id="sbTaskItem"><div class="sb-icon">☐</div><div class="sb-label" id="sbTaskLabel">내 업무</div></div>
-    <div class="sb-sec">도구</div>
-    <div class="sb-item" data-nav="calendar.html"><div class="sb-icon">▦</div><div class="sb-label">캘린더</div></div>
-    <div class="sb-item active" data-nav="meeting.html"><div class="sb-icon">◈</div><div class="sb-label">회의록</div></div>
-    <div class="sb-item" data-nav="memo.html"><div class="sb-icon">◉</div><div class="sb-label">메모장</div></div>
-    
-  </div>
-  <div class="sb-bottom">
-    <div class="sb-sync"><div class="sync-dot" id="syncDot"></div><span>실시간 동기화</span></div>
-    <button class="btn-ghost" id="logoutBtn" style="width:100%;font-size:11px;padding:5px">로그아웃</button>
-  </div>
-</div>
-<div class="main-wrap meet-layout" style="flex-direction:row;overflow:hidden">
-  <div class="meet-sidebar" style="width:220px;flex-shrink:0;border-right:0.5px solid var(--border);background:var(--bg);display:flex;flex-direction:column;overflow:hidden">
-    <div style="padding:14px 16px;border-bottom:0.5px solid var(--bg3);display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
-      <span style="font-size:13px;font-weight:600;color:var(--text)">회의록</span>
-      <button class="btn-solid" id="newMeetingBtn" onclick="if(window.newMeeting)window.newMeeting()" style="font-size:11px;padding:4px 10px;touch-action:manipulation">+ 새 회의</button>
-    </div>
-    <!-- 개인/공통 탭: 탑바 아래로 이동됨 -->
-    <div style="flex:1;overflow-y:auto" id="sbList">
-      <div style="padding:2rem;text-align:center;color:var(--text3);font-size:13px;line-height:1.6">저장된 회의록이 없어요<br>새 회의를 시작해주세요</div>
-    </div>
-  </div>
-  <div class="meet-main" style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0">
-    <div class="topbar">
-  <button class="hamburger" id="hamburgerBtn" aria-label="메뉴">
-    <span></span><span></span><span></span>
-  </button>
-      <div class="page-title" id="meetPageTitle">새 회의록</div>
-      <div style="display:flex;gap:8px">
-<label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2);cursor:pointer;white-space:nowrap">
-          <input type="checkbox" id="shareChk" style="width:auto;cursor:pointer"> 🌐 팀 전체 공유
-        </label>
-        <button class="btn-ghost" id="copySummaryBtn" onclick="if(window.copySummary)window.copySummary()" style="touch-action:manipulation">📋 복사</button>
-        <button class="btn-ghost" id="deleteMeetingBtn" onclick="if(window.deleteMeeting)window.deleteMeeting()" style="display:none;color:var(--red);border-color:rgba(163,45,45,.3)">삭제</button>
-        <button class="btn-solid" id="saveMeetingBtn" onclick="if(window.saveMeeting)window.saveMeeting()" style="touch-action:manipulation">💾 저장</button>
+  <div class="app">
+    <div class="sidebar">
+      <div class="sb-brand">
+        <div class="sb-brand-name">GZ Plan</div>
+        <div class="sb-brand-sub">경영기획팀</div>
       </div>
-    </div>
-    <!-- 개인/공통 탭 -->
-    <div style="display:flex;border-bottom:0.5px solid var(--border);background:var(--bg);flex-shrink:0">
-      <button id="tabPersonal" style="flex:1;padding:10px;font-size:13px;font-weight:600;border:none;border-bottom:2px solid var(--text);background:transparent;color:var(--text);cursor:pointer;touch-action:manipulation">개인</button>
-      <button id="tabShared" style="flex:1;padding:10px;font-size:13px;font-weight:500;border:none;border-bottom:2px solid transparent;background:transparent;color:var(--text2);cursor:pointer;touch-action:manipulation">공통 🌐</button>
-    </div>
-    <div style="flex:1;overflow-y:auto;padding:1.5rem 24px;display:flex;flex-direction:column;gap:14px">
-      <div style="background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:1.25rem">
-        <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:12px">📋 회의 정보</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-          <div class="fg"><label>회의 제목</label><input id="meetTitle" placeholder="예: 4월 주간 팀 회의"/></div>
-          <div class="fg"><label>일시</label><input id="meetDate" type="datetime-local"/></div>
-        </div>
+      <div class="sb-user">
+        <div class="sb-avatar" id="sbAvatar">--</div>
         <div>
-          <div style="font-size:11px;color:var(--text3);margin-bottom:6px">참석자</div>
-          <input id="attendeeInput" placeholder="예: 현주용, 이영찬, 강신욱" style="width:100%;padding:8px 10px;font-size:13px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:inherit;outline:none"/>
-          <div style="font-size:11px;color:var(--text3);margin-top:4px">쉼표로 구분해서 입력하세요</div>
+          <div class="sb-user-name" id="sbUserName"></div>
+          <div class="sb-user-role" id="sbUserRole"></div>
         </div>
       </div>
-      <div id="recWrap" style="background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:1.25rem">
-        <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:12px">🎙 실시간 녹음</div>
-        <div id="recContent">
-          <div style="display:flex;align-items:center;gap:14px;padding:4px 0">
-            <button id="recBtn" style="width:64px;height:64px;border-radius:50%;border:2px solid var(--border);cursor:pointer;font-size:26px;display:flex;align-items:center;justify-content:center;background:var(--bg);flex-shrink:0;-webkit-tap-highlight-color:transparent;box-shadow:0 2px 8px rgba(0,0,0,.1)">🎙</button>
+      <div class="sb-nav" id="sbNav">
+        <div class="sb-sec">업무</div>
+        <div class="sb-item" data-nav="member.html" id="sbTaskItem">
+          <div class="sb-icon">☐</div>
+          <div class="sb-label" id="sbTaskLabel">내 업무</div>
+        </div>
+        <div class="sb-sec">도구</div>
+        <div class="sb-item" data-nav="calendar.html">
+          <div class="sb-icon">▦</div>
+          <div class="sb-label">캘린더</div>
+        </div>
+        <div class="sb-item active" data-nav="meeting.html">
+          <div class="sb-icon">◈</div>
+          <div class="sb-label">회의록</div>
+        </div>
+        <div class="sb-item" data-nav="memo.html">
+          <div class="sb-icon">◉</div>
+          <div class="sb-label">메모장</div>
+        </div>
+
+      </div>
+      <div class="sb-bottom">
+        <div class="sb-sync">
+          <div class="sync-dot" id="syncDot"></div><span>실시간 동기화</span>
+        </div>
+        <button class="btn-ghost" id="logoutBtn" style="width:100%;font-size:11px;padding:5px">로그아웃</button>
+      </div>
+    </div>
+    <div class="main-wrap meet-layout" style="flex-direction:row;overflow:hidden">
+      <div class="meet-sidebar"
+        style="width:220px;flex-shrink:0;border-right:0.5px solid var(--border);background:var(--bg);display:flex;flex-direction:column;overflow:hidden">
+        <div
+          style="padding:14px 16px;border-bottom:0.5px solid var(--bg3);display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+          <span style="font-size:13px;font-weight:600;color:var(--text)">회의록</span>
+          <button class="btn-solid" id="newMeetingBtn" onclick="if(window.newMeeting)window.newMeeting()"
+            style="font-size:11px;padding:4px 10px;touch-action:manipulation">+ 새 회의</button>
+        </div>
+        <!-- 개인/공통 탭: 탑바 아래로 이동됨 -->
+        <div style="flex:1;overflow-y:auto" id="sbList">
+          <div style="padding:2rem;text-align:center;color:var(--text3);font-size:13px;line-height:1.6">저장된 회의록이
+            없어요<br>새 회의를 시작해주세요</div>
+        </div>
+      </div>
+      <div class="meet-main" style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0">
+        <div class="topbar">
+          <button class="hamburger" id="hamburgerBtn" aria-label="메뉴">
+            <span></span><span></span><span></span>
+          </button>
+          <div class="page-title" id="meetPageTitle">새 회의록</div>
+          <div style="display:flex;gap:8px">
+            <label
+              style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2);cursor:pointer;white-space:nowrap">
+              <input type="checkbox" id="shareChk" style="width:auto;cursor:pointer"> 🌐 팀 전체 공유
+            </label>
+            <button class="btn-ghost" id="copySummaryBtn" onclick="if(window.copySummary)window.copySummary()"
+              style="touch-action:manipulation">📋 복사</button>
+            <button class="btn-ghost" id="deleteMeetingBtn" onclick="if(window.deleteMeeting)window.deleteMeeting()"
+              style="display:none;color:var(--red);border-color:rgba(163,45,45,.3)">삭제</button>
+            <button class="btn-solid" id="saveMeetingBtn" onclick="if(window.saveMeeting)window.saveMeeting()"
+              style="touch-action:manipulation">💾 저장</button>
+          </div>
+        </div>
+        <!-- 개인/공통 탭 -->
+        <div style="display:flex;border-bottom:0.5px solid var(--border);background:var(--bg);flex-shrink:0">
+          <button id="tabPersonal"
+            style="flex:1;padding:10px;font-size:13px;font-weight:600;border:none;border-bottom:2px solid var(--text);background:transparent;color:var(--text);cursor:pointer;touch-action:manipulation">개인</button>
+          <button id="tabShared"
+            style="flex:1;padding:10px;font-size:13px;font-weight:500;border:none;border-bottom:2px solid transparent;background:transparent;color:var(--text2);cursor:pointer;touch-action:manipulation">공통
+            🌐</button>
+        </div>
+        <div style="flex:1;overflow-y:auto;padding:1.5rem 24px;display:flex;flex-direction:column;gap:14px">
+          <div
+            style="background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:1.25rem">
+            <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:12px">📋 회의 정보</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+              <div class="fg"><label>회의 제목</label><input id="meetTitle" placeholder="예: 4월 주간 팀 회의" /></div>
+              <div class="fg"><label>일시</label><input id="meetDate" type="datetime-local" /></div>
+            </div>
             <div>
-              <div id="recStatus" style="font-size:12px;color:var(--text2);margin-bottom:2px">버튼을 눌러 녹음을 시작하세요</div>
-              <div id="recTimer" style="font-size:18px;font-weight:500;color:var(--text);font-variant-numeric:tabular-nums">00:00</div>
+              <div style="font-size:11px;color:var(--text3);margin-bottom:6px">참석자</div>
+              <input id="attendeeInput" placeholder="예: 현주용, 이영찬, 강신욱"
+                style="width:100%;padding:8px 10px;font-size:13px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:inherit;outline:none" />
+              <div style="font-size:11px;color:var(--text3);margin-top:4px">쉼표로 구분해서 입력하세요</div>
+            </div>
+          </div>
+          <div id="recWrap"
+            style="background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:1.25rem">
+            <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:12px">🎙 실시간 녹음</div>
+            <div id="recContent">
+              <div style="display:flex;align-items:center;gap:14px;padding:4px 0">
+                <button id="recBtn"
+                  style="width:64px;height:64px;border-radius:50%;border:2px solid var(--border);cursor:pointer;font-size:26px;display:flex;align-items:center;justify-content:center;background:var(--bg);flex-shrink:0;-webkit-tap-highlight-color:transparent;box-shadow:0 2px 8px rgba(0,0,0,.1)">🎙</button>
+                <div>
+                  <div id="recStatus" style="font-size:12px;color:var(--text2);margin-bottom:2px">버튼을 눌러 녹음을 시작하세요</div>
+                  <div id="recTimer"
+                    style="font-size:18px;font-weight:500;color:var(--text);font-variant-numeric:tabular-nums">00:00
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            style="background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:1.25rem">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+              <div style="font-size:12px;font-weight:600;color:var(--text2)">📝 전사 텍스트</div>
+
+            </div>
+            <textarea id="transcriptArea" placeholder="녹음 시작 후 말씀하시면 자동으로 텍스트가 입력됩니다. [] 안의 내용은 인식 중인 텍스트예요."
+              style="width:100%;min-height:100px;padding:10px;font-size:13px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:inherit;resize:vertical;outline:none"></textarea>
+          </div>
+          <!-- 내 메모 카드 -->
+          <div
+            style="background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:1.25rem">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+              <div style="font-size:12px;font-weight:600;color:var(--text2)">✏️ 내 메모</div>
+              <button class="btn-ghost" id="tagSettingBtn" style="font-size:11px;padding:3px 10px">⚙ 태그 설정</button>
+            </div>
+            <!-- 빠른 태그 버튼 -->
+            <div id="quickTagsRow" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px"></div>
+            <textarea id="userNoteArea" placeholder="보충 설명, 결정사항, 액션 아이템 등을 자유롭게 입력하세요. #태그도 사용할 수 있어요."
+              style="width:100%;min-height:100px;padding:10px;font-size:13px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:inherit;resize:vertical;outline:none"></textarea>
+            <!-- 태그 칩 필터 -->
+            <div id="noteTagChips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:8px"></div>
+          </div>
+          <div
+            style="background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:1.25rem">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px">
+              <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
+                <div style="font-size:12px;font-weight:600;color:var(--text2)">✅ 회의록 요약</div>
+                <span id="savedBadge"
+                  style="display:none;font-size:10px;font-weight:600;padding:2px 8px;border-radius:var(--pill);background:var(--green-bg);color:var(--green-t)">저장됨</span>
+                <span id="aiLoadingBadge" style="display:none;font-size:10px;color:var(--text3)">⏳ AI 요약 중...</span>
+              </div>
+              <button id="summarizeBtn" onclick="if(window.summarize)window.summarize()"
+                style="padding:6px 14px;font-size:12px;font-weight:600;border:none;border-radius:var(--radius-sm);background:var(--text);color:var(--bg);cursor:pointer;white-space:nowrap;touch-action:manipulation;flex-shrink:0">✨
+                AI 요약</button>
+            </div>
+            <div style="font-size:11px;color:var(--text3);margin-bottom:10px">전사 텍스트 + 내 메모를 합쳐서 요약해요</div>
+            <textarea id="summaryArea" placeholder="AI 요약 결과가 여기에 표시돼요. 직접 수정도 가능해요."
+              style="width:100%;min-height:180px;padding:10px;font-size:13px;line-height:1.8;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:inherit;resize:vertical;outline:none"></textarea>
+            <div id="calNote" style="display:none;font-size:11px;color:var(--text3);margin-top:8px">▦ 캘린더에 자동 등록됐어요
             </div>
           </div>
         </div>
       </div>
-      <div style="background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:1.25rem">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <div style="font-size:12px;font-weight:600;color:var(--text2)">📝 전사 텍스트</div>
+    </div>
+  </div>
 
-        </div>
-        <textarea id="transcriptArea" placeholder="녹음 시작 후 말씀하시면 자동으로 텍스트가 입력됩니다. [] 안의 내용은 인식 중인 텍스트예요." style="width:100%;min-height:100px;padding:10px;font-size:13px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:inherit;resize:vertical;outline:none"></textarea>
-      </div>
-      <!-- 내 메모 카드 -->
-      <div style="background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:1.25rem">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <div style="font-size:12px;font-weight:600;color:var(--text2)">✏️ 내 메모</div>
-          <button class="btn-ghost" id="tagSettingBtn" style="font-size:11px;padding:3px 10px">⚙ 태그 설정</button>
-        </div>
-        <!-- 빠른 태그 버튼 -->
-        <div id="quickTagsRow" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px"></div>
-        <textarea id="userNoteArea" placeholder="보충 설명, 결정사항, 액션 아이템 등을 자유롭게 입력하세요. #태그도 사용할 수 있어요." style="width:100%;min-height:100px;padding:10px;font-size:13px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:inherit;resize:vertical;outline:none"></textarea>
-        <!-- 태그 칩 필터 -->
-        <div id="noteTagChips" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:8px"></div>
-      </div>
-      <div style="background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:1.25rem">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px">
-          <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
-            <div style="font-size:12px;font-weight:600;color:var(--text2)">✅ 회의록 요약</div>
-            <span id="savedBadge" style="display:none;font-size:10px;font-weight:600;padding:2px 8px;border-radius:var(--pill);background:var(--green-bg);color:var(--green-t)">저장됨</span>
-            <span id="aiLoadingBadge" style="display:none;font-size:10px;color:var(--text3)">⏳ AI 요약 중...</span>
-          </div>
-          <button id="summarizeBtn" onclick="if(window.summarize)window.summarize()" style="padding:6px 14px;font-size:12px;font-weight:600;border:none;border-radius:var(--radius-sm);background:var(--text);color:var(--bg);cursor:pointer;white-space:nowrap;touch-action:manipulation;flex-shrink:0">✨ AI 요약</button>
-        </div>
-        <div style="font-size:11px;color:var(--text3);margin-bottom:10px">전사 텍스트 + 내 메모를 합쳐서 요약해요</div>
-        <textarea id="summaryArea" placeholder="AI 요약 결과가 여기에 표시돼요. 직접 수정도 가능해요." style="width:100%;min-height:180px;padding:10px;font-size:13px;line-height:1.8;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:inherit;resize:vertical;outline:none"></textarea>
-        <div id="calNote" style="display:none;font-size:11px;color:var(--text3);margin-top:8px">▦ 캘린더에 자동 등록됐어요</div>
+  <div class="overlay" id="tagSettingOverlay">
+    <div class="modal" style="max-width:380px">
+      <h3>태그 설정</h3>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:12px">쉼표로 구분해서 입력하세요. # 없이 입력해도 자동으로 붙어요.</p>
+      <div class="fg"><label>기본 태그</label><input id="tagSettingInput" placeholder="#회의, #결정, #액션아이템" /></div>
+      <div class="modal-btns">
+        <button class="btn-cancel" id="tagSettingCancelBtn">취소</button>
+        <button class="btn-ok" id="tagSettingOkBtn">저장</button>
       </div>
     </div>
   </div>
-</div>
-</div>
-
-<div class="overlay" id="tagSettingOverlay">
-  <div class="modal" style="max-width:380px">
-    <h3>태그 설정</h3>
-    <p style="font-size:13px;color:var(--text2);margin-bottom:12px">쉼표로 구분해서 입력하세요. # 없이 입력해도 자동으로 붙어요.</p>
-    <div class="fg"><label>기본 태그</label><input id="tagSettingInput" placeholder="#회의, #결정, #액션아이템"/></div>
-    <div class="modal-btns">
-      <button class="btn-cancel" id="tagSettingCancelBtn">취소</button>
-      <button class="btn-ok" id="tagSettingOkBtn">저장</button>
+  <div class="overlay" id="delOverlay">
+    <div class="modal" style="max-width:360px">
+      <h3>회의록 삭제</h3>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:1.25rem">이 회의록을 삭제할까요? 캘린더 일정도 함께 삭제돼요.</p>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn-cancel" id="delCancelBtn" onclick="if(window.closeOverlay)window.closeOverlay()"
+          style="touch-action:manipulation">취소</button>
+        <button class="btn-ok" id="delConfirmBtn" onclick="if(window.confirmDelete)window.confirmDelete()"
+          style="background:var(--red);touch-action:manipulation">삭제</button>
+      </div>
     </div>
   </div>
-</div>
-<div class="overlay" id="delOverlay">
-  <div class="modal" style="max-width:360px">
-    <h3>회의록 삭제</h3>
-    <p style="font-size:13px;color:var(--text2);margin-bottom:1.25rem">이 회의록을 삭제할까요? 캘린더 일정도 함께 삭제돼요.</p>
-    <div style="display:flex;gap:8px;justify-content:flex-end">
-      <button class="btn-cancel" id="delCancelBtn" onclick="if(window.closeOverlay)window.closeOverlay()" style="touch-action:manipulation">취소</button>
-      <button class="btn-ok" id="delConfirmBtn" onclick="if(window.confirmDelete)window.confirmDelete()" style="background:var(--red);touch-action:manipulation">삭제</button>
-    </div>
-  </div>
-</div>
-<div class="toast" id="toast"></div>
-<script>
-(function() {
-  var sess = localStorage.getItem('tt_user');
-  if (!sess) { location.href = 'index.html'; return; }
-  var u;
-  try { u = JSON.parse(sess); } catch(e) { localStorage.removeItem('tt_user'); sessionStorage.clear(); location.href = 'index.html'; return; }
-  if (!u || !u.id || !u.role) { localStorage.removeItem('tt_user'); sessionStorage.clear(); location.href = 'index.html'; return; }
-  var isMgr = u.role === 'manager' || u.role === 'admin';
-  var av = document.getElementById('sbAvatar');
-  var nm = document.getElementById('sbUserName');
-  var rl = document.getElementById('sbUserRole');
-  if (av) av.textContent = (u.displayName||'--').slice(0,2);
-  if (nm) nm.textContent = u.displayName||'';
-  if (rl) rl.textContent = isMgr ? '팀장' : '팀원';
-  // 팀원이면 내업무, 팀장이면 팀업무로 링크
-  var taskItem = document.getElementById('sbTaskItem');
-  var taskLabel = document.getElementById('sbTaskLabel');
-  if (taskItem && isMgr) { taskItem.dataset.nav = 'manager.html'; }
-  if (taskLabel && isMgr) { taskLabel.textContent = '팀 업무 현황'; }
-  // 어드민이면 관리메뉴 추가
-  if (u.role === 'admin' && !document.querySelector('[data-nav="admin.html"]')) {
-    var nav = document.getElementById('sbNav');
-    if (nav) {
-      var sec = document.createElement('div'); sec.className='sb-sec'; sec.textContent='관리';
-      var item = document.createElement('div'); item.className='sb-item'; item.dataset.nav='admin.html';
-      item.innerHTML='<div class="sb-icon">◯</div><div class="sb-label">계정 관리</div>';
-      nav.appendChild(sec); nav.appendChild(item);
-    }
-  }
-  document.getElementById('logoutBtn').onclick = function() {
-    localStorage.removeItem('tt_user'); sessionStorage.clear(); location.href = 'index.html';
-  };
-  document.querySelectorAll('[data-nav]').forEach(function(el) {
-    el.addEventListener('click', function() { location.href = el.dataset.nav; });
-  });
-
-  // ── 버튼 바인딩 (module defer 대응) ──
-  document.addEventListener('DOMContentLoaded', function() {
-    function bind(id, fn) {
-      var el = document.getElementById(id);
-      if (!el) return;
-      el.addEventListener('click', function() {
-        if (typeof fn === 'function') fn();
-        else if (window[fn]) window[fn]();
+  <div class="toast" id="toast"></div>
+  <script>
+    (function () {
+      var sess = localStorage.getItem('tt_user');
+      if (!sess) { location.href = 'index.html'; return; }
+      var u;
+      try { u = JSON.parse(sess); } catch (e) { localStorage.removeItem('tt_user'); sessionStorage.clear(); location.href = 'index.html'; return; }
+      if (!u || !u.id || !u.role) { localStorage.removeItem('tt_user'); sessionStorage.clear(); location.href = 'index.html'; return; }
+      var isMgr = u.role === 'manager' || u.role === 'admin';
+      var av = document.getElementById('sbAvatar');
+      var nm = document.getElementById('sbUserName');
+      var rl = document.getElementById('sbUserRole');
+      if (av) av.textContent = (u.displayName || '--').slice(0, 2);
+      if (nm) nm.textContent = u.displayName || '';
+      if (rl) rl.textContent = isMgr ? '팀장' : '팀원';
+      // 팀원이면 내업무, 팀장이면 팀업무로 링크
+      var taskItem = document.getElementById('sbTaskItem');
+      var taskLabel = document.getElementById('sbTaskLabel');
+      if (taskItem && isMgr) { taskItem.dataset.nav = 'manager.html'; }
+      if (taskLabel && isMgr) { taskLabel.textContent = '팀 업무 현황'; }
+      // 어드민이면 관리메뉴 추가
+      if (u.role === 'admin' && !document.querySelector('[data-nav="admin.html"]')) {
+        var nav = document.getElementById('sbNav');
+        if (nav) {
+          var sec = document.createElement('div'); sec.className = 'sb-sec'; sec.textContent = '관리';
+          var item = document.createElement('div'); item.className = 'sb-item'; item.dataset.nav = 'admin.html';
+          item.innerHTML = '<div class="sb-icon">◯</div><div class="sb-label">계정 관리</div>';
+          nav.appendChild(sec); nav.appendChild(item);
+        }
+      }
+      document.getElementById('logoutBtn').onclick = function () {
+        localStorage.removeItem('tt_user'); sessionStorage.clear(); location.href = 'index.html';
+      };
+      document.querySelectorAll('[data-nav]').forEach(function (el) {
+        el.addEventListener('click', function () { location.href = el.dataset.nav; });
       });
-    }
-    bind('newMeetingBtn',   'newMeeting');
-    bind('saveMeetingBtn',  'saveMeeting');
-    bind('copySummaryBtn',  'copySummary');
-    bind('deleteMeetingBtn','deleteMeeting');
-    bind('summarizeBtn',    'summarize');
-    // recBtn - touchstart + click 둘 다 바인딩
-    (function() {
-      var rb = document.getElementById('recBtn');
-      if (!rb) return;
-      var fired = false;
-      rb.addEventListener('touchstart', function(e) {
-        e.preventDefault();
-        if (fired) return;
-        fired = true;
-        setTimeout(function() { fired = false; }, 500);
-        if (window.toggleRec) window.toggleRec();
-      }, { passive: false });
-      rb.addEventListener('click', function() {
-        if (fired) return;
-        if (window.toggleRec) window.toggleRec();
+
+      // ── 버튼 바인딩 (module defer 대응) ──
+      document.addEventListener('DOMContentLoaded', function () {
+        function bind(id, fn) {
+          var el = document.getElementById(id);
+          if (!el) return;
+          el.addEventListener('click', function () {
+            if (typeof fn === 'function') fn();
+            else if (window[fn]) window[fn]();
+          });
+        }
+        bind('newMeetingBtn', 'newMeeting');
+        bind('saveMeetingBtn', 'saveMeeting');
+        bind('copySummaryBtn', 'copySummary');
+        bind('deleteMeetingBtn', 'deleteMeeting');
+        bind('summarizeBtn', 'summarize');
+        // recBtn - touchstart + click 둘 다 바인딩
+        (function () {
+          var rb = document.getElementById('recBtn');
+          if (!rb) return;
+          var fired = false;
+          rb.addEventListener('touchstart', function (e) {
+            e.preventDefault();
+            if (fired) return;
+            fired = true;
+            setTimeout(function () { fired = false; }, 500);
+            if (window.toggleRec) window.toggleRec();
+          }, { passive: false });
+          rb.addEventListener('click', function () {
+            if (fired) return;
+            if (window.toggleRec) window.toggleRec();
+          });
+        })();
+        bind('delConfirmBtn', 'confirmDelete');
+        bind('tagSettingBtn', 'openTagSetting');
+        bind('tagSettingOkBtn', 'saveTagSetting');
+        bind('tagSettingCancelBtn', function () { document.getElementById('tagSettingOverlay').classList.remove('show'); });
+        bind('delCancelBtn', function () { document.getElementById('delOverlay').classList.remove('show'); });
+
+        // 탭 전환
+        var tabP = document.getElementById('tabPersonal');
+        var tabS = document.getElementById('tabShared');
+        function setTab(mode) {
+          if (window._setCurMode) window._setCurMode(mode);
+          if (tabP) { tabP.style.borderBottomColor = mode === 'personal' ? 'var(--text)' : 'transparent'; tabP.style.color = mode === 'personal' ? 'var(--text)' : 'var(--text2)'; tabP.style.fontWeight = mode === 'personal' ? '500' : '400'; }
+          if (tabS) { tabS.style.borderBottomColor = mode === 'shared' ? 'var(--text)' : 'transparent'; tabS.style.color = mode === 'shared' ? 'var(--text)' : 'var(--text2)'; tabS.style.fontWeight = mode === 'shared' ? '500' : '400'; }
+        }
+        if (tabP) tabP.addEventListener('click', function () { setTab('personal'); });
+        if (tabS) tabS.addEventListener('click', function () { setTab('shared'); });
+
+        // 오버레이 닫기
+        document.querySelectorAll('.overlay').forEach(function (o) {
+          o.addEventListener('click', function (e) { if (e.target === e.currentTarget) o.classList.remove('show'); });
+        });
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape') document.querySelectorAll('.overlay.show').forEach(function (o) { o.classList.remove('show'); });
+        });
       });
     })();
-    bind('delConfirmBtn',   'confirmDelete');
-    bind('tagSettingBtn',   'openTagSetting');
-    bind('tagSettingOkBtn', 'saveTagSetting');
-    bind('tagSettingCancelBtn', function() { document.getElementById('tagSettingOverlay').classList.remove('show'); });
-    bind('delCancelBtn', function() { document.getElementById('delOverlay').classList.remove('show'); });
-
-    // 탭 전환
-    var tabP = document.getElementById('tabPersonal');
-    var tabS = document.getElementById('tabShared');
-    function setTab(mode) {
-      if (window._setCurMode) window._setCurMode(mode);
-      if (tabP) { tabP.style.borderBottomColor = mode==='personal'?'var(--text)':'transparent'; tabP.style.color = mode==='personal'?'var(--text)':'var(--text2)'; tabP.style.fontWeight = mode==='personal'?'500':'400'; }
-      if (tabS) { tabS.style.borderBottomColor = mode==='shared'?'var(--text)':'transparent'; tabS.style.color = mode==='shared'?'var(--text)':'var(--text2)'; tabS.style.fontWeight = mode==='shared'?'500':'400'; }
-    }
-    if (tabP) tabP.addEventListener('click', function() { setTab('personal'); });
-    if (tabS) tabS.addEventListener('click', function() { setTab('shared'); });
-
-    // 오버레이 닫기
-    document.querySelectorAll('.overlay').forEach(function(o) {
-      o.addEventListener('click', function(e) { if (e.target===e.currentTarget) o.classList.remove('show'); });
-    });
-    document.addEventListener('keydown', function(e) {
-      if (e.key==='Escape') document.querySelectorAll('.overlay.show').forEach(function(o) { o.classList.remove('show'); });
-    });
-  });
-})();
 
 
 
-// ── iOS 감지 및 녹음 UI 분기 ──
-(function() {
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-  const isSpeechSupported = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+    // ── iOS 감지 및 녹음 UI 분기 ──
+    (function () {
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      const isSpeechSupported = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
 
-  // [중요] 깃허브(GitHub) API 키 노출 경고를 피하기 위한 방법!
-  // 방금 털린 키는 폐기하시고, 새 키를 다시 발급받은 뒤 '반반씩' 쪼개서 넣어주세요!
-  window.KEY_PART_1 = "AIzaSyBn6-uXOTWaqdWFnm137";
-  window.KEY_PART_2 = "IbleyHuvQnHQXA";
-  window.GEMINI_API_KEY = window.KEY_PART_1 + window.KEY_PART_2;
-  const WORKER_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${window.GEMINI_API_KEY}`;
+      // [중요] 새로 발급받은 Groq API 키를 반반씩 쪼개서 넣어주세요!
+      // (예: gsk_XXXX... 형태의 키)
+      window.GROQ_KEY_PART_1 = "여기에_gsk_부터_앞부분절반";
+      window.GROQ_KEY_PART_2 = "나머지뒷부분";
+      window.GROQ_API_KEY = window.GROQ_KEY_PART_1 + window.GROQ_KEY_PART_2;
 
-  if (isIOS || !isSpeechSupported) {
-    // iOS: MediaRecorder로 녹음 → Gemini로 전사
-    const recWrap = document.getElementById('recWrap');
-    if (!recWrap) return;
+      if (isIOS || !isSpeechSupported) {
+        // iOS: MediaRecorder로 녹음 → Gemini로 전사
+        const recWrap = document.getElementById('recWrap');
+        if (!recWrap) return;
 
-    let mediaRecorder = null;
-    let audioChunks = [];
-    let recInterval = null;
-    let recSeconds = 0;
-    let isRec = false;
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let recInterval = null;
+        let recSeconds = 0;
+        let isRec = false;
 
-    recWrap.innerHTML = `
+        recWrap.innerHTML = `
       <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:12px">🎙 음성 녹음</div>
       <div style="display:flex;align-items:center;gap:14px;padding:4px 0">
         <button id="iosRecBtn" style="width:64px;height:64px;border-radius:50%;border:2px solid var(--border);cursor:pointer;font-size:26px;display:flex;align-items:center;justify-content:center;background:var(--bg);flex-shrink:0;touch-action:manipulation;box-shadow:0 2px 8px rgba(0,0,0,.1)">🎙</button>
@@ -714,461 +1887,458 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
       </div>
       <div id="iosTranscribing" style="display:none;margin-top:10px;font-size:12px;color:var(--text3)">⏳ Gemini AI가 전사 중...</div>`;
 
-    function updateTimer() {
-      recSeconds++;
-      const m = Math.floor(recSeconds/60), s = recSeconds%60;
-      const el = document.getElementById('iosRecTimer');
-      if(el) el.textContent = String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
-    }
+        function updateTimer() {
+          recSeconds++;
+          const m = Math.floor(recSeconds / 60), s = recSeconds % 60;
+          const el = document.getElementById('iosRecTimer');
+          if (el) el.textContent = String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+        }
 
-    async function transcribeAudio(blob) {
-      const st = document.getElementById('iosRecStatus');
-      const tr = document.getElementById('iosTranscribing');
-      if(st) st.textContent = 'Gemini AI 전사 중...';
-      if(tr) tr.style.display = '';
-      try {
-        // base64 변환
-        const reader = new FileReader();
-        const b64 = await new Promise((res, rej) => {
-          reader.onload = () => res(reader.result.split(',')[1]);
-          reader.onerror = rej;
-          reader.readAsDataURL(blob);
-        });
-        const mimeType = blob.type || 'audio/webm';
-        const resp = await fetch(
-          WORKER_URL,
-          {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-              contents: [{
-                parts: [
-                  {text: '다음 음성을 한국어로 전사해주세요. 발언 내용만 그대로 텍스트로 변환해주세요.'},
-                  {inline_data: {mime_type: mimeType, data: b64}}
-                ]
-              }]
-            })
+        async function transcribeAudio(blob) {
+          const st = document.getElementById('iosRecStatus');
+          const tr = document.getElementById('iosTranscribing');
+          if (st) st.textContent = 'Groq Whisper로 전사 중...';
+          if (tr) tr.style.display = '';
+          if (tr) tr.textContent = '⏳ 엄청난 속도로 전사 중 (Groq)...';
+          try {
+            const formData = new FormData();
+            const extension = blob.type.includes('mp4') ? 'mp4' : blob.type.includes('mp3') ? 'mp3' : 'webm';
+            formData.append('file', blob, `audio.${extension}`);
+            formData.append('model', 'whisper-large-v3');
+            formData.append('language', 'ko');
+            formData.append('response_format', 'json');
+
+            const resp = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${window.GROQ_API_KEY}`
+              },
+              body: formData
+            });
+            const data = await resp.json();
+            
+            if (!resp.ok) {
+              throw new Error(data.error?.message || 'Groq Audio API 에러');
+            }
+            
+            const text = data.text || '';
+            if (text) {
+              const ta = document.getElementById('transcriptArea');
+              if (ta) ta.value = (ta.value ? ta.value + '\n' : '') + text;
+              if (st) st.textContent = '✓ 전사 완료!';
+            } else {
+              if (st) st.textContent = '전사 결과가 없어요';
+            }
+          } catch (e) {
+            if (st) st.textContent = '전사 오류: ' + e.message;
+          } finally {
+            if (tr) tr.style.display = 'none';
           }
-        );
-        const data = await resp.json();
-        const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-        if(text) {
-          const ta = document.getElementById('transcriptArea');
-          if(ta) ta.value = (ta.value ? ta.value + '\n' : '') + text;
-          if(st) st.textContent = '✓ 전사 완료!';
-        } else {
-          if(st) st.textContent = '전사 결과가 없어요';
         }
-      } catch(e) {
-        if(st) st.textContent = '전사 오류: ' + e.message;
-      } finally {
-        if(tr) tr.style.display = 'none';
+
+        async function toggleIOSRec() {
+          const btn = document.getElementById('iosRecBtn');
+          const st = document.getElementById('iosRecStatus');
+          if (!isRec) {
+            try {
+              const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+              audioChunks = [];
+              const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' :
+                MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : 'audio/ogg';
+              mediaRecorder = new MediaRecorder(stream, { mimeType });
+              mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
+              mediaRecorder.onstop = async () => {
+                stream.getTracks().forEach(t => t.stop());
+                const blob = new Blob(audioChunks, { type: mimeType });
+                await transcribeAudio(blob);
+              };
+              mediaRecorder.start(1000);
+              isRec = true;
+              recSeconds = 0;
+              recInterval = setInterval(updateTimer, 1000);
+              if (btn) { btn.textContent = '⏹'; btn.style.background = 'var(--red-bg)'; btn.style.borderColor = 'var(--red)'; }
+              if (st) st.textContent = '녹음 중...';
+            } catch (e) {
+              if (st) st.textContent = '마이크 권한이 필요해요';
+            }
+          } else {
+            isRec = false;
+            clearInterval(recInterval);
+            if (mediaRecorder) mediaRecorder.stop();
+            if (btn) { btn.textContent = '🎙'; btn.style.background = 'var(--bg)'; btn.style.borderColor = 'var(--border)'; }
+            if (st) st.textContent = '녹음 중지됨 - 전사 중...';
+          }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+          var btn = document.getElementById('iosRecBtn');
+          if (btn) btn.addEventListener('click', toggleIOSRec);
+        });
       }
+    })();
+
+    // ── 모바일 햄버거 ──
+    (function () {
+      function openSB() {
+        var s = document.querySelector('.sidebar');
+        var d = document.getElementById('sidebarDim');
+        if (s) s.classList.add('open');
+        if (d) d.classList.add('show');
+        document.body.style.overflow = 'hidden';
+      }
+      function closeSB() {
+        var s = document.querySelector('.sidebar');
+        var d = document.getElementById('sidebarDim');
+        if (s) s.classList.remove('open');
+        if (d) d.classList.remove('show');
+        document.body.style.overflow = '';
+      }
+      var hb = document.getElementById('hamburgerBtn');
+      var dim = document.getElementById('sidebarDim');
+      if (hb) { hb.onclick = openSB; }
+      if (dim) { dim.onclick = closeSB; }
+      // 사이드바 nav 클릭시 닫기
+      document.querySelectorAll('.sidebar [data-nav]').forEach(function (el) {
+        el.addEventListener('click', closeSB);
+      });
+      // window에 노출 (외부에서 호출 가능)
+      window.openSidebar = openSB;
+      window.closeSidebar = closeSB;
+    })();
+
+
+  </script>
+  <script type="module">
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    // ════════════════════════════════════════════
+    // Firebase & 상수
+    // ════════════════════════════════════════════
+    const FC = { apiKey: "AIzaSyA7KylsSyT3_0oQvhBtcrPc-gcdfVq90IQ", authDomain: "gzplan.firebaseapp.com", projectId: "gzplan", storageBucket: "gzplan.firebasestorage.app", messagingSenderId: "186255862586", appId: "1:186255862586:web:f36d21f76012ca43b8fe03" };
+    const MEMBER_IDS = ["강신욱", "김용욱", "오문식", "이길우", "이도영", "이영찬", "이윤형"];
+    const db = getFirestore(initializeApp(FC));
+
+    // ════════════════════════════════════════════
+    // 인증
+    // ════════════════════════════════════════════
+    const sess = localStorage.getItem("tt_user");
+    if (!sess) { location.href = "index.html"; throw "" }
+    const ME = JSON.parse(sess);
+    if (!ME.id) { location.href = "index.html"; throw "" }
+    document.getElementById("sbUserName").textContent = ME.displayName;
+    window.logout = () => { localStorage.removeItem('tt_user'); sessionStorage.clear(); location.href = 'index.html' };
+
+
+    // ════════════════════════════════════════════
+    // 상태
+    // ════════════════════════════════════════════
+    let meetings = [], sharedMeetings = [];
+    let curId = null, curMode = 'personal';  // curMode: 'personal' | 'shared'
+    let attendees = [];
+    let isRecording = false, recognition = null, recInterval = null, recSeconds = 0;
+    let transcript = '', pendingDeleteId = null;
+    // 태그
+    const TAG_KEY = 'gz_meeting_tags';
+    let defaultTags = JSON.parse(localStorage.getItem(TAG_KEY) || '["#회의","#결정","#액션아이템"]');
+    function renderQuickTags() {
+      const el = document.getElementById('quickTagsRow');
+      if (!el) return;
+      el.innerHTML = defaultTags.map(t => `<button onclick="insertMeetingTag('${t}')" style="padding:3px 10px;border-radius:999px;font-size:11px;border:0.5px solid var(--border);background:transparent;color:var(--text2);cursor:pointer">${t}</button>`).join('');
+    }
+    window.insertMeetingTag = tag => {
+      const el = document.getElementById('userNoteArea');
+      const v = el.value, needSpace = v.length > 0 && !v.endsWith(' ') && !v.endsWith('\n');
+      el.value = (needSpace ? v + ' ' : v) + tag + ' '; el.focus();
+    };
+    function extractTags(text) { return [...new Set((text.match(/#[\w가-힣]+/g) || []))]; }
+
+    // ════════════════════════════════════════════
+    // 유틸
+    // ════════════════════════════════════════════
+    function toast(msg) {
+      const el = document.getElementById("toast");
+      el.textContent = msg; el.classList.add("show");
+      clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove("show"), 2400);
+    }
+    function toDatetimeLocal(d = new Date()) {
+      const pad = n => String(n).padStart(2, "0");
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+    function fmtDate(s) {
+      if (!s) return "-";
+      const d = new Date(s);
+      return `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}. ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
     }
 
-    async function toggleIOSRec() {
-      const btn = document.getElementById('iosRecBtn');
-      const st = document.getElementById('iosRecStatus');
-      if (!isRec) {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({audio: true});
-          audioChunks = [];
-          const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' :
-                           MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : 'audio/ogg';
-          mediaRecorder = new MediaRecorder(stream, {mimeType});
-          mediaRecorder.ondataavailable = e => { if(e.data.size > 0) audioChunks.push(e.data); };
-          mediaRecorder.onstop = async () => {
-            stream.getTracks().forEach(t => t.stop());
-            const blob = new Blob(audioChunks, {type: mimeType});
-            await transcribeAudio(blob);
-          };
-          mediaRecorder.start(1000);
-          isRec = true;
-          recSeconds = 0;
-          recInterval = setInterval(updateTimer, 1000);
-          if(btn) { btn.textContent = '⏹'; btn.style.background = 'var(--red-bg)'; btn.style.borderColor = 'var(--red)'; }
-          if(st) st.textContent = '녹음 중...';
-        } catch(e) {
-          if(st) st.textContent = '마이크 권한이 필요해요';
-        }
-      } else {
-        isRec = false;
-        clearInterval(recInterval);
-        if(mediaRecorder) mediaRecorder.stop();
-        if(btn) { btn.textContent = '🎙'; btn.style.background = 'var(--bg)'; btn.style.borderColor = 'var(--border)'; }
-        if(st) st.textContent = '녹음 중지됨 - 전사 중...';
-      }
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-      var btn = document.getElementById('iosRecBtn');
-      if(btn) btn.addEventListener('click', toggleIOSRec);
+    // ════════════════════════════════════════════
+    // Firestore 구독
+    // ════════════════════════════════════════════
+    // 개인 회의록 구독
+    onSnapshot(query(collection(db, 'meetings', ME.id, 'items'), orderBy('date', 'desc')), snap => {
+      meetings = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      if (curMode === 'personal') { renderSidebar(); if (curId) highlightSidebar(curId); }
     });
-  }
-})();
+    // 공통 회의록 구독
+    onSnapshot(query(collection(db, 'meetings_shared'), orderBy('date', 'desc')), snap => {
+      sharedMeetings = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      if (curMode === 'shared') { renderSidebar(); if (curId) highlightSidebar(curId); }
+    });
 
-// ── 모바일 햄버거 ──
-(function() {
-  function openSB() {
-    var s = document.querySelector('.sidebar');
-    var d = document.getElementById('sidebarDim');
-    if (s) s.classList.add('open');
-    if (d) d.classList.add('show');
-    document.body.style.overflow = 'hidden';
-  }
-  function closeSB() {
-    var s = document.querySelector('.sidebar');
-    var d = document.getElementById('sidebarDim');
-    if (s) s.classList.remove('open');
-    if (d) d.classList.remove('show');
-    document.body.style.overflow = '';
-  }
-  var hb = document.getElementById('hamburgerBtn');
-  var dim = document.getElementById('sidebarDim');
-  if (hb) { hb.onclick = openSB; }
-  if (dim) { dim.onclick = closeSB; }
-  // 사이드바 nav 클릭시 닫기
-  document.querySelectorAll('.sidebar [data-nav]').forEach(function(el) {
-    el.addEventListener('click', closeSB);
-  });
-  // window에 노출 (외부에서 호출 가능)
-  window.openSidebar = openSB;
-  window.closeSidebar = closeSB;
-})();
-
-
-</script>
-<script type="module">
-
-import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import{getFirestore,collection,doc,onSnapshot,addDoc,updateDoc,deleteDoc,query,orderBy}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-// ════════════════════════════════════════════
-// Firebase & 상수
-// ════════════════════════════════════════════
-const FC={apiKey:"AIzaSyA7KylsSyT3_0oQvhBtcrPc-gcdfVq90IQ",authDomain:"gzplan.firebaseapp.com",projectId:"gzplan",storageBucket:"gzplan.firebasestorage.app",messagingSenderId:"186255862586",appId:"1:186255862586:web:f36d21f76012ca43b8fe03"};
-const MEMBER_IDS=["강신욱","김용욱","오문식","이길우","이도영","이영찬","이윤형"];
-const db=getFirestore(initializeApp(FC));
-
-// ════════════════════════════════════════════
-// 인증
-// ════════════════════════════════════════════
-const sess=localStorage.getItem("tt_user");
-if(!sess){location.href="index.html";throw""}
-const ME=JSON.parse(sess);
-if(!ME.id){location.href="index.html";throw""}
-document.getElementById("sbUserName").textContent=ME.displayName;
-window.logout=()=>{localStorage.removeItem('tt_user'); sessionStorage.clear(); location.href = 'index.html'};
-
-
-// ════════════════════════════════════════════
-// 상태
-// ════════════════════════════════════════════
-let meetings=[], sharedMeetings=[];
-let curId=null, curMode='personal';  // curMode: 'personal' | 'shared'
-let attendees=[];
-let isRecording=false, recognition=null, recInterval=null, recSeconds=0;
-let transcript='', pendingDeleteId=null;
-// 태그
-const TAG_KEY='gz_meeting_tags';
-let defaultTags=JSON.parse(localStorage.getItem(TAG_KEY)||'["#회의","#결정","#액션아이템"]');
-function renderQuickTags(){
-  const el=document.getElementById('quickTagsRow');
-  if(!el)return;
-  el.innerHTML=defaultTags.map(t=>`<button onclick="insertMeetingTag('${t}')" style="padding:3px 10px;border-radius:999px;font-size:11px;border:0.5px solid var(--border);background:transparent;color:var(--text2);cursor:pointer">${t}</button>`).join('');
-}
-window.insertMeetingTag=tag=>{
-  const el=document.getElementById('userNoteArea');
-  const v=el.value, needSpace=v.length>0&&!v.endsWith(' ')&&!v.endsWith('\n');
-  el.value=(needSpace?v+' ':v)+tag+' '; el.focus();
-};
-function extractTags(text){return[...new Set((text.match(/#[\w가-힣]+/g)||[]))];}
-
-// ════════════════════════════════════════════
-// 유틸
-// ════════════════════════════════════════════
-function toast(msg){
-  const el=document.getElementById("toast");
-  el.textContent=msg;el.classList.add("show");
-  clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("show"),2400);
-}
-function toDatetimeLocal(d=new Date()){
-  const pad=n=>String(n).padStart(2,"0");
-  return`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
-function fmtDate(s){
-  if(!s)return"-";
-  const d=new Date(s);
-  return`${d.getFullYear()}. ${d.getMonth()+1}. ${d.getDate()}. ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
-}
-
-// ════════════════════════════════════════════
-// Firestore 구독
-// ════════════════════════════════════════════
-// 개인 회의록 구독
-onSnapshot(query(collection(db,'meetings',ME.id,'items'),orderBy('date','desc')),snap=>{
-  meetings=snap.docs.map(d=>({id:d.id,...d.data()}));
-  if(curMode==='personal'){renderSidebar();if(curId)highlightSidebar(curId);}
-});
-// 공통 회의록 구독
-onSnapshot(query(collection(db,'meetings_shared'),orderBy('date','desc')),snap=>{
-  sharedMeetings=snap.docs.map(d=>({id:d.id,...d.data()}));
-  if(curMode==='shared'){renderSidebar();if(curId)highlightSidebar(curId);}
-});
-
-// ════════════════════════════════════════════
-// 사이드바 렌더
-// ════════════════════════════════════════════
-function renderSidebar(){
-  const el=document.getElementById("sbList");
-  const list=curMode==='shared'?sharedMeetings:meetings;
-  if(!list.length){
-    el.innerHTML=`<div style="padding:2rem;text-align:center;color:var(--text3);font-size:13px;line-height:1.6">저장된 회의록이 없어요<br>새 회의를 시작해주세요</div>`;
-    return;
-  }
-  el.innerHTML=list.map(m=>{
-    const isShared=sharedMeetings.some(s=>s.authorId===ME.id&&s.srcId===m.id);
-    return `<div class="sb-meeting-item${curId===m.id?' active':''}" onclick="if(window.loadMeeting)window.loadMeeting('${m.id}')">
+    // ════════════════════════════════════════════
+    // 사이드바 렌더
+    // ════════════════════════════════════════════
+    function renderSidebar() {
+      const el = document.getElementById("sbList");
+      const list = curMode === 'shared' ? sharedMeetings : meetings;
+      if (!list.length) {
+        el.innerHTML = `<div style="padding:2rem;text-align:center;color:var(--text3);font-size:13px;line-height:1.6">저장된 회의록이 없어요<br>새 회의를 시작해주세요</div>`;
+        return;
+      }
+      el.innerHTML = list.map(m => {
+        const isShared = sharedMeetings.some(s => s.authorId === ME.id && s.srcId === m.id);
+        return `<div class="sb-meeting-item${curId === m.id ? ' active' : ''}" onclick="if(window.loadMeeting)window.loadMeeting('${m.id}')">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px">
         <div style="flex:1;min-width:0">
-          <div class="sb-item-title">${m.title||'(제목 없음)'}</div>
+          <div class="sb-item-title">${m.title || '(제목 없음)'}</div>
           <div class="sb-item-meta">${fmtDate(m.date)}</div>
-          ${m.tags&&m.tags.length?`<div style="margin-top:3px;font-size:10px;color:var(--blue-t)">${m.tags.join(' ')}</div>`:''}
+          ${m.tags && m.tags.length ? `<div style="margin-top:3px;font-size:10px;color:var(--blue-t)">${m.tags.join(' ')}</div>` : ''}
         </div>
-        ${curMode==='personal'?`<button onclick="event.stopPropagation();toggleShare('${m.id}')"
-          style="flex-shrink:0;padding:2px 7px;font-size:10px;border-radius:var(--pill);border:0.5px solid ${isShared?'var(--green)':'var(--border)'};background:${isShared?'var(--green-bg)':'transparent'};color:${isShared?'var(--green-t)':'var(--text3)'};cursor:pointer;white-space:nowrap">
-          ${isShared?'공유중':'공유'}
-        </button>`:''}
+        ${curMode === 'personal' ? `<button onclick="event.stopPropagation();toggleShare('${m.id}')"
+          style="flex-shrink:0;padding:2px 7px;font-size:10px;border-radius:var(--pill);border:0.5px solid ${isShared ? 'var(--green)' : 'var(--border)'};background:${isShared ? 'var(--green-bg)' : 'transparent'};color:${isShared ? 'var(--green-t)' : 'var(--text3)'};cursor:pointer;white-space:nowrap">
+          ${isShared ? '공유중' : '공유'}
+        </button>`: ''}
       </div>
     </div>`;
-  }).join('');
-}
-
-window.toggleShare=async(id)=>{
-  const m=meetings.find(x=>x.id===id);
-  if(!m)return;
-  const existing=sharedMeetings.find(s=>s.authorId===ME.id&&s.srcId===id);
-  try{
-    if(existing){
-      await deleteDoc(doc(db,'meetings_shared',existing.id));
-      toast('공유가 해제됐어요');
-    }else{
-      await addDoc(collection(db,'meetings_shared'),{...m,srcId:id,sharedAt:new Date().toISOString()});
-      toast('팀 전체에 공유됐어요 🌐');
+      }).join('');
     }
-  }catch(e){toast('오류: '+e.message);}
-};
 
-function highlightSidebar(id){
-  document.querySelectorAll(".sb-item").forEach(el=>{
-    el.classList.toggle("active",el.getAttribute("onclick")===`loadMeeting('${id}')`);
-  });
-}
+    window.toggleShare = async (id) => {
+      const m = meetings.find(x => x.id === id);
+      if (!m) return;
+      const existing = sharedMeetings.find(s => s.authorId === ME.id && s.srcId === id);
+      try {
+        if (existing) {
+          await deleteDoc(doc(db, 'meetings_shared', existing.id));
+          toast('공유가 해제됐어요');
+        } else {
+          await addDoc(collection(db, 'meetings_shared'), { ...m, srcId: id, sharedAt: new Date().toISOString() });
+          toast('팀 전체에 공유됐어요 🌐');
+        }
+      } catch (e) { toast('오류: ' + e.message); }
+    };
 
-// ════════════════════════════════════════════
-// 참석자 UI
-// ════════════════════════════════════════════
-function renderAttendees(){
-  // 텍스트 입력 방식으로 변경됨 - attendeeInput에서 직접 읽음
-  const aw = document.getElementById("attendeeWrap");
-  const mb = document.getElementById("memberBtnRow");
-  if(aw) aw.innerHTML = '';
-  if(mb) mb.innerHTML = '';
-}
+    function highlightSidebar(id) {
+      document.querySelectorAll(".sb-item").forEach(el => {
+        el.classList.toggle("active", el.getAttribute("onclick") === `loadMeeting('${id}')`);
+      });
+    }
 
-window.toggleAttendee=id=>{
-  attendees=attendees.includes(id)?attendees.filter(a=>a!==id):[...attendees,id];
-  renderAttendees();
-};
-window.removeAttendee=id=>{attendees=attendees.filter(a=>a!==id);renderAttendees()};
+    // ════════════════════════════════════════════
+    // 참석자 UI
+    // ════════════════════════════════════════════
+    function renderAttendees() {
+      // 텍스트 입력 방식으로 변경됨 - attendeeInput에서 직접 읽음
+      const aw = document.getElementById("attendeeWrap");
+      const mb = document.getElementById("memberBtnRow");
+      if (aw) aw.innerHTML = '';
+      if (mb) mb.innerHTML = '';
+    }
 
-// ════════════════════════════════════════════
-// 새 회의 / 불러오기
-// ════════════════════════════════════════════
-window.newMeeting=()=>{
-  curId=null;
-  attendees=[];
-  transcript="";
-  document.getElementById("meetTitle").value="";
-  document.getElementById("meetDate").value=toDatetimeLocal();
-  const attI=document.getElementById('attendeeInput');if(attI)attI.value='';
-  document.getElementById("transcriptArea").value="";
-  const una=document.getElementById("userNoteArea");if(una)una.value="";
-  document.getElementById("summaryArea").value="";
-  document.getElementById("savedBadge").style.display="none";
-  document.getElementById("deleteMeetingBtn").style.display="none";
-  document.getElementById("calNote").style.display="none";
-  const sc=document.getElementById("shareChk");if(sc)sc.checked=false;
-  renderAttendees();
-  // 녹음 영역 다시 표시 (새 회의)
-  const recWrap=document.getElementById("recWrap");
-  if(recWrap)recWrap.style.display="";
-  const savBtn=document.getElementById("saveMeetingBtn");
-  const delBtn=document.getElementById("deleteMeetingBtn");
-  if(savBtn)savBtn.style.display="";
-  if(delBtn)delBtn.style.display="none";
-  renderSidebar();
-  renderQuickTags();
-  stopRec();
-};
+    window.toggleAttendee = id => {
+      attendees = attendees.includes(id) ? attendees.filter(a => a !== id) : [...attendees, id];
+      renderAttendees();
+    };
+    window.removeAttendee = id => { attendees = attendees.filter(a => a !== id); renderAttendees() };
 
-window.loadMeeting=id=>{
-  const list=curMode==='shared'?sharedMeetings:meetings;
-  const m=list.find(x=>x.id===id);
-  if(!m)return;
-  curId=id;
-  attendees=m.attendees||[];
-  transcript=m.transcript||'';
-  document.getElementById('meetTitle').value=m.title||'';
-  const attInput=document.getElementById('attendeeInput');if(attInput)attInput.value=(m.attendees||[]).join(', ');
-  document.getElementById('meetDate').value=m.date?toDatetimeLocal(new Date(m.date)):'';
-  document.getElementById('transcriptArea').value=m.transcript||'';
-  document.getElementById('summaryArea').value=m.summary||'';
-  const una=document.getElementById('userNoteArea');if(una)una.value=m.userNote||'';
-  // 녹음 영역 숨기기 (저장된 회의록 보기)
-  const recWrap=document.getElementById('recWrap');
-  if(recWrap)recWrap.style.display='none';
-  // 버튼 상태
-  document.getElementById('savedBadge').style.display='';
-  document.getElementById('deleteMeetingBtn').style.display=
-    (curMode==='shared'&&m.authorId!==ME.id)?'none':'';
-  document.getElementById('saveMeetingBtn').style.display=
-    (curMode==='shared'&&m.authorId!==ME.id)?'none':'';
-  if(m.calendarId)document.getElementById('calNote').style.display='';
-  renderAttendees();
-  highlightSidebar(id);
-};
+    // ════════════════════════════════════════════
+    // 새 회의 / 불러오기
+    // ════════════════════════════════════════════
+    window.newMeeting = () => {
+      curId = null;
+      attendees = [];
+      transcript = "";
+      document.getElementById("meetTitle").value = "";
+      document.getElementById("meetDate").value = toDatetimeLocal();
+      const attI = document.getElementById('attendeeInput'); if (attI) attI.value = '';
+      document.getElementById("transcriptArea").value = "";
+      const una = document.getElementById("userNoteArea"); if (una) una.value = "";
+      document.getElementById("summaryArea").value = "";
+      document.getElementById("savedBadge").style.display = "none";
+      document.getElementById("deleteMeetingBtn").style.display = "none";
+      document.getElementById("calNote").style.display = "none";
+      const sc = document.getElementById("shareChk"); if (sc) sc.checked = false;
+      renderAttendees();
+      // 녹음 영역 다시 표시 (새 회의)
+      const recWrap = document.getElementById("recWrap");
+      if (recWrap) recWrap.style.display = "";
+      const savBtn = document.getElementById("saveMeetingBtn");
+      const delBtn = document.getElementById("deleteMeetingBtn");
+      if (savBtn) savBtn.style.display = "";
+      if (delBtn) delBtn.style.display = "none";
+      renderSidebar();
+      renderQuickTags();
+      stopRec();
+    };
 
-window.toggleRec=()=>{isRecording?stopRec():startRec()};
+    window.loadMeeting = id => {
+      const list = curMode === 'shared' ? sharedMeetings : meetings;
+      const m = list.find(x => x.id === id);
+      if (!m) return;
+      curId = id;
+      attendees = m.attendees || [];
+      transcript = m.transcript || '';
+      document.getElementById('meetTitle').value = m.title || '';
+      const attInput = document.getElementById('attendeeInput'); if (attInput) attInput.value = (m.attendees || []).join(', ');
+      document.getElementById('meetDate').value = m.date ? toDatetimeLocal(new Date(m.date)) : '';
+      document.getElementById('transcriptArea').value = m.transcript || '';
+      document.getElementById('summaryArea').value = m.summary || '';
+      const una = document.getElementById('userNoteArea'); if (una) una.value = m.userNote || '';
+      // 녹음 영역 숨기기 (저장된 회의록 보기)
+      const recWrap = document.getElementById('recWrap');
+      if (recWrap) recWrap.style.display = 'none';
+      // 버튼 상태
+      document.getElementById('savedBadge').style.display = '';
+      document.getElementById('deleteMeetingBtn').style.display =
+        (curMode === 'shared' && m.authorId !== ME.id) ? 'none' : '';
+      document.getElementById('saveMeetingBtn').style.display =
+        (curMode === 'shared' && m.authorId !== ME.id) ? 'none' : '';
+      if (m.calendarId) document.getElementById('calNote').style.display = '';
+      renderAttendees();
+      highlightSidebar(id);
+    };
 
-function initSpeechRecognition(){
-  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){
-    document.getElementById("recContent").innerHTML=`
+    window.toggleRec = () => { isRecording ? stopRec() : startRec() };
+
+    function initSpeechRecognition() {
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) {
+        document.getElementById("recContent").innerHTML = `
       <div style="padding:1rem;text-align:center;color:var(--text2)">
         <p style="font-size:16px;margin-bottom:8px">🌐</p>
         <p style="font-size:14px;font-weight:600;margin-bottom:6px;color:var(--text)">Chrome에서 접속해주세요</p>
         <p style="font-size:12px;line-height:1.7;color:var(--text3)">녹음 기능은 Chrome 브라우저에서만 작동해요.<br>iOS는 App Store에서 Chrome 앱을 설치 후 접속해주세요.</p>
       </div>`;
-    return false;
-  }
-  recognition=new SR();
-  recognition.lang="ko-KR";
-  recognition.continuous=true;
-  recognition.interimResults=true;
-  recognition.maxAlternatives=1;
-  recognition.onstart=()=>{
-    isRecording=true;
-    recSeconds=0;
-    const btn=document.getElementById("recBtn");
-    if(btn){btn.textContent="⏹";btn.disabled=false;btn.classList.add("recording");}
-    const st=document.getElementById("recStatus");
-    if(st){st.textContent="녹음 중... (조용한 환경에서 명확하게 말씀해주세요)";st.className="rec-status active";}
-    recInterval=setInterval(()=>{
-      recSeconds++;
-      const m=Math.floor(recSeconds/60),s=recSeconds%60;
-      const rt=document.getElementById("recTimer");
-      if(rt)rt.textContent=String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");
-    },1000);
-  };
-  recognition.onresult=e=>{
-    let interim="",final="";
-    for(let i=e.resultIndex;i<e.results.length;i++){
-      const result=e.results[i];
-      if(result.isFinal){
-        // confidence 0.5 이상인 결과만 사용
-        if(result[0].confidence>0.3||result[0].confidence===0){
-          final+=result[0].transcript;
+        return false;
+      }
+      recognition = new SR();
+      recognition.lang = "ko-KR";
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.maxAlternatives = 1;
+      recognition.onstart = () => {
+        isRecording = true;
+        recSeconds = 0;
+        const btn = document.getElementById("recBtn");
+        if (btn) { btn.textContent = "⏹"; btn.disabled = false; btn.classList.add("recording"); }
+        const st = document.getElementById("recStatus");
+        if (st) { st.textContent = "녹음 중... (조용한 환경에서 명확하게 말씀해주세요)"; st.className = "rec-status active"; }
+        recInterval = setInterval(() => {
+          recSeconds++;
+          const m = Math.floor(recSeconds / 60), s = recSeconds % 60;
+          const rt = document.getElementById("recTimer");
+          if (rt) rt.textContent = String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
+        }, 1000);
+      };
+      recognition.onresult = e => {
+        let interim = "", final = "";
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+          const result = e.results[i];
+          if (result.isFinal) {
+            // confidence 0.5 이상인 결과만 사용
+            if (result[0].confidence > 0.3 || result[0].confidence === 0) {
+              final += result[0].transcript;
+            }
+          } else {
+            interim += result[0].transcript;
+          }
         }
-      } else {
-        interim+=result[0].transcript;
+        if (final) {
+          transcript += final + " ";
+        }
+        const ta = document.getElementById("transcriptArea");
+        if (ta) ta.value = transcript + (interim ? '[' + interim + ']' : '');
+      };
+      recognition.onerror = e => {
+        if (e.error === "no-speech") return;
+        if (e.error === "not-allowed") {
+          toast("마이크 권한이 필요해요. 브라우저 설정에서 허용해주세요.");
+          const btn = document.getElementById("recBtn");
+          if (btn) { btn.textContent = "🎙"; btn.disabled = false; }
+          const st = document.getElementById("recStatus");
+          if (st) st.textContent = "마이크 권한이 거부됐어요";
+          isRecording = false; return;
+        }
+        toast("녹음 오류: " + e.error);
+        stopRec();
+      };
+      recognition.onend = () => {
+        if (isRecording) {
+          try { recognition.start(); } catch (e) { }
+        }
+      };
+      return true;
+    }
+
+    function startRec() {
+      if (!recognition && !initSpeechRecognition()) return;
+      // 권한 요청 중 상태
+      const btn = document.getElementById("recBtn");
+      btn.textContent = "⏳"; btn.disabled = true;
+      document.getElementById("recStatus").textContent = "마이크 권한 확인 중...";
+
+      // 실제 시작은 onstart 콜백에서 처리
+      try {
+        recognition.start();
+      } catch (e) {
+        btn.textContent = "🎙"; btn.disabled = false;
+        document.getElementById("recStatus").textContent = "녹음을 시작할 수 없어요: " + e.message;
+        isRecording = false;
       }
     }
-    if(final){
-      transcript+=final+" ";
+
+    function stopRec() {
+      isRecording = false;
+      clearInterval(recInterval);
+      recInterval = null;
+      if (recognition) try { recognition.stop(); } catch (e) { }
+      const btn = document.getElementById("recBtn");
+      if (btn) { btn.textContent = "🎙"; btn.disabled = false; btn.classList.remove("recording"); }
+      const st = document.getElementById("recStatus");
+      if (st) { st.textContent = "녹음이 중지됐어요"; st.className = "rec-status"; }
+      const rt = document.getElementById("recTimer");
+      if (rt) rt.textContent = "00:00";
     }
-    const ta=document.getElementById("transcriptArea");
-    if(ta) ta.value=transcript+(interim?'['+interim+']':'');
-  };
-  recognition.onerror=e=>{
-    if(e.error==="no-speech")return;
-    if(e.error==="not-allowed"){
-      toast("마이크 권한이 필요해요. 브라우저 설정에서 허용해주세요.");
-      const btn=document.getElementById("recBtn");
-      if(btn){btn.textContent="🎙";btn.disabled=false;}
-      const st=document.getElementById("recStatus");
-      if(st)st.textContent="마이크 권한이 거부됐어요";
-      isRecording=false;return;
-    }
-    toast("녹음 오류: "+e.error);
-    stopRec();
-  };
-  recognition.onend=()=>{
-    if(isRecording){
-      try{recognition.start();}catch(e){}
-    }
-  };
-  return true;
-}
 
-function startRec(){
-  if(!recognition&&!initSpeechRecognition())return;
-  // 권한 요청 중 상태
-  const btn=document.getElementById("recBtn");
-  btn.textContent="⏳";btn.disabled=true;
-  document.getElementById("recStatus").textContent="마이크 권한 확인 중...";
+    window.clearTranscript = () => {
+      if (!confirm("전사 텍스트를 초기화할까요?")) return;
+      transcript = "";
+      document.getElementById("transcriptArea").value = "";
+    };
 
-  // 실제 시작은 onstart 콜백에서 처리
-  try {
-    recognition.start();
-  } catch(e) {
-    btn.textContent="🎙";btn.disabled=false;
-    document.getElementById("recStatus").textContent="녹음을 시작할 수 없어요: "+e.message;
-    isRecording=false;
-  }
-}
+    // ════════════════════════════════════════════
+    // Claude AI 요약
+    // ════════════════════════════════════════════
+    window.summarize = async () => {
+      const text = document.getElementById("transcriptArea").value.trim();
+      const userNote = document.getElementById("userNoteArea")?.value.trim() || "";
+      if (!text && !userNote) { toast("전사 텍스트 또는 메모를 먼저 입력해주세요"); return }
+      const btn = document.getElementById("summarizeBtn");
+      btn.disabled = true;
+      document.getElementById("aiLoadingBadge").style.display = "flex";
+      document.getElementById("summaryArea").value = "";
 
-function stopRec(){
-  isRecording=false;
-  clearInterval(recInterval);
-  recInterval=null;
-  if(recognition)try{recognition.stop();}catch(e){}
-  const btn=document.getElementById("recBtn");
-  if(btn){btn.textContent="🎙";btn.disabled=false;btn.classList.remove("recording");}
-  const st=document.getElementById("recStatus");
-  if(st){st.textContent="녹음이 중지됐어요";st.className="rec-status";}
-  const rt=document.getElementById("recTimer");
-  if(rt)rt.textContent="00:00";
-}
-
-window.clearTranscript=()=>{
-  if(!confirm("전사 텍스트를 초기화할까요?"))return;
-  transcript="";
-  document.getElementById("transcriptArea").value="";
-};
-
-// ════════════════════════════════════════════
-// Claude AI 요약
-// ════════════════════════════════════════════
-window.summarize=async()=>{
-  const text=document.getElementById("transcriptArea").value.trim();
-  const userNote=document.getElementById("userNoteArea")?.value.trim()||"";
-  if(!text && !userNote){toast("전사 텍스트 또는 메모를 먼저 입력해주세요");return}
-  const btn=document.getElementById("summarizeBtn");
-  btn.disabled=true;
-  document.getElementById("aiLoadingBadge").style.display="flex";
-  document.getElementById("summaryArea").value="";
-
-  const title=document.getElementById("meetTitle").value.trim()||"회의";
-  const date=document.getElementById("meetDate").value;
-  const atts=attendees.join(", ")||"미기록";
-  // userNote는 위에서 이미 읽음
-  const noteSection = userNote ? `
+      const title = document.getElementById("meetTitle").value.trim() || "회의";
+      const date = document.getElementById("meetDate").value;
+      const atts = attendees.join(", ") || "미기록";
+      // userNote는 위에서 이미 읽음
+      const noteSection = userNote ? `
 [내 메모 및 보충 내용]
 ${userNote}` : '';
-  const combinedText = text || '(전사 없음)';
-  const prompt=`다음은 "${title}" 회의 내용입니다.
-일시: ${date?new Date(date).toLocaleString("ko-KR"):"미기록"}
+      const combinedText = text || '(전사 없음)';
+      const prompt = `다음은 "${title}" 회의 내용입니다.
+일시: ${date ? new Date(date).toLocaleString("ko-KR") : "미기록"}
 참석자: ${atts}
 
 [전사 텍스트]
@@ -1192,209 +2362,212 @@ ${noteSection}
 
 [태그]: (내 메모의 #태그들, 없으면 생략)`;
 
-  try{
-    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${window.GEMINI_API_KEY}`,{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        contents:[{parts:[{text:prompt}]}],
-        generationConfig:{maxOutputTokens:1500,temperature:0.3}
-      })
-    });
-    const data=await res.json();
-    // API 오류 체크
-    if(data.error){
-      throw new Error(data.error.message||"API 오류: "+JSON.stringify(data.error));
-    }
-    // 안전 필터로 블록된 경우
-    if(data.candidates?.[0]?.finishReason==="SAFETY"){
-      throw new Error("안전 필터에 의해 차단됐어요");
-    }
-    if(data.promptFeedback?.blockReason){
-      throw new Error("요청이 차단됐어요: "+data.promptFeedback.blockReason);
-    }
-    const summary=data.candidates?.[0]?.content?.parts?.[0]?.text;
-    if(!summary){
-      const reason = data.candidates?.[0]?.finishReason || "알 수 없음";
-      throw new Error("응답 없음 (이유: "+reason+")");
-    }
-    document.getElementById("summaryArea").value=summary;
-    toast("요약이 완료됐어요 ✓");
-  }catch(e){
-    console.error("요약 오류:", e);
-    toast("요약 실패: "+e.message);
-    document.getElementById("summaryArea").value="";
-  }finally{
-    btn.disabled=false;
-    document.getElementById("aiLoadingBadge").style.display="none";
-  }
-};
-
-// ════════════════════════════════════════════
-// 저장
-// ════════════════════════════════════════════
-window.saveMeeting=async()=>{
-  const title=document.getElementById("meetTitle").value.trim();
-  const date=document.getElementById("meetDate").value;
-  const transcript=document.getElementById("transcriptArea").value.trim();
-  const userNote=document.getElementById("userNoteArea").value.trim();
-  const summary=document.getElementById("summaryArea").value.trim();
-  const isShared=document.getElementById("shareChk")?.checked||false;
-  if(!title){toast("회의 제목을 입력해주세요");return}
-
-  const tags=[...new Set([
-    ...(userNote.match(/#[\w가-힣]+/g)||[]),
-    ...(summary.match(/#[\w가-힣]+/g)||[])
-  ])];
-  const attendeeText=document.getElementById('attendeeInput')?.value||'';
-  const attendees_arr=attendeeText?attendeeText.split(',').map(s=>s.trim()).filter(Boolean):[];
-  const data={title,date,attendees:attendees_arr,transcript,userNote,summary,tags,
-    authorId:ME.id,author:ME.displayName,updatedAt:new Date().toISOString()};
-
-  try{
-    if(curId){
-      const wasShared=curMode==='shared';
-      if(wasShared===isShared){
-        // 공유 상태 그대로 — 현재 위치에서 업데이트
-        await updateDoc(
-          wasShared ? doc(db,'meetings_shared',curId) : doc(db,'meetings',ME.id,'items',curId),
-          data);
-        toast("회의록이 수정됐어요 ✓");
-      }else if(!wasShared&&isShared){
-        // 개인 → 공유: meetings_shared로 이동
-        const orig=(meetings).find(x=>x.id===curId);
-        const newRef=await addDoc(collection(db,'meetings_shared'),{...data,createdAt:orig?.createdAt||new Date().toISOString()});
-        await deleteDoc(doc(db,'meetings',ME.id,'items',curId));
-        curId=newRef.id; curMode='shared';
-        toast("팀 전체에 공유됐어요 ✓");
-      }else{
-        // 공유 → 개인: 개인 컬렉션으로 이동
-        const orig=sharedMeetings.find(x=>x.id===curId);
-        const newRef=await addDoc(collection(db,'meetings',ME.id,'items'),{...data,createdAt:orig?.createdAt||new Date().toISOString()});
-        await deleteDoc(doc(db,'meetings_shared',curId));
-        curId=newRef.id; curMode='personal';
-        toast("개인 회의록으로 변경됐어요 ✓");
+      try {
+        const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${window.GROQ_API_KEY}`
+          },
+          body: JSON.stringify({
+            model: "llama-3.3-70b-versatile",
+            messages: [
+              { role: "system", content: "당신은 매우 유능하고 스마트한 회의록 전문 AI입니다." },
+              { role: "user", content: prompt }
+            ],
+            max_tokens: 1500,
+            temperature: 0.3
+          })
+        });
+        const data = await res.json();
+        // API 오류 체크
+        if (!res.ok || data.error) {
+          throw new Error((data.error?.message) || JSON.stringify(data.error) || "알 수 없는 Groq API 에러");
+        }
+        const summary = data.choices?.[0]?.message?.content;
+        if (!summary) {
+          throw new Error("응답 없음");
+        }
+        document.getElementById("summaryArea").value = summary;
+        toast("요약이 완료됐어요 ✓");
+      } catch (e) {
+        console.error("요약 오류:", e);
+        toast("요약 실패: " + e.message);
+        document.getElementById("summaryArea").value = "";
+      } finally {
+        btn.disabled = false;
+        document.getElementById("aiLoadingBadge").style.display = "none";
       }
-    }else{
-      data.createdAt=new Date().toISOString();
-      // 캘린더 자동 등록
-      const calData={
-        title:"📋 "+title,
-        category:"meeting",
-        startDate:date?date.split("T")[0]:new Date().toISOString().split("T")[0],
-        endDate:date?date.split("T")[0]:new Date().toISOString().split("T")[0],
-        memo:`참석자: ${attendees.join(", ")||"미기록"}`,
-        type:"personal",
-        author:ME.displayName,
-        authorId:ME.id,
-        repeat:{type:"none"},
-        createdAt:new Date().toISOString(),
-        updatedAt:new Date().toISOString(),
+    };
+
+    // ════════════════════════════════════════════
+    // 저장
+    // ════════════════════════════════════════════
+    window.saveMeeting = async () => {
+      const title = document.getElementById("meetTitle").value.trim();
+      const date = document.getElementById("meetDate").value;
+      const transcript = document.getElementById("transcriptArea").value.trim();
+      const userNote = document.getElementById("userNoteArea").value.trim();
+      const summary = document.getElementById("summaryArea").value.trim();
+      const isShared = document.getElementById("shareChk")?.checked || false;
+      if (!title) { toast("회의 제목을 입력해주세요"); return }
+
+      const tags = [...new Set([
+        ...(userNote.match(/#[\w가-힣]+/g) || []),
+        ...(summary.match(/#[\w가-힣]+/g) || [])
+      ])];
+      const attendeeText = document.getElementById('attendeeInput')?.value || '';
+      const attendees_arr = attendeeText ? attendeeText.split(',').map(s => s.trim()).filter(Boolean) : [];
+      const data = {
+        title, date, attendees: attendees_arr, transcript, userNote, summary, tags,
+        authorId: ME.id, author: ME.displayName, updatedAt: new Date().toISOString()
       };
-      const calRef=await addDoc(collection(db,"schedules"),calData);
-      data.calendarId=calRef.id;
-      const ref=await addDoc(
-        isShared ? collection(db,'meetings_shared') : collection(db,'meetings',ME.id,'items'),
-        data);
-      curId=ref.id;
-      document.getElementById("deleteMeetingBtn").style.display="";
-      document.getElementById("calNote").style.display="";
-      toast("회의록이 저장됐어요 ✓ 캘린더에도 등록됐어요");
-    }
-    document.getElementById("savedBadge").style.display="";
-  }catch(e){
-    toast("저장 오류: "+e.message);
-  }
-};
 
-// ════════════════════════════════════════════
-// 복사
-// ════════════════════════════════════════════
-window.copySummary=()=>{
-  const text=document.getElementById("summaryArea").value.trim();
-  if(!text){toast("요약 내용이 없어요");return}
-  const title=document.getElementById("meetTitle").value.trim();
-  const full=title?`[${title}]
+      try {
+        if (curId) {
+          const wasShared = curMode === 'shared';
+          if (wasShared === isShared) {
+            // 공유 상태 그대로 — 현재 위치에서 업데이트
+            await updateDoc(
+              wasShared ? doc(db, 'meetings_shared', curId) : doc(db, 'meetings', ME.id, 'items', curId),
+              data);
+            toast("회의록이 수정됐어요 ✓");
+          } else if (!wasShared && isShared) {
+            // 개인 → 공유: meetings_shared로 이동
+            const orig = (meetings).find(x => x.id === curId);
+            const newRef = await addDoc(collection(db, 'meetings_shared'), { ...data, createdAt: orig?.createdAt || new Date().toISOString() });
+            await deleteDoc(doc(db, 'meetings', ME.id, 'items', curId));
+            curId = newRef.id; curMode = 'shared';
+            toast("팀 전체에 공유됐어요 ✓");
+          } else {
+            // 공유 → 개인: 개인 컬렉션으로 이동
+            const orig = sharedMeetings.find(x => x.id === curId);
+            const newRef = await addDoc(collection(db, 'meetings', ME.id, 'items'), { ...data, createdAt: orig?.createdAt || new Date().toISOString() });
+            await deleteDoc(doc(db, 'meetings_shared', curId));
+            curId = newRef.id; curMode = 'personal';
+            toast("개인 회의록으로 변경됐어요 ✓");
+          }
+        } else {
+          data.createdAt = new Date().toISOString();
+          // 캘린더 자동 등록
+          const calData = {
+            title: "📋 " + title,
+            category: "meeting",
+            startDate: date ? date.split("T")[0] : new Date().toISOString().split("T")[0],
+            endDate: date ? date.split("T")[0] : new Date().toISOString().split("T")[0],
+            memo: `참석자: ${attendees.join(", ") || "미기록"}`,
+            type: "personal",
+            author: ME.displayName,
+            authorId: ME.id,
+            repeat: { type: "none" },
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          };
+          const calRef = await addDoc(collection(db, "schedules"), calData);
+          data.calendarId = calRef.id;
+          const ref = await addDoc(
+            isShared ? collection(db, 'meetings_shared') : collection(db, 'meetings', ME.id, 'items'),
+            data);
+          curId = ref.id;
+          document.getElementById("deleteMeetingBtn").style.display = "";
+          document.getElementById("calNote").style.display = "";
+          toast("회의록이 저장됐어요 ✓ 캘린더에도 등록됐어요");
+        }
+        document.getElementById("savedBadge").style.display = "";
+      } catch (e) {
+        toast("저장 오류: " + e.message);
+      }
+    };
 
-${text}`:text;
-  navigator.clipboard.writeText(full).then(()=>toast("클립보드에 복사됐어요 ✓")).catch(()=>{
-    // 폴백
-    const ta=document.createElement("textarea");
-    ta.value=full;document.body.appendChild(ta);ta.select();document.execCommand("copy");document.body.removeChild(ta);
-    toast("클립보드에 복사됐어요 ✓");
-  });
-};
+    // ════════════════════════════════════════════
+    // 복사
+    // ════════════════════════════════════════════
+    window.copySummary = () => {
+      const text = document.getElementById("summaryArea").value.trim();
+      if (!text) { toast("요약 내용이 없어요"); return }
+      const title = document.getElementById("meetTitle").value.trim();
+      const full = title ? `[${title}]
 
-// ════════════════════════════════════════════
-// 삭제
-// ════════════════════════════════════════════
-window.deleteMeeting=()=>{
-  if(!curId)return;
-  pendingDeleteId=curId;
-  document.getElementById("delOverlay").classList.add("show");
-};
+${text}` : text;
+      navigator.clipboard.writeText(full).then(() => toast("클립보드에 복사됐어요 ✓")).catch(() => {
+        // 폴백
+        const ta = document.createElement("textarea");
+        ta.value = full; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); document.body.removeChild(ta);
+        toast("클립보드에 복사됐어요 ✓");
+      });
+    };
 
-window.confirmDelete=async()=>{
-  const m=(curMode==='shared'?sharedMeetings:meetings).find(x=>x.id===pendingDeleteId);
-  if(m?.calendarId){
-    try{await deleteDoc(doc(db,"schedules",m.calendarId))}catch(e){}
-  }
-  await deleteDoc(curMode==='shared'
-      ? doc(db,'meetings_shared',pendingDeleteId)
-      : doc(db,'meetings',ME.id,'items',pendingDeleteId));
-  window.closeOverlay();
-  window.newMeeting();
-  toast('회의록을 삭제했어요');
-};
+    // ════════════════════════════════════════════
+    // 삭제
+    // ════════════════════════════════════════════
+    window.deleteMeeting = () => {
+      if (!curId) return;
+      pendingDeleteId = curId;
+      document.getElementById("delOverlay").classList.add("show");
+    };
 
-window.closeOverlay=()=>document.getElementById("delOverlay").classList.remove("show");
-document.getElementById("delOverlay").addEventListener("click",e=>{if(e.target===e.currentTarget)closeOverlay()});
+    window.confirmDelete = async () => {
+      const m = (curMode === 'shared' ? sharedMeetings : meetings).find(x => x.id === pendingDeleteId);
+      if (m?.calendarId) {
+        try { await deleteDoc(doc(db, "schedules", m.calendarId)) } catch (e) { }
+      }
+      await deleteDoc(curMode === 'shared'
+        ? doc(db, 'meetings_shared', pendingDeleteId)
+        : doc(db, 'meetings', ME.id, 'items', pendingDeleteId));
+      window.closeOverlay();
+      window.newMeeting();
+      toast('회의록을 삭제했어요');
+    };
 
-// ════════════════════════════════════════════
-// 초기화
-// ════════════════════════════════════════════
+    window.closeOverlay = () => document.getElementById("delOverlay").classList.remove("show");
+    document.getElementById("delOverlay").addEventListener("click", e => { if (e.target === e.currentTarget) closeOverlay() });
 
-window.openTagSetting=()=>{
-  document.getElementById('tagSettingInput').value=defaultTags.join(', ');
-  document.getElementById('tagSettingOverlay').classList.add('show');
-  setTimeout(()=>document.getElementById('tagSettingInput').focus(),80);
-};
-window.saveTagSetting=()=>{
-  const val=document.getElementById('tagSettingInput').value;
-  defaultTags=val.split(',').map(t=>t.trim()).filter(t=>t).map(t=>t.startsWith('#')?t:'#'+t);
-  localStorage.setItem(TAG_KEY,JSON.stringify(defaultTags));
-  renderQuickTags();
-  document.getElementById('tagSettingOverlay').classList.remove('show');
-  toast('태그 설정 저장됐어요 ✓');
-};
+    // ════════════════════════════════════════════
+    // 초기화
+    // ════════════════════════════════════════════
 
-window._setCurMode=(mode)=>{
-  curMode=mode;
-  curId=null;
-  renderSidebar();
-  // 탭 전환 시 새 회의록 상태로
-  const pt=document.getElementById('meetPageTitle');
-  if(pt) pt.textContent = mode==='shared' ? '🌐 공통 회의록' : '새 회의록';
-  // 녹음 영역은 새 회의일 때만 표시
-  const recWrap=document.getElementById('recWrap');
-  if(recWrap) recWrap.style.display = mode==='personal' ? '' : 'none';
-  // 입력 필드 초기화
-  ['meetTitle','transcriptArea','summaryArea','userNoteArea'].forEach(id=>{
-    const el=document.getElementById(id); if(el) el.value='';
-  });
-  const attI=document.getElementById('attendeeInput'); if(attI) attI.value='';
-  const sc=document.getElementById('shareChk'); if(sc) sc.checked=(mode==='shared');
-  document.getElementById('savedBadge').style.display='none';
-  document.getElementById('deleteMeetingBtn').style.display='none';
-};
-window.newMeeting();
-renderQuickTags();
-initSpeechRecognition();
+    window.openTagSetting = () => {
+      document.getElementById('tagSettingInput').value = defaultTags.join(', ');
+      document.getElementById('tagSettingOverlay').classList.add('show');
+      setTimeout(() => document.getElementById('tagSettingInput').focus(), 80);
+    };
+    window.saveTagSetting = () => {
+      const val = document.getElementById('tagSettingInput').value;
+      defaultTags = val.split(',').map(t => t.trim()).filter(t => t).map(t => t.startsWith('#') ? t : '#' + t);
+      localStorage.setItem(TAG_KEY, JSON.stringify(defaultTags));
+      renderQuickTags();
+      document.getElementById('tagSettingOverlay').classList.remove('show');
+      toast('태그 설정 저장됐어요 ✓');
+    };
 
-</script>
-</div><!-- content -->
-</div><!-- main -->
-</div><!-- flex -->
+    window._setCurMode = (mode) => {
+      curMode = mode;
+      curId = null;
+      renderSidebar();
+      // 탭 전환 시 새 회의록 상태로
+      const pt = document.getElementById('meetPageTitle');
+      if (pt) pt.textContent = mode === 'shared' ? '🌐 공통 회의록' : '새 회의록';
+      // 녹음 영역은 새 회의일 때만 표시
+      const recWrap = document.getElementById('recWrap');
+      if (recWrap) recWrap.style.display = mode === 'personal' ? '' : 'none';
+      // 입력 필드 초기화
+      ['meetTitle', 'transcriptArea', 'summaryArea', 'userNoteArea'].forEach(id => {
+        const el = document.getElementById(id); if (el) el.value = '';
+      });
+      const attI = document.getElementById('attendeeInput'); if (attI) attI.value = '';
+      const sc = document.getElementById('shareChk'); if (sc) sc.checked = (mode === 'shared');
+      document.getElementById('savedBadge').style.display = 'none';
+      document.getElementById('deleteMeetingBtn').style.display = 'none';
+    };
+    window.newMeeting();
+    renderQuickTags();
+    initSpeechRecognition();
+
+  </script>
+  </div><!-- content -->
+  </div><!-- main -->
+  </div><!-- flex -->
 
 </body>
+
 </html>

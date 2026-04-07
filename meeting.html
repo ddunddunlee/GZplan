@@ -2154,6 +2154,7 @@
     // ════════════════════════════════════════════
     window.newMeeting = () => {
       curId = null;
+      curMode = 'personal';
       attendees = [];
       transcript = "";
       document.getElementById("meetTitle").value = "";
@@ -2506,21 +2507,17 @@ ${text}` : text;
 
     window.confirmDelete = async () => {
       try {
-        const m = (curMode === 'shared' ? sharedMeetings : meetings).find(x => x.id === pendingDeleteId);
+        const savedMode = curMode;
+        const m = (savedMode === 'shared' ? sharedMeetings : meetings).find(x => x.id === pendingDeleteId);
         if (m?.calendarId) {
           try { await deleteDoc(doc(db, "schedules", m.calendarId)) } catch (e) { }
         }
-        await deleteDoc(curMode === 'shared'
+        // onSnapshot이 renderSidebar 재호출 못하도록 먼저 모드 전환
+        curMode = 'personal';
+        curId = null;
+        await deleteDoc(savedMode === 'shared'
           ? doc(db, 'meetings_shared', pendingDeleteId)
           : doc(db, 'meetings', ME.id, 'items', pendingDeleteId));
-        // 로컬 목록에서 즉시 제거
-        if (curMode === 'shared') {
-          sharedMeetings = sharedMeetings.filter(x => x.id !== pendingDeleteId);
-        } else {
-          meetings = meetings.filter(x => x.id !== pendingDeleteId);
-        }
-        curId = null;
-        renderSidebar();
         window.closeOverlay();
         window.newMeeting();
         toast('회의록을 삭제했어요');

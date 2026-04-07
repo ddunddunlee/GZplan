@@ -2029,6 +2029,7 @@
     // 상태
     // ════════════════════════════════════════════
     let meetings = [], sharedMeetings = [];
+    let isDeleting = false;
     let curId = null, curMode = 'personal';  // curMode: 'personal' | 'shared'
     let attendees = [];
     let isRecording = false, recognition = null, recInterval = null, recSeconds = 0;
@@ -2072,12 +2073,11 @@
     // 개인 회의록 구독
     onSnapshot(query(collection(db, 'meetings', ME.id, 'items'), orderBy('date', 'desc')), snap => {
       meetings = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      if (curMode === 'personal') { renderSidebar(); if (curId) highlightSidebar(curId); }
+      if (!isDeleting && curMode === 'personal') { renderSidebar(); if (curId) highlightSidebar(curId); }
     });
-    // 공통 회의록 구독
     onSnapshot(query(collection(db, 'meetings_shared'), orderBy('date', 'desc')), snap => {
       sharedMeetings = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      if (curMode === 'shared') { renderSidebar(); if (curId) highlightSidebar(curId); }
+      if (!isDeleting && curMode === 'shared') { renderSidebar(); if (curId) highlightSidebar(curId); }
     });
 
     // ════════════════════════════════════════════
@@ -2154,7 +2154,6 @@
     // ════════════════════════════════════════════
     window.newMeeting = () => {
       curId = null;
-      curMode = 'personal';
       attendees = [];
       transcript = "";
       document.getElementById("meetTitle").value = "";
@@ -2507,23 +2506,38 @@ ${text}` : text;
 
     window.confirmDelete = async () => {
       try {
+        isDeleting = true;
         const savedMode = curMode;
         const m = (savedMode === 'shared' ? sharedMeetings : meetings).find(x => x.id === pendingDeleteId);
         if (m?.calendarId) {
           try { await deleteDoc(doc(db, "schedules", m.calendarId)) } catch (e) { }
         }
-        // onSnapshot이 renderSidebar 재호출 못하도록 먼저 모드 전환
-        curMode = 'personal';
-        curId = null;
         await deleteDoc(savedMode === 'shared'
           ? doc(db, 'meetings_shared', pendingDeleteId)
           : doc(db, 'meetings', ME.id, 'items', pendingDeleteId));
+        // 로컬에서 즉시 제거
+        if (savedMode === 'shared') {
+          sharedMeetings = sharedMeetings.filter(x => x.id !== pendingDeleteId);
+        } else {
+          meetings = meetings.filter(x => x.id !== pendingDeleteId);
+        }
+        curId = null;
+        renderSidebar();
         window.closeOverlay();
-        window.newMeeting();
+        // 입력창 초기화 (curMode 유지)
+        ['meetTitle','transcriptArea','summaryArea','userNoteArea'].forEach(id => {
+          const el = document.getElementById(id); if (el) el.value = '';
+        });
+        const attI = document.getElementById('attendeeInput'); if (attI) attI.value = '';
+        document.getElementById('savedBadge').style.display = 'none';
+        document.getElementById('deleteMeetingBtn').style.display = 'none';
+        document.getElementById('calNote').style.display = 'none';
         toast('회의록을 삭제했어요');
       } catch(e) {
         toast('삭제 오류: ' + e.message);
         window.closeOverlay();
+      } finally {
+        setTimeout(() => { isDeleting = false; }, 1000);
       }
     };
 

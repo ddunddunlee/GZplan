@@ -514,6 +514,28 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
   .gantt-bar { font-size: 10px; padding: 0 4px; }
   .gantt-user-col { width: 70px; font-size: 12px; }
 
+
+/* ── 사이드바 다크블루 override ── */
+.sidebar{background:#0C447C !important;border-right:none !important;}
+.sb-brand{border-bottom:1px solid rgba(255,255,255,0.1) !important;}
+.sb-brand-name{color:#fff !important;}
+.sb-brand-sub{color:rgba(255,255,255,0.45) !important;}
+.sb-user{border-bottom:1px solid rgba(255,255,255,0.1) !important;}
+.sb-avatar{background:rgba(255,255,255,0.15) !important;color:#fff !important;}
+.sb-user-name{color:#fff !important;}
+.sb-user-role{color:rgba(255,255,255,0.45) !important;}
+.sb-sec{color:rgba(255,255,255,0.35) !important;}
+.sb-icon{color:rgba(255,255,255,0.6) !important;display:flex;align-items:center;}
+.sb-label{color:rgba(255,255,255,0.6) !important;}
+.sb-item:hover{background:rgba(255,255,255,0.1) !important;}
+.sb-item.active{background:rgba(255,255,255,0.15) !important;}
+.sb-item.active .sb-label,.sb-item.active .sb-icon{color:#fff !important;font-weight:500;}
+.sb-bottom{border-top:1px solid rgba(255,255,255,0.1) !important;}
+.sb-sync{color:rgba(255,255,255,0.45) !important;}
+.sb-sync span{color:rgba(255,255,255,0.45) !important;}
+.btn-solid{background:#0C447C !important;border-color:#0C447C !important;}
+.btn-solid:hover{background:#0a3a6a !important;}
+.chip.active{background:#0C447C !important;border-color:#0C447C !important;color:#fff !important;}
 </style>
 </head>
 <body>
@@ -528,14 +550,14 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
   </div>
   <div class="sb-nav">
     <div class="sb-sec">업무</div>
-    <div class="sb-item" data-nav="member.html" id="sbTaskItem"><div class="sb-icon">☐</div><div class="sb-label" id="sbTaskLabel">내 업무</div></div>
+    <div class="sb-item" data-nav="member.html" id="sbTaskItem"><div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg></div><div class="sb-label" id="sbTaskLabel">내 업무</div></div>
     <div class="sb-sec">도구</div>
-    <div class="sb-item" data-nav="calendar.html"><div class="sb-icon">▦</div><div class="sb-label">캘린더</div></div>
-    <div class="sb-item active" data-nav="weekly.html"><div class="sb-icon">📊</div><div class="sb-label">주간 스케줄</div></div>
-    <div class="sb-item" data-nav="meeting.html"><div class="sb-icon">◈</div><div class="sb-label">회의록</div></div>
-    <div class="sb-item" data-nav="memo.html"><div class="sb-icon">◉</div><div class="sb-label">메모장</div></div>
+    <div class="sb-item" data-nav="calendar.html"><div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="sb-label">캘린더</div></div>
+    <div class="sb-item active" data-nav="weekly.html"><div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg></div><div class="sb-label">주간 스케줄</div></div>
+    <div class="sb-item" data-nav="meeting.html"><div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="sb-label">회의록</div></div>
+    <div class="sb-item" data-nav="memo.html"><div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div><div class="sb-label">메모장</div></div>
     <div class="sb-sec" id="sbAdminSec" style="display:none">관리</div>
-    <div class="sb-item" data-nav="admin.html" id="sbAdminItem" style="display:none"><div class="sb-icon">◯</div><div class="sb-label">계정 관리</div></div>
+    <div class="sb-item" data-nav="admin.html" id="sbAdminItem" style="display:none"><div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div><div class="sb-label">계정 관리</div></div>
   </div>
   <div class="sb-bottom">
     <div class="sb-sync"><div class="sync-dot" id="syncDot"></div><span>실시간 동기화</span></div>
@@ -652,7 +674,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var av = document.getElementById('sbAvatar');
     var nm = document.getElementById('sbUserName');
     var rl = document.getElementById('sbUserRole');
-    if (av) av.textContent = (_u.displayName||_u.id||'--').slice(0,2);
+    if (av) av.textContent = (_u.displayName||_u.id||'--').slice(0,1);
     if (nm) nm.textContent = _u.displayName||_u.id||'';
     var isMgr = _u.role==='manager'||_u.role==='admin';
     if (rl) rl.textContent = isMgr ? '팀장' : '팀원';
@@ -741,7 +763,7 @@ const isMgr=ME.role==='manager'||ME.role==='admin';
   var av = document.getElementById('sbAvatar');
   var nm = document.getElementById('sbUserName');
   var rl = document.getElementById('sbUserRole');
-  if (av) av.textContent = (ME.displayName||ME.id||'--').slice(0,2);
+  if (av) av.textContent = (ME.displayName||ME.id||'--').slice(0,1);
   if (nm) nm.textContent = ME.displayName||ME.id||'';
   if (rl) rl.textContent = isMgr ? '팀장' : '팀원';
   // 공통 일정 버튼

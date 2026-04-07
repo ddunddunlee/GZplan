@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8"/>
@@ -406,6 +406,28 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
 .pin-btn,.del-btn{width:24px;height:24px;border-radius:var(--radius-sm);border:none;background:transparent;cursor:pointer;font-size:13px;color:var(--text3);display:flex;align-items:center;justify-content:center}
 .pin-btn:hover{background:var(--bg3);color:var(--text)}
 .pin-btn.on{color:var(--blue)}
+
+/* ── 사이드바 다크블루 override ── */
+.sidebar{background:#0C447C !important;border-right:none !important;}
+.sb-brand{border-bottom:1px solid rgba(255,255,255,0.1) !important;}
+.sb-brand-name{color:#fff !important;}
+.sb-brand-sub{color:rgba(255,255,255,0.45) !important;}
+.sb-user{border-bottom:1px solid rgba(255,255,255,0.1) !important;}
+.sb-avatar{background:rgba(255,255,255,0.15) !important;color:#fff !important;}
+.sb-user-name{color:#fff !important;}
+.sb-user-role{color:rgba(255,255,255,0.45) !important;}
+.sb-sec{color:rgba(255,255,255,0.35) !important;}
+.sb-icon{color:rgba(255,255,255,0.6) !important;display:flex;align-items:center;}
+.sb-label{color:rgba(255,255,255,0.6) !important;}
+.sb-item:hover{background:rgba(255,255,255,0.1) !important;}
+.sb-item.active{background:rgba(255,255,255,0.15) !important;}
+.sb-item.active .sb-label,.sb-item.active .sb-icon{color:#fff !important;font-weight:500;}
+.sb-bottom{border-top:1px solid rgba(255,255,255,0.1) !important;}
+.sb-sync{color:rgba(255,255,255,0.45) !important;}
+.sb-sync span{color:rgba(255,255,255,0.45) !important;}
+.btn-solid{background:#0C447C !important;border-color:#0C447C !important;}
+.btn-solid:hover{background:#0a3a6a !important;}
+.chip.active{background:#0C447C !important;border-color:#0C447C !important;color:#fff !important;}
 </style>
 </head>
 <body>
@@ -420,8 +442,8 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
   </div>
   <div class="sb-nav">
     <div class="sb-sec">관리</div>
-    <div class="sb-item active" id="navAccounts" onclick="if(window.switchAdminTab)window.switchAdminTab('accounts')" style="cursor:pointer"><div class="sb-icon">👤</div><div class="sb-label">계정 관리</div></div>
-    <div class="sb-item" id="navReporters" onclick="if(window.switchAdminTab)window.switchAdminTab('reporters')" style="cursor:pointer"><div class="sb-icon">📋</div><div class="sb-label">최종보고자 목록</div></div>
+    <div class="sb-item active" id="navAccounts" onclick="if(window.switchAdminTab)window.switchAdminTab('accounts')" style="cursor:pointer"><div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div><div class="sb-label">계정 관리</div></div>
+    <div class="sb-item" id="navReporters" onclick="if(window.switchAdminTab)window.switchAdminTab('reporters')" style="cursor:pointer"><div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div><div class="sb-label">최종보고자 목록</div></div>
   </div>
   <div class="sb-bottom">
     <div class="sb-sync"><div class="sync-dot" id="syncDot" style="display:none"></div><span id="syncTxt" style="display:none">실시간 동기화</span></div>
@@ -605,7 +627,7 @@ function renderList(){
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
         <!-- 아바타 -->
         <div style="width:36px;height:36px;border-radius:50%;background:var(--text);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--bg);flex-shrink:0">
-          ${(a.displayName||a.docId).slice(0,2)}
+          ${(a.displayName||a.docId).slice(0,1)}
         </div>
         <!-- 정보 -->
         <div style="flex:1;min-width:0">

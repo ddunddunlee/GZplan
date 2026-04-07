@@ -44,37 +44,37 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 /* ── 사이드바 ── */
 .sidebar{
   width:var(--sw);flex-shrink:0;
-  background:var(--bg);border-right:0.5px solid var(--border);
+  background:#0C447C;border-right:none;
   display:flex;flex-direction:column;
   position:fixed;top:0;left:0;height:100vh;z-index:300;
   transition:transform .25s ease;overflow:hidden;
 }
-.sb-brand{padding:18px 16px 14px;border-bottom:0.5px solid var(--bg3);flex-shrink:0}
-.sb-brand-name{font-size:15px;font-weight:600;color:var(--text);letter-spacing:-.3px}
-.sb-brand-sub{font-size:11px;color:var(--text3);margin-top:2px}
-.sb-user{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:0.5px solid var(--bg3);flex-shrink:0}
-.sb-avatar{width:30px;height:30px;border-radius:50%;background:var(--text);
+.sb-brand{padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,0.1);flex-shrink:0}
+.sb-brand-name{font-size:15px;font-weight:600;color:#fff;letter-spacing:-.3px}
+.sb-brand-sub{font-size:11px;color:rgba(255,255,255,0.45);margin-top:2px}
+.sb-user{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.1);flex-shrink:0}
+.sb-avatar{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.15);
   display:flex;align-items:center;justify-content:center;
-  font-size:11px;font-weight:600;color:var(--bg);flex-shrink:0}
-.sb-user-name{font-size:13px;font-weight:500;color:var(--text);
+  font-size:11px;font-weight:600;color:#fff;flex-shrink:0}
+.sb-user-name{font-size:13px;font-weight:500;color:#fff;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sb-user-role{font-size:11px;color:var(--text3)}
+.sb-user-role{font-size:11px;color:rgba(255,255,255,0.45)}
 .sb-nav{flex:1;padding:8px 0;overflow-y:auto;overflow-x:hidden}
-.sb-sec{padding:4px 16px;font-size:10px;font-weight:600;color:var(--text3);
+.sb-sec{padding:4px 16px;font-size:10px;font-weight:600;color:rgba(255,255,255,0.35);
   letter-spacing:.08em;text-transform:uppercase;margin-top:10px}
 .sb-item{display:flex;align-items:center;gap:10px;padding:9px 16px;
   cursor:pointer;margin:1px 8px;border-radius:var(--radius-sm);
   transition:background .12s;min-height:var(--touch-min)}
-.sb-item:hover{background:var(--bg2)}
-.sb-item.active{background:var(--bg3)}
-.sb-item.active .sb-label,.sb-item.active .sb-icon{color:var(--text);font-weight:500}
-.sb-icon{font-size:15px;width:22px;text-align:center;color:var(--text2);flex-shrink:0}
-.sb-label{font-size:13px;color:var(--text2);flex:1;
+.sb-item:hover{background:rgba(255,255,255,0.1)}
+.sb-item.active{background:rgba(255,255,255,0.15)}
+.sb-item.active .sb-label,.sb-item.active .sb-icon{color:#fff;font-weight:500}
+.sb-icon{font-size:15px;width:22px;text-align:center;color:rgba(255,255,255,0.6);flex-shrink:0;display:flex;align-items:center}
+.sb-label{font-size:13px;color:rgba(255,255,255,0.6);flex:1;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sb-badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:var(--pill);
   background:var(--red-bg);color:var(--red);flex-shrink:0}
-.sb-bottom{padding:12px 16px;border-top:0.5px solid var(--bg3);display:flex;flex-direction:column;gap:8px;flex-shrink:0}
-.sb-sync{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text3)}
+.sb-bottom{padding:12px 16px;border-top:1px solid rgba(255,255,255,0.1);display:flex;flex-direction:column;gap:8px;flex-shrink:0}
+.sb-sync{display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,0.45)}
 .sync-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0}
 .sync-dot.syncing{background:var(--orange);animation:blink .8s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
@@ -187,7 +187,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
   display:inline-flex;align-items:center;
 }
 .chip:hover{border-color:var(--border2);color:var(--text)}
-.chip.active{background:var(--text);color:var(--bg);border-color:var(--text)}
+.chip.active{background:#0C447C;color:#fff;border-color:#0C447C}
 
 /* ── 업무 카드 ── */
 .task-list{display:flex;flex-direction:column;gap:6px}
@@ -389,7 +389,6 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
 }
 
 /* ── 페이지 고유 CSS ── */
-.3}}
 
 /* ── 메인 ── */
 .main-wrap{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;min-height:100vh}
@@ -450,28 +449,6 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
   .cal-day{min-height:60px}
 .event-bar{font-size:9px}
 .cal-weekday{font-size:10px;padding:6px 2px}
-
-/* ── 사이드바 다크블루 override ── */
-.sidebar{background:#0C447C !important;border-right:none !important;}
-.sb-brand{border-bottom:1px solid rgba(255,255,255,0.1) !important;}
-.sb-brand-name{color:#fff !important;}
-.sb-brand-sub{color:rgba(255,255,255,0.45) !important;}
-.sb-user{border-bottom:1px solid rgba(255,255,255,0.1) !important;}
-.sb-avatar{background:rgba(255,255,255,0.15) !important;color:#fff !important;}
-.sb-user-name{color:#fff !important;}
-.sb-user-role{color:rgba(255,255,255,0.45) !important;}
-.sb-sec{color:rgba(255,255,255,0.35) !important;}
-.sb-icon{color:rgba(255,255,255,0.6) !important;display:flex;align-items:center;}
-.sb-label{color:rgba(255,255,255,0.6) !important;}
-.sb-item:hover{background:rgba(255,255,255,0.1) !important;}
-.sb-item.active{background:rgba(255,255,255,0.15) !important;}
-.sb-item.active .sb-label,.sb-item.active .sb-icon{color:#fff !important;font-weight:500;}
-.sb-bottom{border-top:1px solid rgba(255,255,255,0.1) !important;}
-.sb-sync{color:rgba(255,255,255,0.45) !important;}
-.sb-sync span{color:rgba(255,255,255,0.45) !important;}
-.btn-solid{background:#0C447C !important;border-color:#0C447C !important;}
-.btn-solid:hover{background:#0a3a6a !important;}
-.chip.active{background:#0C447C !important;border-color:#0C447C !important;color:#fff !important;}
 </style>
 </head>
 <body>

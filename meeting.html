@@ -2092,7 +2092,7 @@
       }
       el.innerHTML = list.map(m => {
         const isShared = sharedMeetings.some(s => s.authorId === ME.id && s.srcId === m.id);
-        return `<div class="sb-meeting-item${curId === m.id ? ' active' : ''}" onclick="if(window.loadMeeting)window.loadMeeting('${m.id}')">
+        return `<div class="sb-meeting-item${curId === m.id ? ' active' : ''}" onclick="if(window.loadMeeting)window.loadMeeting('${m.id}','${curMode}')">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px">
         <div style="flex:1;min-width:0">
           <div class="sb-item-title">${m.title || '(제목 없음)'}</div>
@@ -2178,7 +2178,8 @@
       stopRec();
     };
 
-    window.loadMeeting = id => {
+    window.loadMeeting = (id, mode) => {
+      if (mode) curMode = mode;
       const list = curMode === 'shared' ? sharedMeetings : meetings;
       const m = list.find(x => x.id === id);
       if (!m) return;
@@ -2512,6 +2513,14 @@ ${text}` : text;
         await deleteDoc(curMode === 'shared'
           ? doc(db, 'meetings_shared', pendingDeleteId)
           : doc(db, 'meetings', ME.id, 'items', pendingDeleteId));
+        // 로컬 목록에서 즉시 제거
+        if (curMode === 'shared') {
+          sharedMeetings = sharedMeetings.filter(x => x.id !== pendingDeleteId);
+        } else {
+          meetings = meetings.filter(x => x.id !== pendingDeleteId);
+        }
+        curId = null;
+        renderSidebar();
         window.closeOverlay();
         window.newMeeting();
         toast('회의록을 삭제했어요');

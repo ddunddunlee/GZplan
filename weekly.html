@@ -429,6 +429,7 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
   font-size: 13px;
   background: var(--bg2);
   color: var(--text);
+  padding: 8px 4px;
 }
 .gantt-user-col.header {
   background: var(--bg);
@@ -441,7 +442,6 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
 }
 .gantt-col {
   border-right: 0.5px solid var(--border);
-  min-height: 40px;
   position: relative;
 }
 .gantt-col:last-child {
@@ -552,8 +552,8 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
       </div>
     </div>
     
-    <div class="filter-row" id="typeFilterRow" style="display:none"></div>
-    <div class="filter-row" id="memberFilterRow" style="display:none"></div>
+    <div class="filter-row" id="typeFilterRow"></div>
+    <div class="filter-row" id="memberFilterRow"></div>
     <div class="legend" id="legend"></div>
     
     <div class="gantt-grid">
@@ -874,8 +874,7 @@ function renderFilters(){
   const mEl=document.getElementById('memberFilterRow');
   if(!isMgr){mEl.style.display='none';return}
   mEl.style.display='';
-  let h=`<span style="font-size:12px;color:var(--text3);margin-right:4px">팀원</span>`;
-  h+=`<button class="chip${memberFilter==='all'?' active':''}" onclick="setMF('all')">전체</button>`;
+  let h=`<button class="chip${memberFilter==='all'?' active':''}" onclick="setMF('all')">전체</button>`;
   MEMBER_IDS.forEach((id,i)=>{h+=`<button class="chip member-chip${memberFilter===id?' active':''}" style="border-left-color:${MEMBER_COLORS[i]}" onclick="setMF('${id}')">${id}</button>`});
   mEl.innerHTML=h;
 }
@@ -1031,9 +1030,9 @@ function renderWeeklySchedule() {
     for(let i=0; i<7; i++) gridCols += `<div class="gantt-col"></div>`;
     
     bodyHtml += `
-      <div class="gantt-row">
-        <div class="gantt-user-col" style="color: ${MEMBER_COLORS[mIdx] || 'var(--text)'}">${member}</div>
-        <div class="gantt-days-wrap" style="position:relative;">
+      <div class="gantt-row" style="min-height:${layerHeight}px;">
+        <div class="gantt-user-col" style="color: ${MEMBER_COLORS[mIdx] || 'var(--text)'}; min-height:${layerHeight}px;">${member}</div>
+        <div class="gantt-days-wrap" style="position:relative; min-height:${layerHeight}px;">
           ${gridCols}
           <div class="gantt-cell-layer" style="position:absolute; inset:0; min-height:${layerHeight}px;">
             ${barsHtml}
@@ -1186,7 +1185,7 @@ window.switchView=tab=>{
 window.closeModal=id=>document.getElementById(id).classList.remove('show');
 document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===e.currentTarget)e.target.classList.remove('show')}));
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.overlay.show').forEach(o=>o.classList.remove('show'))});
-loadCategories();renderCalendar();
+loadCategories();renderWeeklySchedule();
 </script>
 </body>
 </html>

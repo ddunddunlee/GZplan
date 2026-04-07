@@ -439,10 +439,12 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
   display: grid;
   grid-template-columns: repeat(7, minmax(100px, 1fr));
   flex: 1;
+  position: relative;
 }
 .gantt-col {
   border-right: 0.5px solid var(--border);
   position: relative;
+  min-height: inherit;
 }
 .gantt-col:last-child {
   border-right: none;
@@ -1030,12 +1032,14 @@ function renderWeeklySchedule() {
     for(let i=0; i<7; i++) gridCols += `<div class="gantt-col"></div>`;
     
     bodyHtml += `
-      <div class="gantt-row" style="min-height:${layerHeight}px;">
-        <div class="gantt-user-col" style="color: ${MEMBER_COLORS[mIdx] || 'var(--text)'}; min-height:${layerHeight}px;">${member}</div>
-        <div class="gantt-days-wrap" style="position:relative; min-height:${layerHeight}px;">
+      <div class="gantt-row" style="height:${layerHeight}px;">
+        <div class="gantt-user-col" style="color:${MEMBER_COLORS[mIdx]||'var(--text)'};">${member}</div>
+        <div class="gantt-days-wrap" style="height:${layerHeight}px;">
           ${gridCols}
-          <div class="gantt-cell-layer" style="position:absolute; inset:0; min-height:${layerHeight}px;">
+          <div style="position:absolute;top:0;left:0;right:0;height:${layerHeight}px;pointer-events:none;z-index:10;">
+            <div style="position:relative;width:100%;height:100%;pointer-events:auto;">
             ${barsHtml}
+            </div>
           </div>
         </div>
       </div>

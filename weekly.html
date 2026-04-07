@@ -564,7 +564,6 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
     
     <div class="filter-row" id="typeFilterRow"></div>
     <div class="filter-row" id="memberFilterRow"></div>
-    <div class="legend" id="legend"></div>
     
     <div class="gantt-grid">
       <div class="gantt-row">
@@ -845,22 +844,7 @@ function renderCatList(){
     </div>`;
   }).join('');
 }
-function renderLegend(){
-  const el=document.getElementById('legend');if(!el)return;
-  let h='';
-  // 팀장: 팀원 색상만 표시
-  if(isMgr && typeFilter!=='personal'&&typeFilter!=='common'){
-    MEMBER_IDS.forEach((id,i)=>{
-      h+=`<div class="legend-item"><div class="legend-dot" style="background:${MEMBER_COLORS[i]}"></div>${id}</div>`;
-    });
-  }
-  // 팀원: 개인일정/공통 구분만
-  if(!isMgr){
-    if(typeFilter!=='common')h+=`<div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>개인</div>`;
-    if(typeFilter!=='personal')h+=`<div class="legend-item"><div class="legend-dot" style="background:#5F5E5A"></div>🏢 공통</div>`;
-  }
-  el.innerHTML=h;
-}
+function renderLegend(){}
 window.updCatColor=async(id,color)=>{const c=CAT_LIST.find(x=>x.id===id);if(c)c.color=color;await saveCats();rebuildCatMap();renderLegend();renderWeeklySchedule();toast('색상 변경됐어요 ✓')};
 window.updCatLabel=async(id,label)=>{const c=CAT_LIST.find(x=>x.id===id);if(!c||!label.trim())return;c.label=label.trim();await saveCats();rebuildCatMap();renderCatSelect();renderLegend();renderWeeklySchedule();toast('이름 변경됐어요 ✓')};
 window.addCategory=async()=>{const n=document.getElementById('newCatName').value.trim(),color=document.getElementById('newCatColor').value;if(!n){toast('이름을 입력해주세요');return}CAT_LIST.push({id:'cat_'+Date.now(),label:n,color});await saveCats();rebuildCatMap();renderCatSelect();renderCatList();renderLegend();document.getElementById('newCatName').value='';toast(`"${n}" 추가됐어요 ✓`)};

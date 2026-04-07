@@ -436,10 +436,16 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
   color: var(--text3);
 }
 .gantt-days-wrap {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(100px, 1fr));
   flex: 1;
   position: relative;
+  overflow: hidden;
+}
+.gantt-col-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-right: 0.5px solid var(--border);
+  pointer-events: none;
 }
 .gantt-col {
   border-right: 0.5px solid var(--border);
@@ -561,7 +567,7 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
     <div class="gantt-grid">
       <div class="gantt-row">
         <div class="gantt-user-col header">담당자</div>
-        <div class="gantt-days-wrap" id="ganttHeaderDays"></div>
+        <div class="gantt-days-wrap" id="ganttHeaderDays" style="position:relative;height:34px;"></div>
       </div>
       <div id="ganttBody"></div>
     </div>
@@ -923,7 +929,9 @@ function renderWeeklySchedule() {
     if(d.getDay() === 0) cls += ' sun';
     if(d.getDay() === 6) cls += ' sat';
     if(ds === todayStr) cls += ' today';
-    return `<div class="${cls}">${d.getMonth()+1}/${d.getDate()} (${WD_LABEL[i]})</div>`;
+    const leftPct = (i / 7) * 100;
+    const widthPct = (1 / 7) * 100;
+    return `<div class="${cls}" style="position:absolute;left:${leftPct}%;width:${widthPct}%;border-right:0.5px solid var(--border);box-sizing:border-box;">${d.getMonth()+1}/${d.getDate()} (${WD_LABEL[i]})</div>`;
   }).join('');
   
   const allInst = [];
@@ -1028,15 +1036,20 @@ function renderWeeklySchedule() {
       `;
     });
     
-    let gridCols = '';
-    for(let i=0; i<7; i++) gridCols += `<div class="gantt-col"></div>`;
-    
+    // 날짜 구분선 (absolute div, 7칸)
+    let colLines = '';
+    for(let i=0; i<7; i++) {
+      const leftPct = (i / 7) * 100;
+      const widthPct = (1 / 7) * 100;
+      colLines += `<div class="gantt-col-line" style="left:${leftPct}%;width:${widthPct}%;"></div>`;
+    }
+
     bodyHtml += `
       <div class="gantt-row" style="height:${layerHeight}px;">
         <div class="gantt-user-col" style="color:${MEMBER_COLORS[mIdx]||'var(--text)'};">${member}</div>
         <div class="gantt-days-wrap" style="height:${layerHeight}px;">
-          ${gridCols}
-          <div style="position:absolute;top:0;left:0;right:0;height:${layerHeight}px;pointer-events:none;z-index:10;">
+          ${colLines}
+          <div style="position:absolute;inset:0;pointer-events:none;z-index:10;">
             <div style="position:relative;width:100%;height:100%;pointer-events:auto;">
             ${barsHtml}
             </div>

@@ -2072,11 +2072,11 @@
     // ════════════════════════════════════════════
     // 개인 회의록 구독
     onSnapshot(query(collection(db, 'meetings', ME.id, 'items'), orderBy('date', 'desc')), snap => {
-      meetings = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      meetings = snap.docs.map(d => { const data = d.data(); delete data.id; return { id: d.id, ...data }; });
       if (!isDeleting && curMode === 'personal') { renderSidebar(); if (curId) highlightSidebar(curId); }
     });
     onSnapshot(query(collection(db, 'meetings_shared'), orderBy('date', 'desc')), snap => {
-      sharedMeetings = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      sharedMeetings = snap.docs.map(d => { const data = d.data(); delete data.id; return { id: d.id, ...data }; });
       if (!isDeleting && curMode === 'shared') { renderSidebar(); if (curId) highlightSidebar(curId); }
     });
 
@@ -2091,7 +2091,6 @@
         return;
       }
       el.innerHTML = list.map(m => {
-        const isShared = sharedMeetings.some(s => s.authorId === ME.id && s.srcId === m.id);
         return `<div class="sb-meeting-item${curId === m.id ? ' active' : ''}" onclick="if(window.loadMeeting)window.loadMeeting('${m.id}','${curMode}')">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px">
         <div style="flex:1;min-width:0">
@@ -2100,8 +2099,8 @@
           ${m.tags && m.tags.length ? `<div style="margin-top:3px;font-size:10px;color:var(--blue-t)">${m.tags.join(' ')}</div>` : ''}
         </div>
         ${curMode === 'personal' ? `<button onclick="event.stopPropagation();toggleShare('${m.id}')"
-          style="flex-shrink:0;padding:2px 7px;font-size:10px;border-radius:var(--pill);border:0.5px solid ${isShared ? 'var(--green)' : 'var(--border)'};background:${isShared ? 'var(--green-bg)' : 'transparent'};color:${isShared ? 'var(--green-t)' : 'var(--text3)'};cursor:pointer;white-space:nowrap">
-          ${isShared ? '공유중' : '공유'}
+          style="flex-shrink:0;padding:2px 7px;font-size:10px;border-radius:var(--pill);border:0.5px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;white-space:nowrap">
+          공유
         </button>`: ''}
       </div>
     </div>`;
@@ -2111,18 +2110,10 @@
     window.toggleShare = async (id) => {
       const m = meetings.find(x => x.id === id);
       if (!m) return;
-      // srcId가 있으면 srcId로, 없으면 authorId+title+date로 매칭
-      const existing = sharedMeetings.find(s =>
-        s.authorId === ME.id && (s.srcId === id || (s.title === m.title && s.date === m.date))
-      );
       try {
-        if (existing) {
-          await deleteDoc(doc(db, 'meetings_shared', existing.id));
-          toast('공유가 해제됐어요');
-        } else {
-          await addDoc(collection(db, 'meetings_shared'), { ...m, srcId: id, sharedAt: new Date().toISOString() });
-          toast('팀 전체에 공유됐어요 🌐');
-        }
+        const data = {...m}; delete data.id;
+        await addDoc(collection(db, 'meetings_shared'), { ...data, srcId: id, sharedAt: new Date().toISOString() });
+        toast('팀 전체에 공유됐어요 🌐');
       } catch (e) { toast('오류: ' + e.message); }
     };
 

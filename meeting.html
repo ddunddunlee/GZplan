@@ -1745,6 +1745,7 @@
         <button class="btn-cancel" id="delCancelBtn" onclick="if(window.closeOverlay)window.closeOverlay()"
           style="touch-action:manipulation">취소</button>
         <button class="btn-ok" id="delConfirmBtn"
+          onclick="window.confirmDelete && window.confirmDelete()"
           style="background:var(--red);touch-action:manipulation">삭제</button>
       </div>
     </div>
@@ -1818,7 +1819,6 @@
             if (window.toggleRec) window.toggleRec();
           });
         })();
-        bind('delConfirmBtn', 'confirmDelete');
         bind('tagSettingBtn', 'openTagSetting');
         bind('tagSettingOkBtn', 'saveTagSetting');
         bind('tagSettingCancelBtn', function () { document.getElementById('tagSettingOverlay').classList.remove('show'); });
@@ -2509,13 +2509,16 @@ ${text}` : text;
         isDeleting = true;
         const savedMode = curMode;
         const m = (savedMode === 'shared' ? sharedMeetings : meetings).find(x => x.id === pendingDeleteId);
+        console.log('[삭제 시도]', savedMode, pendingDeleteId, m);
         if (m?.calendarId) {
           try { await deleteDoc(doc(db, "schedules", m.calendarId)) } catch (e) { }
         }
-        await deleteDoc(savedMode === 'shared'
+        const targetRef = savedMode === 'shared'
           ? doc(db, 'meetings_shared', pendingDeleteId)
-          : doc(db, 'meetings', ME.id, 'items', pendingDeleteId));
-        // 로컬에서 즉시 제거
+          : doc(db, 'meetings', ME.id, 'items', pendingDeleteId);
+        console.log('[삭제 경로]', targetRef.path);
+        await deleteDoc(targetRef);
+        console.log('[삭제 완료]');
         if (savedMode === 'shared') {
           sharedMeetings = sharedMeetings.filter(x => x.id !== pendingDeleteId);
         } else {
@@ -2524,7 +2527,6 @@ ${text}` : text;
         curId = null;
         renderSidebar();
         window.closeOverlay();
-        // 입력창 초기화 (curMode 유지)
         ['meetTitle','transcriptArea','summaryArea','userNoteArea'].forEach(id => {
           const el = document.getElementById(id); if (el) el.value = '';
         });
@@ -2534,6 +2536,7 @@ ${text}` : text;
         document.getElementById('calNote').style.display = 'none';
         toast('회의록을 삭제했어요');
       } catch(e) {
+        console.error('[삭제 오류]', e);
         toast('삭제 오류: ' + e.message);
         window.closeOverlay();
       } finally {

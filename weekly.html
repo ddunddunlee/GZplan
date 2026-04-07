@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8"/>
@@ -6,17 +6,17 @@
 <link rel="apple-touch-icon" href="./apple-touch-icon.png"/>
 <meta name="mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-title" content="GZ기획팀"/>
+<meta name="apple-mobile-web-app-title" content="GZ湲고쉷?"/>
 <meta name="theme-color" content="#ffffff"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>주간 스케줄 — GZ 경영기획팀</title>
+<title>二쇨컙 ?ㅼ?以???GZ 寃쎌쁺湲고쉷?</title>
 <style>
-/* ════════════════════════════════════════════
-   GZ Plan — 공통 반응형 CSS
+/* ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧
+   GZ Plan ??怨듯넻 諛섏쓳??CSS
    PC(1024+) / Tablet(768-1023) / Mobile(~767)
-════════════════════════════════════════════ */
+?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧 */
 
-/* ── Reset & 변수 ── */
+/* ?? Reset & 蹂???? */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#fff;--bg2:#f7f7f5;--bg3:#f0f0ee;
@@ -34,14 +34,14 @@
   --touch-min:44px;
 }
 
-/* ── 기본 ── */
+/* ?? 湲곕낯 ?? */
 html,body{height:100%}
 body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-serif;
   background:var(--bg2);color:var(--text);min-height:100vh;font-size:14px;
   -webkit-text-size-adjust:100%}
 .app{display:flex;min-height:100vh}
 
-/* ── 사이드바 ── */
+/* ?? ?ъ씠?쒕컮 ?? */
 .sidebar{
   width:var(--sw);flex-shrink:0;
   background:var(--bg);border-right:0.5px solid var(--border);
@@ -79,10 +79,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 .sync-dot.syncing{background:var(--orange);animation:blink .8s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 
-/* ── 메인 ── */
+/* ?? 硫붿씤 ?? */
 .main-wrap{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;min-height:100vh;min-width:0}
 
-/* ── 탑바 ── */
+/* ?? ?묐컮 ?? */
 .topbar{
   background:var(--bg);border-bottom:0.5px solid var(--border);
   padding:0 24px;height:var(--topbar-h);
@@ -93,7 +93,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0}
 .topbar-right{display:flex;gap:8px;align-items:center;flex-shrink:0;flex-wrap:wrap}
 
-/* ── 햄버거 ── */
+/* ?? ?꾨쾭嫄??? */
 .hamburger{
   display:none;width:36px;height:36px;border:none;background:transparent;
   cursor:pointer;flex-direction:column;align-items:center;justify-content:center;
@@ -104,7 +104,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 .sidebar-dim{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:290}
 .sidebar-dim.show{display:block}
 
-/* ── 버튼 ── */
+/* ?? 踰꾪듉 ?? */
 .btn-ghost{
   padding:0 14px;height:34px;border-radius:var(--radius-sm);font-size:12px;
   border:0.5px solid var(--border);background:transparent;color:var(--text2);
@@ -118,7 +118,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 }
 .btn-solid:hover{opacity:.82}
 
-/* ── 모달/오버레이 ── */
+/* ?? 紐⑤떖/?ㅻ쾭?덉씠 ?? */
 .overlay{
   display:none;position:fixed;inset:0;
   background:rgba(0,0,0,.45);
@@ -159,7 +159,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 }
 .fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--border2)}
 
-/* ── 토스트 ── */
+/* ?? ?좎뒪???? */
 .toast{
   position:fixed;bottom:2rem;left:50%;
   transform:translateX(-50%) translateY(10px);
@@ -171,14 +171,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 }
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-/* ── 통계 카드 ── */
+/* ?? ?듦퀎 移대뱶 ?? */
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
 .stat{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px 16px}
 .stat-label{font-size:11px;color:var(--text3);margin-bottom:6px;white-space:nowrap}
 .stat-value{font-size:22px;font-weight:600;color:var(--text);line-height:1}
 .stat-value.warn{color:#BA7517}.stat-value.danger{color:var(--red)}
 
-/* ── 필터 칩 ── */
+/* ?? ?꾪꽣 移??? */
 .filter-row{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;align-items:center}
 .chip{
   padding:5px 12px;border-radius:var(--pill);font-size:12px;
@@ -189,7 +189,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 .chip:hover{border-color:var(--border2);color:var(--text)}
 .chip.active{background:var(--text);color:var(--bg);border-color:var(--text)}
 
-/* ── 업무 카드 ── */
+/* ?? ?낅Т 移대뱶 ?? */
 .task-list{display:flex;flex-direction:column;gap:6px}
 .empty{text-align:center;padding:3rem 1rem;color:var(--text3);font-size:13px}
 .task-card{
@@ -240,7 +240,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 .pin-btn:hover{background:var(--bg3);color:var(--text)}.pin-btn.on{color:var(--blue)}
 .del-btn:hover{background:var(--red-bg);color:var(--red)}
 
-/* ── 중요도/보고자 배지 ── */
+/* ?? 以묒슂??蹂닿퀬??諛곗? ?? */
 .priority-badge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:var(--pill);cursor:pointer;display:inline-block;white-space:nowrap}
 .priority-badge.p1{background:#f0f0ee;color:#888}
 .priority-badge.p2{background:var(--blue-bg);color:var(--blue-t)}
@@ -249,7 +249,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 .priority-badge.p5{background:var(--red);color:#fff}
 .reporter-badge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:var(--pill);cursor:pointer;display:inline-block;background:var(--purple-bg);color:var(--purple-t);white-space:nowrap}
 
-/* ── 상세 패널 ── */
+/* ?? ?곸꽭 ?⑤꼸 ?? */
 .resizer{width:12px;flex-shrink:0;cursor:col-resize;display:flex;align-items:center;justify-content:center}
 .resizer::after{content:'';width:3px;height:30px;background:var(--border);border-radius:var(--pill)}
 .resizer:hover::after{background:var(--border2);height:46px}
@@ -324,53 +324,53 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 .divider{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:8px;padding:4px 0 6px}
 .divider::before,.divider::after{content:'';flex:1;height:0.5px;background:var(--border)}
 
-/* ── 터치 지원 ── */
+/* ?? ?곗튂 吏???? */
 button,[onclick],[data-nav],.sb-item,.task-card,.chip{
   -webkit-tap-highlight-color:transparent;touch-action:manipulation;
 }
 
-/* ══════════════════════════════════════════
-   반응형 — 태블릿 (768px ~ 1023px)
-══════════════════════════════════════════ */
+/* ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧
+   諛섏쓳?????쒕툝由?(768px ~ 1023px)
+?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧 */
 @media(max-width:1023px){
   :root{--sw:200px}
   .stats{grid-template-columns:repeat(2,1fr)}
   .detail-panel{width:280px;min-width:240px}
 }
 
-/* ══════════════════════════════════════════
-   반응형 — 모바일 (~ 767px)
-══════════════════════════════════════════ */
+/* ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧
+   諛섏쓳????紐⑤컮??(~ 767px)
+?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧 */
 @media(max-width:767px){
   :root{--sw:240px;--topbar-h:48px}
 
-  /* 사이드바 슬라이드 */
+  /* ?ъ씠?쒕컮 ?щ씪?대뱶 */
   .sidebar{transform:translateX(-100%)}
   .sidebar.open{transform:translateX(0)}
 
-  /* 햄버거 표시 */
+  /* ?꾨쾭嫄??쒖떆 */
   .hamburger{display:flex}
 
-  /* 메인 영역 */
+  /* 硫붿씤 ?곸뿭 */
   .main-wrap{margin-left:0}
   .topbar{padding:0 14px;gap:8px}
   .page-title{font-size:14px}
 
-  /* 통계 2열 */
+  /* ?듦퀎 2??*/
   .stats{grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
   .stat{padding:12px}
   .stat-value{font-size:18px}
 
-  /* 필터 스크롤 */
+  /* ?꾪꽣 ?ㅽ겕濡?*/
   .filter-row{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
   .filter-row::-webkit-scrollbar{display:none}
 
-  /* 카드 */
+  /* 移대뱶 */
   .task-card{padding:10px 12px;gap:8px}
   .task-title{font-size:12px}
   .card-right{position:static;margin-left:auto;flex-shrink:0}
 
-  /* 상세 패널 전체화면 */
+  /* ?곸꽭 ?⑤꼸 ?꾩껜?붾㈃ */
   .detail-panel{
     position:fixed;inset:0;width:100%;max-width:100%;
     border-radius:0;z-index:350;max-height:100vh;
@@ -378,23 +378,23 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
   }
   .resizer{display:none}
 
-  /* 모달 */
+  /* 紐⑤떖 */
   .modal{max-width:100%;margin:0;border-radius:var(--radius) var(--radius) 0 0;
     position:fixed;bottom:0;left:0;right:0;max-height:90vh;}
   .overlay{align-items:flex-end;padding:0}
 
-  /* 버튼 크기 */
+  /* 踰꾪듉 ?ш린 */
   .btn-ghost,.btn-solid,.btn-ok,.btn-cancel{height:38px;font-size:13px}
   .chip{min-height:34px;padding:5px 12px}
 }
 
-/* ── 추가 공통 CSS ── */
+/* ?? 異붽? 怨듯넻 CSS ?? */
 .pin-btn,.del-btn{width:24px;height:24px;border-radius:var(--radius-sm);border:none;background:transparent;cursor:pointer;font-size:13px;color:var(--text3);display:flex;align-items:center;justify-content:center}
 .pin-btn:hover{background:var(--bg3);color:var(--text)}
 .pin-btn.on{color:var(--blue)}
 .pin-btn:hover{background:var(--bg3);color:var(--text)}
 .pin-btn.on{color:var(--blue)}
-/* ── 주간 스케줄 전용 CSS ── */
+/* ?? 二쇨컙 ?ㅼ?以??꾩슜 CSS ?? */
 .gantt-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 10px; }
 .gantt-title { font-size: 18px; font-weight: 600; color: var(--text); min-width: 160px; text-align: center; }
 .nav-btn { width: 30px; height: 30px; border-radius: var(--radius-sm); border: 0.5px solid var(--border); background: var(--bg); color: var(--text2); cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; touch-action: manipulation; }
@@ -416,7 +416,7 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
 .gantt-row:last-child {
   border-bottom: none;
 }
-/* 첫 번째 컬럼: 담당자 구분 */
+/* 泥?踰덉㎏ 而щ읆: ?대떦??援щ텇 */
 .gantt-user-col {
   width: 100px;
   flex-shrink: 0;
@@ -433,7 +433,7 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
   background: var(--bg);
   color: var(--text3);
 }
-/* 요일 컬럼 (비율 고정) */
+/* ?붿씪 而щ읆 (鍮꾩쑉 怨좎젙) */
 .gantt-days-wrap {
   display: grid;
   grid-template-columns: repeat(7, minmax(100px, 1fr));
@@ -461,7 +461,7 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
 .gantt-col.header.sun { color: var(--red); }
 .gantt-col.header.sat { color: var(--blue); }
 
-/* 막대바 래퍼 (Row Level) */
+/* 留됰?諛??섑띁 (Row Level) */
 .gantt-cell-layer {
   position: relative;
   display: flex;
@@ -478,7 +478,7 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
   transition: opacity 0.2s;
 }
 .gantt-bar-wrap.overlap-high {
-  z-index: 20; /* 연차 등 최우선 순위 */
+  z-index: 20; /* ?곗감 ??理쒖슦???쒖쐞 */
 }
 .gantt-bar {
   background: var(--blue);
@@ -508,68 +508,68 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
 </style>
 </head>
 <body>
-<!-- 모바일 딤 -->
+<!-- 紐⑤컮????-->
 <div class="sidebar-dim" id="sidebarDim"></div>
 <div class="app">
 <div class="sidebar">
-  <div class="sb-brand"><div class="sb-brand-name">GZ Plan</div><div class="sb-brand-sub">경영기획팀</div></div>
+  <div class="sb-brand"><div class="sb-brand-name">GZ Plan</div><div class="sb-brand-sub">寃쎌쁺湲고쉷?</div></div>
   <div class="sb-user">
     <div class="sb-avatar" id="sbAvatar">--</div>
     <div><div class="sb-user-name" id="sbUserName"></div><div class="sb-user-role" id="sbUserRole"></div></div>
   </div>
   <div class="sb-nav">
-    <div class="sb-sec">업무</div>
-    <div class="sb-item" data-nav="member.html" id="sbTaskItem"><div class="sb-icon">☐</div><div class="sb-label" id="sbTaskLabel">내 업무</div></div>
-    <div class="sb-sec">도구</div>
-    <div class="sb-item" data-nav="calendar.html"><div class="sb-icon">▦</div><div class="sb-label">캘린더</div></div>
-    <div class="sb-item active"><div class="sb-icon">📊</div><div class="sb-label">주간 스케줄</div></div>
-    <div class="sb-item" data-nav="meeting.html"><div class="sb-icon">◈</div><div class="sb-label">회의록</div></div>
-    <div class="sb-item" data-nav="memo.html"><div class="sb-icon">◉</div><div class="sb-label">메모장</div></div>
-    <div class="sb-sec" id="sbAdminSec" style="display:none">관리</div>
-    <div class="sb-item" data-nav="admin.html" id="sbAdminItem" style="display:none"><div class="sb-icon">◯</div><div class="sb-label">계정 관리</div></div>
+    <div class="sb-sec">?낅Т</div>
+    <div class="sb-item" data-nav="member.html" id="sbTaskItem"><div class="sb-icon">??/div><div class="sb-label" id="sbTaskLabel">???낅Т</div></div>
+    <div class="sb-sec">?꾧뎄</div>
+    <div class="sb-item" data-nav="calendar.html"><div class="sb-icon">??/div><div class="sb-label">罹섎┛??/div></div>
+    <div class="sb-item active"><div class="sb-icon">?뱤</div><div class="sb-label">二쇨컙 ?ㅼ?以?/div></div>
+    <div class="sb-item" data-nav="meeting.html"><div class="sb-icon">??/div><div class="sb-label">?뚯쓽濡?/div></div>
+    <div class="sb-item" data-nav="memo.html"><div class="sb-icon">??/div><div class="sb-label">硫붾え??/div></div>
+    <div class="sb-sec" id="sbAdminSec" style="display:none">愿由?/div>
+    <div class="sb-item" data-nav="admin.html" id="sbAdminItem" style="display:none"><div class="sb-icon">??/div><div class="sb-label">怨꾩젙 愿由?/div></div>
   </div>
   <div class="sb-bottom">
-    <div class="sb-sync"><div class="sync-dot" id="syncDot"></div><span>실시간 동기화</span></div>
-    <button class="btn-ghost" id="logoutBtn" style="width:100%;font-size:11px;padding:5px">로그아웃</button>
+    <div class="sb-sync"><div class="sync-dot" id="syncDot"></div><span>?ㅼ떆媛??숆린??/span></div>
+    <button class="btn-ghost" id="logoutBtn" style="width:100%;font-size:11px;padding:5px">濡쒓렇?꾩썐</button>
   </div>
 </div>
 <div class="main-wrap">
   <div class="topbar">
-  <button class="hamburger" id="hamburgerBtn" aria-label="메뉴">
+  <button class="hamburger" id="hamburgerBtn" aria-label="硫붾돱">
     <span></span><span></span><span></span>
   </button>
-    <div class="page-title">주간 스케줄 (업무 & 일정)</div>
+    <div class="page-title">二쇨컙 ?ㅼ?以?(?낅Т & ?쇱젙)</div>
     <div class="topbar-right">
-      <button class="btn-solid" id="addPersonalBtn">+ 일정/업무 추가</button>
+      <button class="btn-solid" id="addPersonalBtn">+ ?쇱젙/?낅Т 異붽?</button>
     </div>
   </div>
   <div id="view-gantt" style="padding:1.25rem 24px; max-width: 1400px; overflow-x: auto;">
     <div class="gantt-header">
       <div style="display:flex;align-items:center;gap:10px">
-        <button class="nav-btn" id="prevBtn">‹</button>
+        <button class="nav-btn" id="prevBtn">??/button>
         <div class="gantt-title" id="ganttTitle"></div>
-        <button class="nav-btn" id="nextBtn">›</button>
-        <button class="today-btn" id="todayBtn">이번 주</button>
+        <button class="nav-btn" id="nextBtn">??/button>
+        <button class="today-btn" id="todayBtn">?대쾲 二?/button>
       </div>
     </div>
     
-    <!-- 필터 및 범례 자리 -->
+    <!-- ?꾪꽣 諛?踰붾? ?먮━ -->
     <div class="filter-row" id="typeFilterRow" style="display:none"></div>
     <div class="filter-row" id="memberFilterRow" style="display:none"></div>
     <div class="legend" id="legend"></div>
     
-    <!-- 주간 스케줄 실물 -->
+    <!-- 二쇨컙 ?ㅼ?以??ㅻЪ -->
     <div class="gantt-grid">
-      <!-- 헤더 (요일) -->
+      <!-- ?ㅻ뜑 (?붿씪) -->
       <div class="gantt-row">
-        <div class="gantt-user-col header">담당자</div>
+        <div class="gantt-user-col header">?대떦??/div>
         <div class="gantt-days-wrap" id="ganttHeaderDays">
-          <!-- JS에서 렌더링 -->
+          <!-- JS?먯꽌 ?뚮뜑留?-->
         </div>
       </div>
-      <!-- 바디 (담당자별 스케줄 렌더링) -->
+      <!-- 諛붾뵒 (?대떦?먮퀎 ?ㅼ?以??뚮뜑留? -->
       <div id="ganttBody">
-        <!-- JS에서 렌더링 -->
+        <!-- JS?먯꽌 ?뚮뜑留?-->
       </div>
     </div>
   </div>
@@ -578,40 +578,40 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
 
 <div class="overlay" id="addOverlay">
   <div class="modal">
-    <h3 id="addModalTitle">일정 추가</h3>
-    <div class="fg"><label>제목</label><input id="eTitle" placeholder="일정 제목을 입력하세요"/></div>
-    <div class="fg"><label>카테고리</label><select id="eCategory"></select></div>
+    <h3 id="addModalTitle">?쇱젙 異붽?</h3>
+    <div class="fg"><label>?쒕ぉ</label><input id="eTitle" placeholder="?쇱젙 ?쒕ぉ???낅젰?섏꽭??/></div>
+    <div class="fg"><label>移댄뀒怨좊━</label><select id="eCategory"></select></div>
     <div class="fg date-row">
-      <div><label>시작일</label><input id="eStart" type="date"/></div>
-      <div><label>종료일</label><input id="eEnd" type="date"/></div>
+      <div><label>?쒖옉??/label><input id="eStart" type="date"/></div>
+      <div><label>醫낅즺??/label><input id="eEnd" type="date"/></div>
     </div>
     <div class="fg">
-      <label>반복</label>
+      <label>諛섎났</label>
       <select id="eRepeatType">
-        <option value="none">반복 없음</option>
-        <option value="monthly_nth_weekday">매월 N번째 주 요일</option>
-        <option value="monthly_day_weekday">매월 N일 포함 주 요일</option>
-        <option value="monthly_date">매월 고정 날짜</option>
+        <option value="none">諛섎났 ?놁쓬</option>
+        <option value="monthly_nth_weekday">留ㅼ썡 N踰덉㎏ 二??붿씪</option>
+        <option value="monthly_day_weekday">留ㅼ썡 N???ы븿 二??붿씪</option>
+        <option value="monthly_date">留ㅼ썡 怨좎젙 ?좎쭨</option>
       </select>
       <div class="repeat-box" id="repeatOpts" style="display:none">
-        <div id="rNthWeekday" style="display:none"><div class="repeat-row">매월
-          <select id="rNth"><option value="1">1번째</option><option value="2">2번째</option><option value="3">3번째</option><option value="4">4번째</option></select>주의
-          <select id="rWeekday1"><option value="0">일</option><option value="1">월</option><option value="2">화</option><option value="3">수</option><option value="4">목</option><option value="5">금</option><option value="6">토</option></select>
+        <div id="rNthWeekday" style="display:none"><div class="repeat-row">留ㅼ썡
+          <select id="rNth"><option value="1">1踰덉㎏</option><option value="2">2踰덉㎏</option><option value="3">3踰덉㎏</option><option value="4">4踰덉㎏</option></select>二쇱쓽
+          <select id="rWeekday1"><option value="0">??/option><option value="1">??/option><option value="2">??/option><option value="3">??/option><option value="4">紐?/option><option value="5">湲?/option><option value="6">??/option></select>
         </div></div>
-        <div id="rDayWeekday" style="display:none"><div class="repeat-row">매월
-          <input id="rTargetDay" type="number" min="1" max="28" value="20" style="width:55px"/>일 포함 주의
-          <select id="rWeekday2"><option value="0">일</option><option value="1">월</option><option value="2">화</option><option value="3">수</option><option value="4">목</option><option value="5">금</option><option value="6">토</option></select>
+        <div id="rDayWeekday" style="display:none"><div class="repeat-row">留ㅼ썡
+          <input id="rTargetDay" type="number" min="1" max="28" value="20" style="width:55px"/>???ы븿 二쇱쓽
+          <select id="rWeekday2"><option value="0">??/option><option value="1">??/option><option value="2">??/option><option value="3">??/option><option value="4">紐?/option><option value="5">湲?/option><option value="6">??/option></select>
         </div></div>
-        <div id="rMonthlyDate" style="display:none"><div class="repeat-row">매월 <input id="rDate" type="number" min="1" max="28" value="1" style="width:55px"/>일</div></div>
-        <div class="repeat-row">종료: <select id="rEndType"><option value="endless">무기한</option><option value="date">날짜 지정</option></select>
+        <div id="rMonthlyDate" style="display:none"><div class="repeat-row">留ㅼ썡 <input id="rDate" type="number" min="1" max="28" value="1" style="width:55px"/>??/div></div>
+        <div class="repeat-row">醫낅즺: <select id="rEndType"><option value="endless">臾닿린??/option><option value="date">?좎쭨 吏??/option></select>
           <input id="rEndDate" type="date" style="display:none"/></div>
       </div>
     </div>
-    <div class="fg"><label>메모 (선택)</label><textarea id="eMemo" placeholder="메모를 입력하세요"></textarea></div>
+    <div class="fg"><label>硫붾え (?좏깮)</label><textarea id="eMemo" placeholder="硫붾え瑜??낅젰?섏꽭??></textarea></div>
     <div id="addErrLine" style="font-size:12px;color:var(--red);min-height:18px"></div>
     <div class="modal-btns">
-      <button class="btn-cancel" id="addCancelBtn">취소</button>
-      <button class="btn-ok" id="addSubmitBtn">추가하기</button>
+      <button class="btn-cancel" id="addCancelBtn">痍⑥냼</button>
+      <button class="btn-ok" id="addSubmitBtn">異붽??섍린</button>
     </div>
   </div>
 </div>
@@ -620,26 +620,26 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
 </div>
 <div class="overlay" id="repeatEditOverlay">
   <div class="modal" style="max-width:360px">
-    <h3>반복 일정 수정</h3>
-    <p style="font-size:13px;color:var(--text2);margin-bottom:12px">어떤 일정을 수정할까요?</p>
+    <h3>諛섎났 ?쇱젙 ?섏젙</h3>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:12px">?대뼡 ?쇱젙???섏젙?좉퉴??</p>
     <div class="repeat-edit-opts">
-      <label class="repeat-opt"><input type="radio" name="repeatEdit" value="this" checked/> 이 일정만</label>
-      <label class="repeat-opt"><input type="radio" name="repeatEdit" value="future"/> 이 일정 및 이후</label>
-      <label class="repeat-opt"><input type="radio" name="repeatEdit" value="all"/> 모든 반복 일정</label>
+      <label class="repeat-opt"><input type="radio" name="repeatEdit" value="this" checked/> ???쇱젙留?/label>
+      <label class="repeat-opt"><input type="radio" name="repeatEdit" value="future"/> ???쇱젙 諛??댄썑</label>
+      <label class="repeat-opt"><input type="radio" name="repeatEdit" value="all"/> 紐⑤뱺 諛섎났 ?쇱젙</label>
     </div>
-    <div class="modal-btns"><button class="btn-cancel" id="repeatEditCancelBtn">취소</button><button class="btn-ok" id="repeatEditOkBtn">확인</button></div>
+    <div class="modal-btns"><button class="btn-cancel" id="repeatEditCancelBtn">痍⑥냼</button><button class="btn-ok" id="repeatEditOkBtn">?뺤씤</button></div>
   </div>
 </div>
 <div class="overlay" id="repeatDelOverlay">
   <div class="modal" style="max-width:360px">
-    <h3>반복 일정 삭제</h3>
-    <p style="font-size:13px;color:var(--text2);margin-bottom:12px">어떤 일정을 삭제할까요?</p>
+    <h3>諛섎났 ?쇱젙 ??젣</h3>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:12px">?대뼡 ?쇱젙????젣?좉퉴??</p>
     <div class="repeat-edit-opts">
-      <label class="repeat-opt"><input type="radio" name="repeatDel" value="this" checked/> 이 일정만</label>
-      <label class="repeat-opt"><input type="radio" name="repeatDel" value="future"/> 이 일정 및 이후</label>
-      <label class="repeat-opt"><input type="radio" name="repeatDel" value="all"/> 모든 반복 일정</label>
+      <label class="repeat-opt"><input type="radio" name="repeatDel" value="this" checked/> ???쇱젙留?/label>
+      <label class="repeat-opt"><input type="radio" name="repeatDel" value="future"/> ???쇱젙 諛??댄썑</label>
+      <label class="repeat-opt"><input type="radio" name="repeatDel" value="all"/> 紐⑤뱺 諛섎났 ?쇱젙</label>
     </div>
-    <div class="modal-btns"><button class="btn-cancel" id="repeatDelCancelBtn">취소</button><button class="btn-ok" id="repeatDelOkBtn" style="background:var(--red)">삭제</button></div>
+    <div class="modal-btns"><button class="btn-cancel" id="repeatDelCancelBtn">痍⑥냼</button><button class="btn-ok" id="repeatDelOkBtn" style="background:var(--red)">??젣</button></div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -655,11 +655,11 @@ document.addEventListener('DOMContentLoaded', function() {
     if (av) av.textContent = (_u.displayName||_u.id||'--').slice(0,2);
     if (nm) nm.textContent = _u.displayName||_u.id||'';
     var isMgr = _u.role==='manager'||_u.role==='admin';
-    if (rl) rl.textContent = isMgr ? '팀장' : '팀원';
+    if (rl) rl.textContent = isMgr ? '??? : '???;
     var ti = document.getElementById('sbTaskItem');
     var tl = document.getElementById('sbTaskLabel');
     if (ti) ti.dataset.nav = isMgr ? 'manager.html' : 'member.html';
-    if (tl) tl.textContent = isMgr ? '팀 업무 현황' : '내 업무';
+    if (tl) tl.textContent = isMgr ? '? ?낅Т ?꾪솴' : '???낅Т';
     if (_u.role==='admin') {
       var as = document.getElementById('sbAdminSec');
       var ai = document.getElementById('sbAdminItem');
@@ -720,11 +720,11 @@ document.addEventListener('DOMContentLoaded', function() {
 import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import {getFirestore,collection,doc,getDoc,setDoc,onSnapshot,addDoc,updateDoc,deleteDoc,query,orderBy} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 const FC={apiKey:"AIzaSyA7KylsSyT3_0oQvhBtcrPc-gcdfVq90IQ",authDomain:"gzplan.firebaseapp.com",projectId:"gzplan",storageBucket:"gzplan.firebasestorage.app",messagingSenderId:"186255862586",appId:"1:186255862586:web:f36d21f76012ca43b8fe03"};
-const MEMBER_IDS=["강신욱","김용욱","오문식","이길우","이도영","이영찬","이윤형"];
+const MEMBER_IDS=["媛뺤떊??,"源?⑹슧","?ㅻЦ??,"?닿만??,"?대룄??,"?댁쁺李?,"?댁쑄??];
 const MEMBER_COLORS=["#378ADD","#7F77DD","#EF9F27","#639922","#E24B4A","#D4537E","#1D9E75"];
 const PRIORITY_COLORS={1:'#888',2:'#378ADD',3:'#EF9F27',4:'#E24B4A',5:'#a32d2d'};
-const WD=['일','월','화','수','목','금','토'];
-const DEFAULT_CATS=[{id:'meeting',label:'회의',color:'#378ADD'},{id:'report',label:'보고',color:'#7F77DD'},{id:'trip',label:'출장',color:'#EF9F27'},{id:'event',label:'행사',color:'#639922'},{id:'etc',label:'기타',color:'#888888'}];
+const WD=['??,'??,'??,'??,'紐?,'湲?,'??];
+const DEFAULT_CATS=[{id:'meeting',label:'?뚯쓽',color:'#378ADD'},{id:'report',label:'蹂닿퀬',color:'#7F77DD'},{id:'trip',label:'異쒖옣',color:'#EF9F27'},{id:'event',label:'?됱궗',color:'#639922'},{id:'etc',label:'湲고?',color:'#888888'}];
 const toStr=d=>d.toISOString().split('T')[0];
 const parse=s=>{const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
 const fmt=s=>{if(!s)return'-';const d=parse(s);return`${d.getFullYear()}. ${d.getMonth()+1}. ${d.getDate()}.`};
@@ -736,36 +736,36 @@ const ME=JSON.parse(sess);
 if(!ME.id){location.href='index.html';throw''}
 const isMgr=ME.role==='manager'||ME.role==='admin';
 
-// ── 사이드바 초기화 ──
+// ?? ?ъ씠?쒕컮 珥덇린????
 (function() {
   var av = document.getElementById('sbAvatar');
   var nm = document.getElementById('sbUserName');
   var rl = document.getElementById('sbUserRole');
   if (av) av.textContent = (ME.displayName||ME.id||'--').slice(0,2);
   if (nm) nm.textContent = ME.displayName||ME.id||'';
-  if (rl) rl.textContent = isMgr ? '팀장' : '팀원';
-  // 공통 일정 버튼
+  if (rl) rl.textContent = isMgr ? '??? : '???;
+  // 怨듯넻 ?쇱젙 踰꾪듉
   if (isMgr) {
     var cb1 = document.getElementById('addCommonBtnTop');
     if (cb1) cb1.style.display = '';
   }
-  // 어드민이면 계정관리 메뉴 표시
+  // ?대뱶誘쇱씠硫?怨꾩젙愿由?硫붾돱 ?쒖떆
   if (ME.role === 'admin') {
     var adminSec = document.getElementById('sbAdminSec');
     var adminItem = document.getElementById('sbAdminItem');
     if (adminSec) adminSec.style.display = '';
     if (adminItem) adminItem.style.display = '';
   }
-  // 팀원이면 내업무, 팀장이면 팀업무
+  // ??먯씠硫??댁뾽臾? ??μ씠硫???낅Т
   var taskItem = document.getElementById('sbTaskItem');
   if (taskItem) taskItem.dataset.nav = isMgr ? 'manager.html' : 'member.html';
   var taskLabel = document.getElementById('sbTaskLabel');
-  if (taskLabel) taskLabel.textContent = isMgr ? '팀 업무 현황' : '내 업무';
+  if (taskLabel) taskLabel.textContent = isMgr ? '? ?낅Т ?꾪솴' : '???낅Т';
 })();
 
 
 
-// ── 모바일 햄버거 ──
+// ?? 紐⑤컮???꾨쾭嫄???
 (function() {
   function openSB() {
     var s = document.querySelector('.sidebar');
@@ -785,29 +785,29 @@ const isMgr=ME.role==='manager'||ME.role==='admin';
   var dim = document.getElementById('sidebarDim');
   if (hb) { hb.onclick = openSB; }
   if (dim) { dim.onclick = closeSB; }
-  // 사이드바 nav 클릭시 닫기
+  // ?ъ씠?쒕컮 nav ?대┃???リ린
   document.querySelectorAll('.sidebar [data-nav]').forEach(function(el) {
     el.addEventListener('click', closeSB);
   });
-  // window에 노출 (외부에서 호출 가능)
+  // window???몄텧 (?몃??먯꽌 ?몄텧 媛??
   window.openSidebar = openSB;
   window.closeSidebar = closeSB;
 })();
 
 
-// logout: 일반 script에서 처리
+// logout: ?쇰컲 script?먯꽌 泥섎━
 window.goBack=()=>{location.href=isMgr?'manager.html':'member.html'};
 const DEMO_SCHEDULES=[
-  {id:'__d1',title:'월간 업무 보고',category:'report',startDate:'2026-04-06',endDate:'2026-04-06',type:'common',author:'관리자',authorId:'admin',memo:'4월 월간 업무 현황 보고',repeat:{type:'none'},_demo:true},
-  {id:'__d2',title:'팀 정기 회의',category:'meeting',startDate:'2026-04-07',endDate:'2026-04-07',type:'common',author:'관리자',authorId:'admin',repeat:{type:'monthly_nth_weekday',week:1,weekday:2},_demo:true},
-  {id:'__d3',title:'2분기 사업계획 보고',category:'report',startDate:'2026-04-13',endDate:'2026-04-13',type:'common',author:'관리자',authorId:'admin',repeat:{type:'none'},_demo:true},
-  {id:'__d4',title:'출장 (서울 본사)',category:'trip',startDate:'2026-04-15',endDate:'2026-04-16',type:'personal',author:'강신욱',authorId:'강신욱',repeat:{type:'none'},_demo:true},
-  {id:'__d5',title:'신규 프로젝트 기획 회의',category:'meeting',startDate:'2026-04-21',endDate:'2026-04-21',type:'common',author:'관리자',authorId:'admin',repeat:{type:'none'},_demo:true},
-  {id:'__d6',title:'경영진 보고',category:'report',startDate:'2026-04-27',endDate:'2026-04-27',type:'common',author:'관리자',authorId:'admin',repeat:{type:'none'},_demo:true},
-  {id:'__d7',title:'팀 워크숍',category:'event',startDate:'2026-04-29',endDate:'2026-04-30',type:'common',author:'관리자',authorId:'admin',memo:'2분기 팀빌딩 행사',repeat:{type:'none'},_demo:true},
-  {id:'__d8',title:'월간 업무 보고',category:'report',startDate:'2026-05-04',endDate:'2026-05-04',type:'common',author:'관리자',authorId:'admin',repeat:{type:'none'},_demo:true},
-  {id:'__d9',title:'팀 정기 회의',category:'meeting',startDate:'2026-05-12',endDate:'2026-05-12',type:'common',author:'관리자',authorId:'admin',repeat:{type:'none'},_demo:true},
-  {id:'__d10',title:'상반기 성과 점검',category:'report',startDate:'2026-05-25',endDate:'2026-05-25',type:'common',author:'관리자',authorId:'admin',repeat:{type:'none'},_demo:true},
+  {id:'__d1',title:'?붽컙 ?낅Т 蹂닿퀬',category:'report',startDate:'2026-04-06',endDate:'2026-04-06',type:'common',author:'愿由ъ옄',authorId:'admin',memo:'4???붽컙 ?낅Т ?꾪솴 蹂닿퀬',repeat:{type:'none'},_demo:true},
+  {id:'__d2',title:'? ?뺢린 ?뚯쓽',category:'meeting',startDate:'2026-04-07',endDate:'2026-04-07',type:'common',author:'愿由ъ옄',authorId:'admin',repeat:{type:'monthly_nth_weekday',week:1,weekday:2},_demo:true},
+  {id:'__d3',title:'2遺꾧린 ?ъ뾽怨꾪쉷 蹂닿퀬',category:'report',startDate:'2026-04-13',endDate:'2026-04-13',type:'common',author:'愿由ъ옄',authorId:'admin',repeat:{type:'none'},_demo:true},
+  {id:'__d4',title:'異쒖옣 (?쒖슱 蹂몄궗)',category:'trip',startDate:'2026-04-15',endDate:'2026-04-16',type:'personal',author:'媛뺤떊??,authorId:'媛뺤떊??,repeat:{type:'none'},_demo:true},
+  {id:'__d5',title:'?좉퇋 ?꾨줈?앺듃 湲고쉷 ?뚯쓽',category:'meeting',startDate:'2026-04-21',endDate:'2026-04-21',type:'common',author:'愿由ъ옄',authorId:'admin',repeat:{type:'none'},_demo:true},
+  {id:'__d6',title:'寃쎌쁺吏?蹂닿퀬',category:'report',startDate:'2026-04-27',endDate:'2026-04-27',type:'common',author:'愿由ъ옄',authorId:'admin',repeat:{type:'none'},_demo:true},
+  {id:'__d7',title:'? ?뚰겕??,category:'event',startDate:'2026-04-29',endDate:'2026-04-30',type:'common',author:'愿由ъ옄',authorId:'admin',memo:'2遺꾧린 ?鍮뚮뵫 ?됱궗',repeat:{type:'none'},_demo:true},
+  {id:'__d8',title:'?붽컙 ?낅Т 蹂닿퀬',category:'report',startDate:'2026-05-04',endDate:'2026-05-04',type:'common',author:'愿由ъ옄',authorId:'admin',repeat:{type:'none'},_demo:true},
+  {id:'__d9',title:'? ?뺢린 ?뚯쓽',category:'meeting',startDate:'2026-05-12',endDate:'2026-05-12',type:'common',author:'愿由ъ옄',authorId:'admin',repeat:{type:'none'},_demo:true},
+  {id:'__d10',title:'?곷컲湲??깃낵 ?먭?',category:'report',startDate:'2026-05-25',endDate:'2026-05-25',type:'common',author:'愿由ъ옄',authorId:'admin',repeat:{type:'none'},_demo:true},
 ];
 
 let schedules=[...DEMO_SCHEDULES],taskEvents=[],CAT_LIST=[...DEFAULT_CATS],CAT_MAP={};
@@ -831,10 +831,9 @@ function renderWeeklySchedule() {
   const wStartStr = toStr(weekDates[0]);
   const wEndStr = toStr(weekDates[6]);
   
-  document.getElementById('ganttTitle').textContent = `${weekDates[0].getFullYear()}년 ${weekDates[0].getMonth()+1}월 ${weekDates[0].getDate()}일 ~ ${weekDates[6].getMonth()+1}월 ${weekDates[6].getDate()}일`;
+  document.getElementById('ganttTitle').textContent = `${weekDates[0].getFullYear()}??${weekDates[0].getMonth()+1}??${weekDates[0].getDate()}??~ ${weekDates[6].getMonth()+1}??${weekDates[6].getDate()}??;
   
-  // 헤더 요일 그리기
-  const WD_LABEL = ['월', '화', '수', '목', '금', '토', '일'];
+  // ?ㅻ뜑 ?붿씪 洹몃━湲?  const WD_LABEL = ['??, '??, '??, '紐?, '湲?, '??, '??];
   const todayStr = toStr(new Date());
   
   document.getElementById('ganttHeaderDays').innerHTML = weekDates.map((d, i) => {
@@ -846,8 +845,7 @@ function renderWeeklySchedule() {
     return `<div class="${cls}">${d.getMonth()+1}/${d.getDate()} (${WD_LABEL[i]})</div>`;
   }).join('');
   
-  // 전역 데이터 수집 및 해당 주간 필터링
-  const allInst = [];
+  // ?꾩뿭 ?곗씠???섏쭛 諛??대떦 二쇨컙 ?꾪꽣留?  const allInst = [];
   if(typeFilter === 'all' || typeFilter === 'task') {
     taskEvents.filter(t => memberFilter === 'all' || t._mid === memberFilter).forEach(t => allInst.push({...t, _type: 'task'}));
   }
@@ -861,7 +859,7 @@ function renderWeeklySchedule() {
     if(!ev.repeat || ev.repeat.type === 'none') {
       allInst.push({...ev, _type: ev.type || 'personal'});
     } else {
-      // 대략적인 반복 범위 계산 (현재 뷰 앞뒤 1달 정도만 캐싱해서 그리기)
+      // ??듭쟻??諛섎났 踰붿쐞 怨꾩궛 (?꾩옱 酉??욌뮘 1???뺣룄留?罹먯떛?댁꽌 洹몃━湲?
       getRepeatDates(ev, weekDates[0].getFullYear(), weekDates[0].getMonth()).forEach(ds => {
         allInst.push({...ev, startDate: ds, endDate: ds, instanceDate: ds, isRepeatInstance: true, _type: ev.type || 'personal'});
       });
@@ -872,20 +870,20 @@ function renderWeeklySchedule() {
     }
   });
   
-  // 화면에 그릴 담당자 리스트 (팀장이 아니면 본인만)
+  // ?붾㈃??洹몃┫ ?대떦??由ъ뒪??(??μ씠 ?꾨땲硫?蹂몄씤留?
   const displayMembers = isMgr ? (memberFilter === 'all' ? MEMBER_IDS : [memberFilter]) : [ME.id];
   let bodyHtml = '';
   
   displayMembers.forEach((member, mIdx) => {
-    // 해당 담당자의 주간 이벤트 (공통일정 포함)
+    // ?대떦 ?대떦?먯쓽 二쇨컙 ?대깽??(怨듯넻?쇱젙 ?ы븿)
     const memberEvts = allInst.filter(e => {
-      // 1. 공통업무인지 확인
+      // 1. 怨듯넻?낅Т?몄? ?뺤씤
       const isCommon = e._type === 'common';
-      // 2. 담당자인지 확인
+      // 2. ?대떦?먯씤吏 ?뺤씤
       const isMine = e._type === 'task' ? e._mid === member : e.authorId === member;
       if(!isMine && !isCommon) return false;
       
-      // 3. 이번 주 윈도우랑 겹치는지 판단
+      // 3. ?대쾲 二??덈룄?곕옉 寃뱀튂?붿? ?먮떒
       const st = e.startDate;
       const en = e.endDate || e.startDate;
       return (st <= wEndStr && en >= wStartStr);
@@ -893,27 +891,27 @@ function renderWeeklySchedule() {
     
     memberEvts.sort((a,b) => a.startDate.localeCompare(b.startDate));
     
-    // 간섭 계산을 위한 매트릭스 (row 할당)
-    const rowTops = {}; // 각 이벤트의 행 위치(0, 1, 2...)
+    // 媛꾩꽠 怨꾩궛???꾪븳 留ㅽ듃由?뒪 (row ?좊떦)
+    const rowTops = {}; // 媛??대깽?몄쓽 ???꾩튂(0, 1, 2...)
     const placed = [];
     
     memberEvts.forEach(ev => {
       let r = 0;
-      // 겹치는지 체크
+      // 寃뱀튂?붿? 泥댄겕
       while(placed.some(p => p.row === r && !(p.endDate < ev.startDate || p.startDate > (ev.endDate||ev.startDate)))) {
         r++;
       }
       placed.push({row: r, startDate: ev.startDate, endDate: ev.endDate||ev.startDate, ev});
     });
     
-    // 최대 row 개수 계산
+    // 理쒕? row 媛쒖닔 怨꾩궛
     const maxRow = placed.length > 0 ? Math.max(...placed.map(p=>p.row)) + 1 : 1;
     const layerHeight = Math.max(60, maxRow * 30 + 10);
     
     let barsHtml = '';
     placed.forEach(p => {
       const e = p.ev;
-      // 이번 주 내에서 시작, 종료 idx 파악
+      // ?대쾲 二??댁뿉???쒖옉, 醫낅즺 idx ?뚯븙
       const stStr = e.startDate < wStartStr ? wStartStr : e.startDate;
       const enStr = (e.endDate||e.startDate) > wEndStr ? wEndStr : (e.endDate||e.startDate);
       
@@ -929,9 +927,9 @@ function renderWeeklySchedule() {
       let color = '#888', label = '', bc = 'gantt-bar';
       let title = e.title || '';
       
-      // 연차 최우선 표기
+      // ?곗감 理쒖슦???쒓린
       let isVacation = false;
-      if (e.category === 'vacation' || title.includes('연차') || title.includes('휴가') || title.includes('반차')) {
+      if (e.category === 'vacation' || title.includes('?곗감') || title.includes('?닿?') || title.includes('諛섏감')) {
         isVacation = true;
       }
       
@@ -941,12 +939,12 @@ function renderWeeklySchedule() {
         label = title;
       } else if(e._type === 'common') {
         color = '#5F5E5A';
-        label = `🏢 ${title}`;
+        label = `?룫 ${title}`;
       } else {
         const cat = CAT_MAP[e.category] || {color: '#888'};
         color = cat.color;
-        label = `${e.isRepeatInstance?'🔁 ':''}${title}`;
-        if(isVacation) color = '#E24B4A'; // 빨간색 계열로 강조
+        label = `${e.isRepeatInstance?'?봺 ':''}${title}`;
+        if(isVacation) color = '#E24B4A'; // 鍮④컙??怨꾩뿴濡?媛뺤“
       }
       
       const op = e.status === 'done' ? 'opacity:.6;' : '';
@@ -961,8 +959,7 @@ function renderWeeklySchedule() {
       `;
     });
     
-    // 격자 그리기
-    let gridCols = '';
+    // 寃⑹옄 洹몃━湲?    let gridCols = '';
     for(let i=0; i<7; i++) gridCols += `<div class="gantt-col"></div>`;
     
     bodyHtml += `
@@ -979,7 +976,7 @@ function renderWeeklySchedule() {
   });
   
   if (displayMembers.length === 0) {
-     bodyHtml = '<div style="padding: 2rem; text-align: center; color: var(--text3)">조건에 맞는 담당자가 없습니다.</div>';
+     bodyHtml = '<div style="padding: 2rem; text-align: center; color: var(--text3)">議곌굔??留욌뒗 ?대떦?먭? ?놁뒿?덈떎.</div>';
   }
   
   document.getElementById('ganttBody').innerHTML = bodyHtml;
@@ -996,25 +993,25 @@ window.goToday = () => {
 window.openDetail=(id,instanceDate,type,mid)=>{
   if(type==='task'){
     const t=taskEvents.find(x=>x.id===id&&x._mid===mid);if(!t)return;
-    const sl={todo:'대기',inprogress:'진행 중',done:'완료'};
-    document.getElementById('detailContent').innerHTML=`<div class="detail-cat" style="background:${PRIORITY_COLORS[t.priority||3]}">업무 스케줄</div><h3 style="font-size:16px;font-weight:600;margin-bottom:12px">${t.title}</h3><div class="detail-row"><span class="detail-lbl">담당자</span><span class="detail-val">${t._mid}</span></div><div class="detail-row"><span class="detail-lbl">기간</span><span class="detail-val">${fmt(t.startDate)} ~ ${fmt(t.endDate)}</span></div><div class="detail-row"><span class="detail-lbl">상태</span><span class="detail-val">${sl[t.status]||'-'}</span></div><div class="detail-row"><span class="detail-lbl">중요도</span><span class="detail-val">${t.priority||3}</span></div>`;
-    document.getElementById('detailBtns').innerHTML=`<button class="btn-cancel" onclick="closeModal('detailOverlay')" style="margin-left:auto">닫기</button>`;
+    const sl={todo:'?湲?,inprogress:'吏꾪뻾 以?,done:'?꾨즺'};
+    document.getElementById('detailContent').innerHTML=`<div class="detail-cat" style="background:${PRIORITY_COLORS[t.priority||3]}">?낅Т ?ㅼ?以?/div><h3 style="font-size:16px;font-weight:600;margin-bottom:12px">${t.title}</h3><div class="detail-row"><span class="detail-lbl">?대떦??/span><span class="detail-val">${t._mid}</span></div><div class="detail-row"><span class="detail-lbl">湲곌컙</span><span class="detail-val">${fmt(t.startDate)} ~ ${fmt(t.endDate)}</span></div><div class="detail-row"><span class="detail-lbl">?곹깭</span><span class="detail-val">${sl[t.status]||'-'}</span></div><div class="detail-row"><span class="detail-lbl">以묒슂??/span><span class="detail-val">${t.priority||3}</span></div>`;
+    document.getElementById('detailBtns').innerHTML=`<button class="btn-cancel" onclick="closeModal('detailOverlay')" style="margin-left:auto">?リ린</button>`;
     document.getElementById('detailOverlay').classList.add('show');return;
   }
   const ev=schedules.find(e=>e.id===id);if(!ev)return;
   const isC=ev.type==='common',canEdit=isC?isMgr:(isMgr||ev.authorId===ME.id);
   const isR=ev.repeat&&ev.repeat.type!=='none';
-  const cat=CAT_MAP[ev.category]||{label:'기타',color:'#888'};
+  const cat=CAT_MAP[ev.category]||{label:'湲고?',color:'#888'};
   const rl=getRL(ev.repeat);
-  document.getElementById('detailContent').innerHTML=`<div class="detail-cat" style="background:${isC?'#5F5E5A':cat.color}">${isC?'🏢 공통 일정':cat.label}</div><h3 style="font-size:16px;font-weight:600;margin-bottom:12px">${ev.title}</h3><div class="detail-row"><span class="detail-lbl">날짜</span><span class="detail-val">${fmt(ev.startDate)}${ev.startDate!==ev.endDate?' ~ '+fmt(ev.endDate):''}</span></div>${isR?`<div class="detail-row"><span class="detail-lbl">반복</span><span class="detail-val"><span class="repeat-badge">🔁 ${rl}</span></span></div>`:''}${ev.memo?`<div class="detail-row"><span class="detail-lbl">메모</span><span class="detail-val">${ev.memo}</span></div>`:''}<div class="detail-row"><span class="detail-lbl">작성자</span><span class="detail-val">${ev.author||'-'}</span></div>`;
-  document.getElementById('detailBtns').innerHTML=canEdit?`<button class="btn-danger" onclick="reqDel('${id}','${instanceDate}')">삭제</button><button class="btn-cancel" onclick="closeModal('detailOverlay')">닫기</button><button class="btn-ok" onclick="openEdit('${id}','${instanceDate}')">수정</button>`:`<button class="btn-cancel" onclick="closeModal('detailOverlay')" style="margin-left:auto">닫기</button>`;
+  document.getElementById('detailContent').innerHTML=`<div class="detail-cat" style="background:${isC?'#5F5E5A':cat.color}">${isC?'?룫 怨듯넻 ?쇱젙':cat.label}</div><h3 style="font-size:16px;font-weight:600;margin-bottom:12px">${ev.title}</h3><div class="detail-row"><span class="detail-lbl">?좎쭨</span><span class="detail-val">${fmt(ev.startDate)}${ev.startDate!==ev.endDate?' ~ '+fmt(ev.endDate):''}</span></div>${isR?`<div class="detail-row"><span class="detail-lbl">諛섎났</span><span class="detail-val"><span class="repeat-badge">?봺 ${rl}</span></span></div>`:''}${ev.memo?`<div class="detail-row"><span class="detail-lbl">硫붾え</span><span class="detail-val">${ev.memo}</span></div>`:''}<div class="detail-row"><span class="detail-lbl">?묒꽦??/span><span class="detail-val">${ev.author||'-'}</span></div>`;
+  document.getElementById('detailBtns').innerHTML=canEdit?`<button class="btn-danger" onclick="reqDel('${id}','${instanceDate}')">??젣</button><button class="btn-cancel" onclick="closeModal('detailOverlay')">?リ린</button><button class="btn-ok" onclick="openEdit('${id}','${instanceDate}')">?섏젙</button>`:`<button class="btn-cancel" onclick="closeModal('detailOverlay')" style="margin-left:auto">?リ린</button>`;
   document.getElementById('detailOverlay').classList.add('show');
 };
-function getRL(r){if(!r||r.type==='none')return'';if(r.type==='monthly_nth_weekday')return`매월 ${r.week}번째 주 ${WD[r.weekday]}요일`;if(r.type==='monthly_day_weekday')return`매월 ${r.targetDay}일 포함 주 ${WD[r.weekday]}요일`;if(r.type==='monthly_date')return`매월 ${r.date}일`;return''}
+function getRL(r){if(!r||r.type==='none')return'';if(r.type==='monthly_nth_weekday')return`留ㅼ썡 ${r.week}踰덉㎏ 二?${WD[r.weekday]}?붿씪`;if(r.type==='monthly_day_weekday')return`留ㅼ썡 ${r.targetDay}???ы븿 二?${WD[r.weekday]}?붿씪`;if(r.type==='monthly_date')return`留ㅼ썡 ${r.date}??;return''}
 window.openAddModal=(type='personal')=>{
   editingId=null;editScope=null;editInstanceDate=null;editType=type;
-  document.getElementById('addModalTitle').textContent=type==='common'?'🏢 공통 일정 추가':'개별 일정 추가';
-  document.getElementById('addSubmitBtn').textContent='추가하기';
+  document.getElementById('addModalTitle').textContent=type==='common'?'?룫 怨듯넻 ?쇱젙 異붽?':'媛쒕퀎 ?쇱젙 異붽?';
+  document.getElementById('addSubmitBtn').textContent='異붽??섍린';
   document.getElementById('eTitle').value='';document.getElementById('eCategory').value=CAT_LIST[0]?.id||'meeting';
   document.getElementById('eMemo').value='';document.getElementById('eRepeatType').value='none';
   document.getElementById('addErrLine').textContent='';
@@ -1035,10 +1032,10 @@ window.submitEvent=async()=>{
   const sd=document.getElementById('eStart').value,ed=document.getElementById('eEnd').value;
   const memo=document.getElementById('eMemo').value.trim(),rt=document.getElementById('eRepeatType').value;
   const err=document.getElementById('addErrLine');err.textContent='';
-  if(!title){err.textContent='제목을 입력해주세요';return}
-  if(!sd){err.textContent='시작일을 입력해주세요';return}
-  if(!ed){err.textContent='종료일을 입력해주세요';return}
-  if(ed<sd){err.textContent='종료일이 시작일보다 빨라요';return}
+  if(!title){err.textContent='?쒕ぉ???낅젰?댁＜?몄슂';return}
+  if(!sd){err.textContent='?쒖옉?쇱쓣 ?낅젰?댁＜?몄슂';return}
+  if(!ed){err.textContent='醫낅즺?쇱쓣 ?낅젰?댁＜?몄슂';return}
+  if(ed<sd){err.textContent='醫낅즺?쇱씠 ?쒖옉?쇰낫??鍮⑤씪??;return}
   let repeat={type:'none'};
   if(rt!=='none'){
     const ret=document.getElementById('rEndType').value,red=ret==='date'?document.getElementById('rEndDate').value:null;
@@ -1046,7 +1043,7 @@ window.submitEvent=async()=>{
     else if(rt==='monthly_day_weekday')repeat={type:rt,targetDay:Number(document.getElementById('rTargetDay').value),weekday:Number(document.getElementById('rWeekday2').value),endDate:red};
     else if(rt==='monthly_date')repeat={type:rt,date:Number(document.getElementById('rDate').value),endDate:red};
   }
-  const btn=document.getElementById('addSubmitBtn');btn.disabled=true;btn.textContent='저장 중...';
+  const btn=document.getElementById('addSubmitBtn');btn.disabled=true;btn.textContent='???以?..';
   try{
     const data={title,category:cat,startDate:sd,endDate:ed,memo,repeat,author:ME.displayName,authorId:ME.id,updatedAt:new Date().toISOString()};
     if(editingId){
@@ -1054,26 +1051,26 @@ window.submitEvent=async()=>{
         const orig=schedules.find(e=>e.id===editingId);
         await updateDoc(doc(db,'schedules',editingId),{exceptions:[...(orig?.exceptions||[]),editInstanceDate]});
         await addDoc(collection(db,'schedules'),{...data,type:orig?.type||'personal',repeat:{type:'none'},isException:true,seriesId:orig?.seriesId||editingId,createdAt:new Date().toISOString()});
-        toast('이 일정만 수정됐어요 ✓');
+        toast('???쇱젙留??섏젙?먯뼱????);
       }else if(editScope==='future'){
         const orig=schedules.find(e=>e.id===editingId);
         const prev=toStr(new Date(parse(editInstanceDate).getTime()-86400000));
         await updateDoc(doc(db,'schedules',editingId),{repeat:{...orig?.repeat,endDate:prev}});
         await addDoc(collection(db,'schedules'),{...data,type:orig?.type||'personal',seriesId:Date.now()+'_'+ME.id,createdAt:new Date().toISOString()});
-        toast('이후 일정이 수정됐어요 ✓');
-      }else{await updateDoc(doc(db,'schedules',editingId),data);toast('일정이 수정됐어요 ✓')}
+        toast('?댄썑 ?쇱젙???섏젙?먯뼱????);
+      }else{await updateDoc(doc(db,'schedules',editingId),data);toast('?쇱젙???섏젙?먯뼱????)}
     }else{
       if(repeat.type!=='none')data.seriesId=Date.now()+'_'+ME.id;
       data.type=editType;data.createdAt=new Date().toISOString();
-      await addDoc(collection(db,'schedules'),data);toast('일정을 추가했어요 ✓');
+      await addDoc(collection(db,'schedules'),data);toast('?쇱젙??異붽??덉뼱????);
     }
     closeModal('addOverlay');
-  }catch(e){document.getElementById('addErrLine').textContent='오류: '+e.message}
-  finally{btn.disabled=false;btn.textContent=editingId?'저장하기':'추가하기'}
+  }catch(e){document.getElementById('addErrLine').textContent='?ㅻ쪟: '+e.message}
+  finally{btn.disabled=false;btn.textContent=editingId?'??ν븯湲?:'異붽??섍린'}
 };
 window.openEdit=(id,instanceDate)=>{
   const ev=schedules.find(e=>e.id===id);if(!ev)return;
-  if(ev._demo){toast('샘플 데이터예요. 실제 일정을 추가해보세요 :)');return;}
+  if(ev._demo){toast('?섑뵆 ?곗씠?곗삁?? ?ㅼ젣 ?쇱젙??異붽??대낫?몄슂 :)');return;}
   closeModal('detailOverlay');
   if(ev.repeat&&ev.repeat.type!=='none'){pendingRepeatAction={id,instanceDate};document.getElementById('repeatEditOverlay').classList.add('show');return}
   fillEdit(ev);
@@ -1085,8 +1082,8 @@ window.confirmRepeatEdit=()=>{
 };
 function fillEdit(ev,instanceDate=null,scope=null){
   editingId=ev.id;editScope=scope;editInstanceDate=instanceDate;editType=ev.type||'personal';
-  document.getElementById('addModalTitle').textContent=ev.type==='common'?'🏢 공통 일정 수정':'일정 수정';
-  document.getElementById('addSubmitBtn').textContent='저장하기';
+  document.getElementById('addModalTitle').textContent=ev.type==='common'?'?룫 怨듯넻 ?쇱젙 ?섏젙':'?쇱젙 ?섏젙';
+  document.getElementById('addSubmitBtn').textContent='??ν븯湲?;
   document.getElementById('eTitle').value=ev.title;document.getElementById('eCategory').value=ev.category||CAT_LIST[0]?.id;
   document.getElementById('eStart').value=ev.startDate;document.getElementById('eEnd').value=ev.endDate;
   document.getElementById('eMemo').value=ev.memo||'';document.getElementById('addErrLine').textContent='';
@@ -1100,20 +1097,20 @@ function fillEdit(ev,instanceDate=null,scope=null){
 }
 window.reqDel=(id,instanceDate)=>{
   const ev=schedules.find(e=>e.id===id);if(!ev)return;
-  if(ev._demo){toast('샘플 데이터예요. 실제 일정을 추가해보세요 :)');return;}
+  if(ev._demo){toast('?섑뵆 ?곗씠?곗삁?? ?ㅼ젣 ?쇱젙??異붽??대낫?몄슂 :)');return;}
   closeModal('detailOverlay');
   if(ev.repeat&&ev.repeat.type!=='none'){pendingDelId={id,instanceDate};document.getElementById('repeatDelOverlay').classList.add('show');return}
-  if(confirm('이 일정을 삭제할까요?'))deleteDoc(doc(db,'schedules',id)).then(()=>toast('일정을 삭제했어요'));
+  if(confirm('???쇱젙????젣?좉퉴??'))deleteDoc(doc(db,'schedules',id)).then(()=>toast('?쇱젙????젣?덉뼱??));
 };
 window.confirmRepeatDel=async()=>{
   const scope=document.querySelector('input[name="repeatDel"]:checked').value;closeModal('repeatDelOverlay');
   const{id,instanceDate}=pendingDelId;const ev=schedules.find(e=>e.id===id);if(!ev)return;
-  if(scope==='this'){await updateDoc(doc(db,'schedules',id),{exceptions:[...(ev.exceptions||[]),instanceDate]});toast('이 일정을 삭제했어요')}
-  else if(scope==='future'){const prev=toStr(new Date(parse(instanceDate).getTime()-86400000));await updateDoc(doc(db,'schedules',id),{repeat:{...ev.repeat,endDate:prev}});toast('이후 일정을 삭제했어요')}
-  else{await deleteDoc(doc(db,'schedules',id));toast('모든 반복 일정을 삭제했어요')}
+  if(scope==='this'){await updateDoc(doc(db,'schedules',id),{exceptions:[...(ev.exceptions||[]),instanceDate]});toast('???쇱젙????젣?덉뼱??)}
+  else if(scope==='future'){const prev=toStr(new Date(parse(instanceDate).getTime()-86400000));await updateDoc(doc(db,'schedules',id),{repeat:{...ev.repeat,endDate:prev}});toast('?댄썑 ?쇱젙????젣?덉뼱??)}
+  else{await deleteDoc(doc(db,'schedules',id));toast('紐⑤뱺 諛섎났 ?쇱젙????젣?덉뼱??)}
 };
 window.switchView=tab=>{
-  // gantt 에서는 view switch 불필요 (tab-cal, tab-cat 제거됨)
+  // gantt ?먯꽌??view switch 遺덊븘??(tab-cal, tab-cat ?쒓굅??
 };
 window.closeModal=id=>document.getElementById(id).classList.remove('show');
 document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===e.currentTarget)e.target.classList.remove('show')}));

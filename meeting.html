@@ -2407,7 +2407,7 @@ ${noteSection}
       const transcript = document.getElementById("transcriptArea").value.trim();
       const userNote = document.getElementById("userNoteArea").value.trim();
       const summary = document.getElementById("summaryArea").value.trim();
-      const isShared = false;
+      const isShared = curMode === 'shared';
       if (!title) { toast("회의 제목을 입력해주세요"); return }
 
       const tags = [...new Set([

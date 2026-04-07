@@ -711,10 +711,6 @@ window.closePoolModal = () => { document.getElementById('poolOverlay').classList
 window.addPoolTask = async () => {
   const title = document.getElementById('pTitle').value.trim();
   if (!title) { toast('업무명을 입력해주세요'); return; }
-  const assignee = curTab === '__all__'
-    ? (document.getElementById('iMember')?.value || '')
-    : curTab;
-  if (!assignee) { toast('담당 팀원을 선택해주세요'); return; }
   const data = {
     title, desc: document.getElementById('pDesc').value.trim(),
     priority: Number(document.getElementById('pPriority').value)||3,

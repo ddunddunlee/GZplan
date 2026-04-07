@@ -1744,7 +1744,7 @@
       <div style="display:flex;gap:8px;justify-content:flex-end">
         <button class="btn-cancel" id="delCancelBtn" onclick="if(window.closeOverlay)window.closeOverlay()"
           style="touch-action:manipulation">취소</button>
-        <button class="btn-ok" id="delConfirmBtn" onclick="if(window.confirmDelete)window.confirmDelete()"
+        <button class="btn-ok" id="delConfirmBtn"
           style="background:var(--red);touch-action:manipulation">삭제</button>
       </div>
     </div>
@@ -2504,16 +2504,21 @@ ${text}` : text;
     };
 
     window.confirmDelete = async () => {
-      const m = (curMode === 'shared' ? sharedMeetings : meetings).find(x => x.id === pendingDeleteId);
-      if (m?.calendarId) {
-        try { await deleteDoc(doc(db, "schedules", m.calendarId)) } catch (e) { }
+      try {
+        const m = (curMode === 'shared' ? sharedMeetings : meetings).find(x => x.id === pendingDeleteId);
+        if (m?.calendarId) {
+          try { await deleteDoc(doc(db, "schedules", m.calendarId)) } catch (e) { }
+        }
+        await deleteDoc(curMode === 'shared'
+          ? doc(db, 'meetings_shared', pendingDeleteId)
+          : doc(db, 'meetings', ME.id, 'items', pendingDeleteId));
+        window.closeOverlay();
+        window.newMeeting();
+        toast('회의록을 삭제했어요');
+      } catch(e) {
+        toast('삭제 오류: ' + e.message);
+        window.closeOverlay();
       }
-      await deleteDoc(curMode === 'shared'
-        ? doc(db, 'meetings_shared', pendingDeleteId)
-        : doc(db, 'meetings', ME.id, 'items', pendingDeleteId));
-      window.closeOverlay();
-      window.newMeeting();
-      toast('회의록을 삭제했어요');
     };
 
     window.closeOverlay = () => document.getElementById("delOverlay").classList.remove("show");

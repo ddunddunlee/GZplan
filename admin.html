@@ -18,9 +18,9 @@
 /* ── Reset & 변수 ── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#fff;--bg2:#F0F4F8;--bg3:#DDE3EA;
+  --bg:#fff;--bg2:#f7f7f5;--bg3:#f0f0ee;
   --text:#1a1a1a;--text2:#6b6b6b;--text3:#a8a8a8;
-  --border:#DDE3EA;--border2:#B8C6D6;
+  --border:#e5e5e3;--border2:#d0d0cc;
   --radius:10px;--radius-sm:6px;--pill:999px;
   --blue:#378ADD;--blue-bg:#E6F1FB;--blue-t:#0C447C;
   --amber-bg:#FAEEDA;--amber-t:#633806;
@@ -40,40 +40,43 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
   -webkit-text-size-adjust:100%}
 .app{display:flex;min-height:100vh}
 
+/* ── 사이드바 ── */
 .sidebar{
   width:var(--sw);flex-shrink:0;
-  background:#0C447C;border-right:none;
+  background:var(--bg);border-right:0.5px solid var(--border);
   display:flex;flex-direction:column;
   position:fixed;top:0;left:0;height:100vh;z-index:300;
   transition:transform .25s ease;overflow:hidden;
 }
-.sb-brand{padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,0.1);flex-shrink:0}
-.sb-brand-name{font-size:15px;font-weight:600;color:#fff;letter-spacing:-.3px}
-.sb-brand-sub{font-size:11px;color:rgba(255,255,255,0.45);margin-top:2px}
-.sb-user{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.1);flex-shrink:0}
-.sb-avatar{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.15);
+.sb-brand{padding:18px 16px 14px;border-bottom:0.5px solid var(--bg3);flex-shrink:0}
+.sb-brand-name{font-size:15px;font-weight:600;color:var(--text);letter-spacing:-.3px}
+.sb-brand-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.sb-user{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:0.5px solid var(--bg3);flex-shrink:0}
+.sb-avatar{width:30px;height:30px;border-radius:50%;background:var(--text);
   display:flex;align-items:center;justify-content:center;
-  font-size:11px;font-weight:600;color:#fff;flex-shrink:0}
-.sb-user-name{font-size:13px;font-weight:500;color:#fff;
+  font-size:11px;font-weight:600;color:var(--bg);flex-shrink:0}
+.sb-user-name{font-size:13px;font-weight:500;color:var(--text);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sb-user-role{font-size:11px;color:rgba(255,255,255,0.45)}
+.sb-user-role{font-size:11px;color:var(--text3)}
 .sb-nav{flex:1;padding:8px 0;overflow-y:auto;overflow-x:hidden}
-.sb-sec{padding:4px 16px;font-size:10px;font-weight:600;color:rgba(255,255,255,0.35);
+.sb-sec{padding:4px 16px;font-size:10px;font-weight:600;color:var(--text3);
   letter-spacing:.08em;text-transform:uppercase;margin-top:10px}
 .sb-item{display:flex;align-items:center;gap:10px;padding:9px 16px;
   cursor:pointer;margin:1px 8px;border-radius:var(--radius-sm);
   transition:background .12s;min-height:var(--touch-min)}
-.sb-item:hover{background:rgba(255,255,255,0.1)}
-.sb-item.active{background:rgba(255,255,255,0.15)}
-.sb-item.active .sb-label,.sb-item.active .sb-icon{color:#fff;font-weight:500}
-.sb-icon{font-size:15px;width:22px;text-align:center;color:rgba(255,255,255,0.6);flex-shrink:0;display:flex;align-items:center;}
-.sb-label{font-size:13px;color:rgba(255,255,255,0.6);flex:1;
+.sb-item:hover{background:var(--bg2)}
+.sb-item.active{background:var(--bg3)}
+.sb-item.active .sb-label,.sb-item.active .sb-icon{color:var(--text);font-weight:500}
+.sb-icon{font-size:15px;width:22px;text-align:center;color:var(--text2);flex-shrink:0}
+.sb-label{font-size:13px;color:var(--text2);flex:1;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sb-badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:var(--pill);
   background:var(--red-bg);color:var(--red);flex-shrink:0}
+.sb-bottom{padding:12px 16px;border-top:0.5px solid var(--bg3);display:flex;flex-direction:column;gap:8px;flex-shrink:0}
+.sb-sync{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text3)}
 .sync-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0}
 .sync-dot.syncing{background:var(--orange);animation:blink .8s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}50%{opacity:.3}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 
 /* ── 메인 ── */
 .main-wrap{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;min-height:100vh;min-width:0}
@@ -396,35 +399,47 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
   .appContent{padding:1rem 14px 5rem!important}
 }
 
+.3}}
 
 /* ── 메인 ── */
 .main-wrap{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;min-height:100vh}
 .pin-btn,.del-btn{width:24px;height:24px;border-radius:var(--radius-sm);border:none;background:transparent;cursor:pointer;font-size:13px;color:var(--text3);display:flex;align-items:center;justify-content:center}
 .pin-btn:hover{background:var(--bg3);color:var(--text)}
 .pin-btn.on{color:var(--blue)}
-
-.sb-brand{border-bottom:1px solid rgba(255,255,255,0.1);}
-.sb-brand-sub{color:rgba(255,255,255,0.45);}
-.sb-user{border-bottom:1px solid rgba(255,255,255,0.1);}
-.sb-item{border-radius:6px;}
 </style>
+</head>
 <body>
-  <div class="sidebar-dim" id="sidebarDim" onclick="var s=document.querySelector('.sidebar');if(s){s.classList.remove('open');this.classList.remove('show');document.body.style.overflow='';}"></div>
-  <div class="app">
-    <div class="sidebar">
-      <div class="sb-brand"><div class="sb-brand-name">GZ Plan</div><div class="sb-brand-sub">경영기획팀</div></div>
-      <div class="sb-user"><div class="sb-avatar" id="sbAvatar">--</div><div><div class="sb-user-name" id="sbUserName"></div><div class="sb-user-role">팀장</div></div></div>
-      <div class="sb-nav" id="sbNav"><div class="sb-sec">업무</div>
-        <div class="sb-item" data-nav="manager.html"><div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg></div><div class="sb-label">팀원 업무 현황</div></div>
-        <div class="sb-item" data-nav="calendar.html"><div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="sb-label">캘린더</div></div>
-        <div class="sb-item" data-nav="weekly.html"><div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg></div><div class="sb-label">주간 스케줄</div></div>
-        <div class="sb-item" data-nav="meeting.html"><div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="sb-label">회의록</div></div>
-        <div class="sb-item" data-nav="memo.html"><div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div><div class="sb-label">메모장</div></div>
-      </div>
-      <div class="sb-bottom"><div class="sb-sync"><div class="sync-dot" id="syncDot"></div><span>실시간 동기화</span></div><button class="btn-ghost" id="logoutBtn" style="width:100%;font-size:11px;padding:5px">로그아웃</button></div>
-    </div>
-    <div class="main-wrap">
-<!-- 탭 헤더 (사이드바 클릭으로 전환) -->
+<!-- 모바일 딤 -->
+<div class="sidebar-dim" id="sidebarDim"></div>
+<div class="app">
+<div class="sidebar">
+  <div class="sb-brand"><div class="sb-brand-name">GZ Plan</div><div class="sb-brand-sub">경영기획팀</div></div>
+  <div class="sb-user">
+    <div class="sb-avatar" id="sbAvatar">--</div>
+    <div><div class="sb-user-name" id="sbUserName"></div><div class="sb-user-role" id="sbUserRole"></div></div>
+  </div>
+  <div class="sb-nav">
+    <div class="sb-sec">관리</div>
+    <div class="sb-item active" id="navAccounts" onclick="if(window.switchAdminTab)window.switchAdminTab('accounts')" style="cursor:pointer"><div class="sb-icon">👤</div><div class="sb-label">계정 관리</div></div>
+    <div class="sb-item" id="navReporters" onclick="if(window.switchAdminTab)window.switchAdminTab('reporters')" style="cursor:pointer"><div class="sb-icon">📋</div><div class="sb-label">최종보고자 목록</div></div>
+  </div>
+  <div class="sb-bottom">
+    <div class="sb-sync"><div class="sync-dot" id="syncDot" style="display:none"></div><span id="syncTxt" style="display:none">실시간 동기화</span></div>
+    <button class="btn-ghost" id="logoutBtn" style="width:100%;font-size:11px;padding:5px">로그아웃</button>
+  </div>
+</div>
+<div class="main-wrap">
+  <div class="topbar">
+  <button class="hamburger" id="hamburgerBtn" aria-label="메뉴">
+    <span></span><span></span><span></span>
+  </button><div class="page-title">계정 관리</div></div>
+  <div id="gate" style="display:flex;align-items:center;justify-content:center;flex:1">
+    <div style="width:24px;height:24px;border:2px solid var(--border);border-top-color:var(--text);border-radius:50%;animation:sp .7s linear infinite"></div>
+    <style>@keyframes sp{to{transform:rotate(360deg)}}</style>
+  </div>
+  <div id="appContent" style="display:none;padding:0;width:100%">
+
+  <!-- 탭 헤더 (사이드바 클릭으로 전환) -->
 
   <!-- 계정 관리 섹션 -->
   <div id="tabAccounts" style="padding:1.5rem 24px 6rem;max-width:900px;margin:0 auto">
@@ -590,7 +605,7 @@ function renderList(){
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
         <!-- 아바타 -->
         <div style="width:36px;height:36px;border-radius:50%;background:var(--text);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--bg);flex-shrink:0">
-          ${(a.displayName||a.docId).slice(0,1)}
+          ${(a.displayName||a.docId).slice(0,2)}
         </div>
         <!-- 정보 -->
         <div style="flex:1;min-width:0">
@@ -735,7 +750,5 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </div>
 </div>
-    </div>
-  </div>
 </body>
 </html>

@@ -503,7 +503,6 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
     </div>
     <div class="filter-row" id="typeFilterRow"></div>
     <div class="filter-row" id="memberFilterRow"></div>
-    <div class="legend" id="legend"></div>
     <div class="cal-grid">
       <div class="cal-weekdays">
         <div class="cal-weekday">일</div><div class="cal-weekday">월</div><div class="cal-weekday">화</div>
@@ -836,10 +835,10 @@ function renderFilters(){
   mEl.style.display='';
   let h=`<span style="font-size:12px;color:var(--text3);margin-right:4px">팀원</span>`;
   h+=`<button class="chip${memberFilter==='all'?' active':''}" onclick="setMF('all')">전체</button>`;
-  MEMBER_IDS.forEach((id,i)=>{h+=`<button class="chip member-chip${memberFilter===id?' active':''}" style="border-left-color:${MEMBER_COLORS[i]}" onclick="setMF('${id}')">${id}</button>`});
+  MEMBER_IDS.forEach((id,i)=>{h+=`<button class="chip member-chip${memberFilter===id?' active':''}" onclick="setMF('${id}')"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${MEMBER_COLORS[i]};margin-right:5px;flex-shrink:0"></span>${id}</button>`});
   mEl.innerHTML=h;
 }
-window.setTF=v=>{typeFilter=v;renderFilters();renderLegend();renderCalendar()};
+window.setTF=v=>{typeFilter=v;renderFilters();renderCalendar()};
 window.setMF=v=>{memberFilter=v;renderFilters();renderCalendar()};
 function getNthWeek(year,month,nth){let n=0,d=new Date(year,month,1);while(d.getDay()!==0)d=new Date(year,month,d.getDate()+1);while(true){const sat=new Date(d.getFullYear(),d.getMonth(),d.getDate()+6);if(sat.getMonth()===month){n++;if(n===nth)return d}d=new Date(d.getFullYear(),d.getMonth(),d.getDate()+7);if(d.getMonth()!==month)break}return null}
 function getWeekSun(year,month,td){const d=new Date(year,month,td);return new Date(year,month,td-d.getDay())}

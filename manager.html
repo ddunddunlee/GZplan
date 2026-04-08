@@ -1270,7 +1270,6 @@ window.closeModal = () => {
 };
 
 window.addTask = async () => {
-  if (curTab === '__all__') return;
   const title = document.getElementById('iTitle').value.trim();
   if (!title) { toast('업무명을 입력해주세요'); return; }
   const assignee = curTab === '__all__'
@@ -1282,7 +1281,7 @@ window.addTask = async () => {
   btn.textContent = '추가 중...';
   try {
     const ts = now();
-    await fsAdd(curTab, {
+    await fsAdd(assignee, {
       title,
       desc:        document.getElementById('iDesc').value.trim(),
       assignee: curTab === '__all__'

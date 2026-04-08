@@ -290,7 +290,11 @@ button, [onclick], [data-nav], .sb-item, .task-card, .chip {
       <div class="detail-panel" id="detailPanel">
         <div class="dp-head">
           <div style="flex:1;min-width:0">
-            <div class="dp-member" id="dpMember"></div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <select id="dpMember" onchange="if(window.changeAssignee)window.changeAssignee(this.value)"
+                style="font-size:11px;font-weight:600;color:var(--blue);border:none;background:transparent;cursor:pointer;padding:0;outline:none;max-width:120px">
+              </select>
+            </div>
             <input class="dp-title-input" id="dpTitle" onblur="if(window.updateTitle&&this.dataset.id)window.updateTitle(this.dataset.id,this.dataset.mid,this.value)"/>
           </div>
           <button class="dp-close" id="closeDetailBtn" onclick="if(window.closeDetail)window.closeDetail()" style="touch-action:manipulation">✕</button>
@@ -1079,6 +1083,40 @@ window.selTask = (docId, memberId) => {
   render();
 };
 
+window.changeAssignee = async (newMemberId) => {
+  if (!selDocId || !selMId || newMemberId === selMId) return;
+  const t = mData[selMId]?.tasks.find(t => t._id === selDocId);
+  if (!t) return;
+  if (!confirm(`담당자를 ${selMId} → ${newMemberId} 로 변경할까요?`)) {
+    // 취소 시 select 원래대로
+    const dpMember = document.getElementById('dpMember');
+    if (dpMember) dpMember.value = selMId;
+    return;
+  }
+  const ts = now();
+  const newData = {
+    ...t,
+    assignee: newMemberId,
+    updated: ts,
+    history: [...(t.history || []), {
+      id: Date.now() + '', type: 'assign',
+      text: `담당자 변경: ${selMId} → ${newMemberId} (팀장)`,
+      date: ts, author: ME.displayName
+    }]
+  };
+  delete newData._id;
+  delete newData._mid;
+  try {
+    await fsAdd(newMemberId, newData);
+    await fsDel(selMId, selDocId);
+    toast(`${newMemberId}에게 업무가 이전됐어요 ✓`);
+    selDocId = null; selMId = null;
+    document.getElementById('detailPanel').classList.remove('open');
+  } catch(e) {
+    toast('오류: ' + e.message);
+  }
+};
+
 window.closeDetail = () => {
   selDocId = null;
   selMId   = null;
@@ -1352,7 +1390,11 @@ const origSelTask = window.selTask;
 window.selTask = (docId, memberId) => {
   origSelTask(docId, memberId);
   const dpMember = document.getElementById('dpMember');
-  if (dpMember) dpMember.textContent = memberId;
+  if (dpMember) {
+    dpMember.innerHTML = MEMBER_IDS.map(id =>
+      `<option value="${id}" ${id === memberId ? 'selected' : ''}>${id}</option>`
+    ).join('');
+  }
 };
 
 

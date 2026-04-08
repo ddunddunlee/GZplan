@@ -342,7 +342,13 @@ button, [onclick], [data-nav], .sb-item, .task-card, .chip {
     </div>
     <div class="fg"><label>업무 발생일</label><input id="iOccurred" type="date"/></div>
     <div class="fg"><label>업무 시작일</label><input id="iStart" type="date"/></div>
-    <div class="fg"><label>업무 타겟일</label><input id="iDue" type="date"/></div>
+    <div class="fg">
+      <label>업무 타겟일</label>
+      <div style="display:flex;gap:6px;align-items:center">
+        <input id="iDue" type="date" style="flex:1"/>
+        <button type="button" onclick="(function(){var el=document.getElementById('iDue');var st=document.getElementById('iStart');var base=el.value?new Date(el.value):(st&&st.value?new Date(st.value):new Date());base.setDate(base.getDate()+7);el.value=base.toISOString().slice(0,10);})()" style="flex-shrink:0;padding:0 10px;height:36px;font-size:12px;font-weight:600;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);cursor:pointer;white-space:nowrap;touch-action:manipulation">+7일</button>
+      </div>
+    </div>
     <div class="fg"><label>최종보고자</label><select id="iReporter"><option value="">없음</option></select></div>
     <div class="modal-btns">
       <button class="btn-cancel" id="modalCancelBtn" onclick="if(window.closeModal)window.closeModal()" style="touch-action:manipulation">취소</button>
@@ -365,7 +371,13 @@ button, [onclick], [data-nav], .sb-item, .task-card, .chip {
     </div>
     <div class="fg"><label>업무 발생일</label><input id="pOccurred" type="date"/></div>
     <div class="fg"><label>업무 시작일</label><input id="pStart" type="date"/></div>
-    <div class="fg"><label>업무 타겟일</label><input id="pDue" type="date"/></div>
+    <div class="fg">
+      <label>업무 타겟일</label>
+      <div style="display:flex;gap:6px;align-items:center">
+        <input id="pDue" type="date" style="flex:1"/>
+        <button type="button" onclick="(function(){var el=document.getElementById('pDue');var st=document.getElementById('pStart');var base=el.value?new Date(el.value):(st&&st.value?new Date(st.value):new Date());base.setDate(base.getDate()+7);el.value=base.toISOString().slice(0,10);})()" style="flex-shrink:0;padding:0 10px;height:36px;font-size:12px;font-weight:600;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);cursor:pointer;white-space:nowrap;touch-action:manipulation">+7일</button>
+      </div>
+    </div>
     <div class="fg"><label>최종보고자 (선택)</label><select id="pReporter"><option value="">없음</option></select></div>
     <div class="modal-btns">
       <button class="btn-cancel" onclick="if(window.closePoolModal)window.closePoolModal()">취소</button>
@@ -707,6 +719,7 @@ window.openPoolModal = () => {
   ['pTitle','pDesc','pStart','pDue','pOccurred'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
   document.getElementById('pPriority').value = '3';
   const po = document.getElementById('pOccurred'); if(po) po.value = new Date().toISOString().split('T')[0];
+  const ps = document.getElementById('pStart');    if(ps) ps.value = new Date().toISOString().split('T')[0];
   const sel = document.getElementById('pReporter');
   if(sel) sel.innerHTML = '<option value="">없음</option>' + REPORTERS.map(r=>`<option value="${r}">${r}</option>`).join('');
   document.getElementById('poolOverlay').classList.add('show');
@@ -1243,6 +1256,9 @@ window.openModal = () => {
   // 타이틀
   const h3 = document.querySelector('#overlay h3');
   if (h3) h3.textContent = curTab === '__all__' ? '새 업무 추가' : `새 업무 추가 — ${curTab}`;
+  const _today = new Date().toISOString().split('T')[0];
+  const _occ = document.getElementById('iOccurred'); if(_occ) _occ.value = _today;
+  const _st  = document.getElementById('iStart');    if(_st)  _st.value  = _today;
   document.getElementById('overlay').classList.add('show');
   setTimeout(() => document.getElementById('iTitle')?.focus(), 80);
 };

@@ -1365,7 +1365,7 @@ document.querySelectorAll('[data-mfilter]').forEach(btn => {
 
 // ── DOM 이벤트 바인딩 (module defer 대응) ──
 document.getElementById('modalCancelBtn')?.addEventListener('click', () => window.closeModal?.());
-document.getElementById('addTaskOkBtn')?.addEventListener('click', () => window.addTask?.());
+
 document.getElementById('addNoteBtn')?.addEventListener('click', () => window.addNote?.());
 document.getElementById('closeDetailBtn')?.addEventListener('click', () => window.closeDetail?.());
 // 필터 칩
@@ -1402,10 +1402,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if (cancelBtn) cancelBtn.addEventListener('click', function() {
     if (window.closeModal) window.closeModal();
   });
-  var okBtn = document.getElementById('addTaskOkBtn');
-  if (okBtn) okBtn.addEventListener('click', function() {
-    if (window.addTask) window.addTask();
-  });
+
   var noteBtn = document.getElementById('addNoteBtn');
   if (noteBtn) noteBtn.addEventListener('click', function() {
     if (window.addNote) window.addNote();

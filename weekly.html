@@ -794,18 +794,7 @@ const isMgr=ME.role==='manager'||ME.role==='admin';
 
 // logout: 일반 script에서 처리
 window.goBack=()=>{location.href=isMgr?'manager.html':'member.html'};
-const DEMO_SCHEDULES=[
-  {id:'__d1',title:'월간 업무 보고',category:'report',startDate:'2026-04-06',endDate:'2026-04-06',type:'common',author:'관리자',authorId:'admin',memo:'4월 월간 업무 현황 보고',repeat:{type:'none'},_demo:true},
-  {id:'__d2',title:'팀 정기 회의',category:'meeting',startDate:'2026-04-07',endDate:'2026-04-07',type:'common',author:'관리자',authorId:'admin',repeat:{type:'monthly_nth_weekday',week:1,weekday:2},_demo:true},
-  {id:'__d3',title:'2분기 사업계획 보고',category:'report',startDate:'2026-04-13',endDate:'2026-04-13',type:'common',author:'관리자',authorId:'admin',repeat:{type:'none'},_demo:true},
-  {id:'__d4',title:'출장 (서울 본사)',category:'trip',startDate:'2026-04-15',endDate:'2026-04-16',type:'personal',author:'강신욱',authorId:'강신욱',repeat:{type:'none'},_demo:true},
-  {id:'__d5',title:'신규 프로젝트 기획 회의',category:'meeting',startDate:'2026-04-21',endDate:'2026-04-21',type:'common',author:'관리자',authorId:'admin',repeat:{type:'none'},_demo:true},
-  {id:'__d6',title:'경영진 보고',category:'report',startDate:'2026-04-27',endDate:'2026-04-27',type:'common',author:'관리자',authorId:'admin',repeat:{type:'none'},_demo:true},
-  {id:'__d7',title:'팀 워크숍',category:'event',startDate:'2026-04-29',endDate:'2026-04-30',type:'common',author:'관리자',authorId:'admin',memo:'2분기 팀빌딩 행사',repeat:{type:'none'},_demo:true},
-  {id:'__d8',title:'월간 업무 보고',category:'report',startDate:'2026-05-04',endDate:'2026-05-04',type:'common',author:'관리자',authorId:'admin',repeat:{type:'none'},_demo:true},
-  {id:'__d9',title:'팀 정기 회의',category:'meeting',startDate:'2026-05-12',endDate:'2026-05-12',type:'common',author:'관리자',authorId:'admin',repeat:{type:'none'},_demo:true},
-  {id:'__d10',title:'상반기 성과 점검',category:'report',startDate:'2026-05-25',endDate:'2026-05-25',type:'common',author:'관리자',authorId:'admin',repeat:{type:'none'},_demo:true},
-];
+const DEMO_SCHEDULES=[];
 
 let schedules=[...DEMO_SCHEDULES],taskEvents=[],CAT_LIST=[...DEFAULT_CATS],CAT_MAP={};
 let curYear=new Date().getFullYear(),curMonth=new Date().getMonth();

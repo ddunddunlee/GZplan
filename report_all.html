@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<link rel="manifest" href="./manifest.json"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#ffffff"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>GZ Plan — 주간보고(전체)</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#fff;--bg2:#F0F4F8;--bg3:#DDE3EA;
+  --text:#1a1a1a;--text2:#6b6b6b;--text3:#a8a8a8;
+  --border:#DDE3EA;--radius:10px;--radius-sm:6px;--pill:999px;
+  --blue:#378ADD;--blue-bg:#E6F1FB;--blue-t:#0C447C;
+  --sw:220px;--topbar-h:52px;--touch-min:44px;
+}
+html,body{height:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-serif;
+  background:var(--bg2);color:var(--text);min-height:100vh;font-size:14px}
+.app{display:flex;min-height:100vh}
+.sidebar{width:var(--sw);flex-shrink:0;background:#0C447C;display:flex;flex-direction:column;
+  position:fixed;top:0;left:0;height:100vh;z-index:300;transition:transform .25s ease;overflow:hidden;}
+.sb-brand{padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,0.1);flex-shrink:0}
+.sb-brand-name{font-size:15px;font-weight:600;color:#fff;letter-spacing:-.3px}
+.sb-brand-sub{font-size:11px;color:rgba(255,255,255,0.45);margin-top:2px}
+.sb-user{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.1);flex-shrink:0}
+.sb-avatar{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;flex-shrink:0}
+.sb-user-name{font-size:13px;font-weight:500;color:#fff}
+.sb-user-role{font-size:11px;color:rgba(255,255,255,0.45)}
+.sb-nav{flex:1;padding:8px 0;overflow-y:auto}
+.sb-sec{padding:4px 16px;font-size:10px;font-weight:600;color:rgba(255,255,255,0.35);letter-spacing:.08em;text-transform:uppercase;margin-top:10px}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;margin:1px 8px;border-radius:var(--radius-sm);transition:background .12s;min-height:var(--touch-min)}
+.sb-item:hover{background:rgba(255,255,255,0.1)}
+.sb-item.active{background:rgba(255,255,255,0.15)}
+.sb-item.active .sb-label,.sb-item.active .sb-icon{color:#fff;font-weight:500}
+.sb-icon{width:22px;color:rgba(255,255,255,0.6);flex-shrink:0;display:flex;align-items:center}
+.sb-label{font-size:13px;color:rgba(255,255,255,0.6);flex:1}
+.sb-bottom{padding:12px 16px;border-top:1px solid rgba(255,255,255,0.1);display:flex;flex-direction:column;gap:8px;flex-shrink:0}
+.sb-sync{display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,0.45)}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:#639922;flex-shrink:0}
+.main-wrap{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;min-height:100vh;min-width:0}
+.topbar{background:var(--bg);border-bottom:0.5px solid var(--border);padding:0 24px;height:var(--topbar-h);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;flex-shrink:0;gap:12px;}
+.page-title{font-size:15px;font-weight:600;color:var(--text);flex:1}
+.topbar-right{display:flex;gap:8px;align-items:center;flex-shrink:0}
+.hamburger{display:none;width:36px;height:36px;border:none;background:transparent;cursor:pointer;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:4px;border-radius:var(--radius-sm);flex-shrink:0}
+.hamburger span{display:block;width:20px;height:2px;background:var(--text);border-radius:2px}
+.sidebar-dim{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:290}
+.sidebar-dim.show{display:block}
+.btn-ghost{background:transparent;color:var(--text2);border:0.5px solid var(--border);border-radius:var(--radius-sm);padding:0 14px;height:32px;font-size:13px;cursor:pointer;font-family:inherit}
+.week-nav{display:flex;align-items:center;gap:10px}
+.nav-btn{width:28px;height:28px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:#fff;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center}
+.nav-btn:hover{background:var(--bg2)}
+.week-label{font-size:14px;font-weight:600;color:var(--text);min-width:180px;text-align:center}
+.content-wrap{padding:20px 24px 80px;flex:1}
+
+/* 상단 섹션 */
+.top-section-card{background:#fff;border:0.5px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:12px}
+.top-section-title{font-size:12px;font-weight:700;color:var(--text);margin-bottom:10px;text-transform:uppercase;letter-spacing:.04em}
+.evt-chips{display:flex;flex-wrap:wrap;gap:6px}
+.evt-chip{font-size:12px;padding:4px 10px;border-radius:var(--pill);font-weight:500}
+.common-chip{background:#EDEDF5;color:#3C3489}
+.evt-empty{font-size:12px;color:var(--text3)}
+.attend-list{display:flex;flex-direction:column;gap:6px}
+.attend-row{display:flex;align-items:baseline;gap:10px;font-size:12px}
+.attend-name{font-weight:700;color:#0C447C;flex-shrink:0;width:52px}
+.attend-items{color:var(--text2);line-height:1.6}
+.section-divider{height:1px;background:var(--border);margin:8px 0 20px}
+
+/* 팀원 보고 */
+.mgr-report-row{display:flex;gap:0;border-bottom:0.5px solid var(--border);padding:20px 0}
+.mgr-report-row:first-child{padding-top:0}
+.mgr-report-row:last-child{border-bottom:none}
+.mgr-report-name{width:80px;flex-shrink:0;font-size:13px;font-weight:700;color:#0C447C;padding-top:2px}
+.mgr-report-body{flex:1;min-width:0}
+.mgr-report-card{background:#fff;border:0.5px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.report-empty{padding:14px 18px;font-size:12px;color:var(--text3)}
+
+/* 팀장 주요업무 */
+.mgr-note-box{font-size:12px;line-height:1.8;color:var(--text);word-break:break-word;min-height:30px}
+
+/* 추진업무 */
+.task-list-view{padding:0}
+.task-view-row{display:flex;align-items:center;gap:8px;padding:7px 14px;border-bottom:0.5px solid var(--border);font-size:12px}
+.task-view-row:last-child{border-bottom:none}
+.task-view-num{width:20px;font-size:11px;color:var(--text3);flex-shrink:0}
+.task-view-name{flex:1;color:var(--text)}
+.task-view-memo{font-size:11px;color:var(--text2);width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#1a1a1a;color:#fff;padding:10px 20px;border-radius:var(--pill);font-size:13px;opacity:0;pointer-events:none;transition:all .25s;z-index:999;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media(max-width:767px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .hamburger{display:flex}
+  .main-wrap{margin-left:0}
+  .topbar{padding:0 14px}
+  .content-wrap{padding:14px 14px 80px}
+  .week-label{min-width:140px;font-size:13px}
+}
+</style>
+</head>
+<body>
+<div class="sidebar-dim" id="sidebarDim"></div>
+<div class="app">
+  <div class="sidebar">
+    <div class="sb-brand">
+      <div class="sb-brand-name">GZ Plan</div>
+      <div class="sb-brand-sub">경영기획팀</div>
+    </div>
+    <div class="sb-user">
+      <div class="sb-avatar" id="sbAvatar">--</div>
+      <div>
+        <div class="sb-user-name" id="sbUserName"></div>
+        <div class="sb-user-role" id="sbUserRole"></div>
+      </div>
+    </div>
+    <div class="sb-nav">
+      <div class="sb-sec">업무</div>
+      <div class="sb-item" data-nav="member.html" id="sbTaskItem">
+        <div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg></div>
+        <div class="sb-label" id="sbTaskLabel">내 업무</div>
+      </div>
+      <div class="sb-item" data-nav="report.html">
+        <div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 1 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+        <div class="sb-label">주간 보고</div>
+      </div>
+      <div class="sb-item active" data-nav="report_all.html">
+        <div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <div class="sb-label">주간보고(전체)</div>
+      </div>
+      <div class="sb-sec">도구</div>
+      <div class="sb-item" data-nav="calendar.html">
+        <div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+        <div class="sb-label">캘린더</div>
+      </div>
+      <div class="sb-item" data-nav="weekly.html">
+        <div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg></div>
+        <div class="sb-label">주간 스케줄</div>
+      </div>
+      <div class="sb-item" data-nav="meeting.html">
+        <div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <div class="sb-label">회의록</div>
+      </div>
+      <div class="sb-item" data-nav="memo.html">
+        <div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+        <div class="sb-label">메모장</div>
+      </div>
+    </div>
+    <div class="sb-bottom">
+      <div class="sb-sync"><div class="sync-dot"></div><span>실시간 동기화</span></div>
+      <button class="btn-ghost" id="logoutBtn" style="width:100%;font-size:11px;padding:5px;color:rgba(255,255,255,0.6);border-color:rgba(255,255,255,0.2)">로그아웃</button>
+    </div>
+  </div>
+
+  <div class="main-wrap">
+    <div class="topbar">
+      <button class="hamburger" id="hamburgerBtn"><span></span><span></span><span></span></button>
+      <div class="page-title">주간보고 (전체)</div>
+      <div class="topbar-right">
+        <div class="week-nav">
+          <button class="nav-btn" id="prevBtn">‹</button>
+          <div class="week-label" id="weekLabel"></div>
+          <button class="nav-btn" id="nextBtn">›</button>
+          <button class="btn-ghost" id="todayBtn" style="font-size:12px">이번 주</button>
+        </div>
+      </div>
+    </div>
+    <div class="content-wrap" id="contentWrap">
+      <div style="text-align:center;padding:40px;color:var(--text3)">불러오는 중...</div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import {
+  getFirestore, collection, doc, getDoc, getDocs, orderBy, query
+} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const FIREBASE_CONFIG = {
+  apiKey:"AIzaSyA7KylsSyT3_0oQvhBtcrPc-gcdfVq90IQ",
+  authDomain:"gzplan.firebaseapp.com",projectId:"gzplan",
+  storageBucket:"gzplan.firebasestorage.app",
+  messagingSenderId:"186255862586",
+  appId:"1:186255862586:web:f36d21f76012ca43b8fe03",
+};
+
+let MEMBER_IDS = ["강신욱","김용욱","오문식","이길우","이도영","이상현","이영찬","이윤형"];
+let MEMBER_ORGS = {
+  "강신욱":["IR/이사회 등","시장/경쟁사","보도자료 일정","사업지원본부(인프라지원실)","사업지원본부(경영지원실)","CISO","GLA"],
+  "김용욱":["중국","신규사업본부(시티골프사업부)","글로벌사업팀","글로벌사업개척TF"],
+  "오문식":["신규사업본부(카트사업부)","신규사업본부(시티골프사업부)","기술개발본부(NX개발실)","NX개발실(베트남R&D)"],
+  "이길우":["GS사업본부","AI센서개발실"],
+  "이도영":["미국","베트남"],
+  "이상현":["신규사업본부(플랫폼사업부)","기술개발본부(모바일개발실)","기술개발본부(GDR개발실)"],
+  "이영찬":["GDR직영사업","골프존 클라우드"],
+  "이윤형":["일본","사업지원본부(기획실)"]
+};
+
+const db = getFirestore(initializeApp(FIREBASE_CONFIG));
+const sess = localStorage.getItem('tt_user');
+if (!sess) { location.href = 'index.html'; throw ''; }
+let ME;
+try { ME = JSON.parse(sess); } catch { location.href = 'index.html'; throw ''; }
+if (!ME?.id) { location.href = 'index.html'; throw ''; }
+
+// 사이드바 초기화
+document.getElementById('sbAvatar').textContent = (ME.displayName||ME.id||'--').slice(0,1);
+document.getElementById('sbUserName').textContent = ME.displayName||ME.id||'';
+const isMgr = ME.role === 'manager' || ME.role === 'admin';
+document.getElementById('sbUserRole').textContent = isMgr ? '팀장' : '팀원';
+const taskItem = document.getElementById('sbTaskItem');
+const taskLabel = document.getElementById('sbTaskLabel');
+if (taskItem) taskItem.dataset.nav = isMgr ? 'manager.html' : 'member.html';
+if (taskLabel) taskLabel.textContent = isMgr ? '팀 업무 현황' : '내 업무';
+
+// Firestore 설정 로드
+try {
+  const [orgSnap, orderSnap] = await Promise.all([
+    getDoc(doc(db,'config','memberOrgs')),
+    getDoc(doc(db,'config','memberOrder'))
+  ]);
+  if (orgSnap.exists()) MEMBER_ORGS = orgSnap.data().orgs || MEMBER_ORGS;
+  if (orderSnap.exists() && orderSnap.data().order?.length) {
+    const saved = orderSnap.data().order;
+    MEMBER_IDS.length = 0; saved.forEach(id => MEMBER_IDS.push(id));
+  }
+} catch(e) {}
+
+// 주차 계산
+function getWeekKey(date) {
+  const d = new Date(date); d.setHours(0,0,0,0);
+  const day = d.getDay();
+  const mon = new Date(d); mon.setDate(d.getDate() - (day===0?6:day-1));
+  const sun = new Date(mon); sun.setDate(mon.getDate()+6);
+  const fmt = d => `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+  return {
+    key: `${mon.getFullYear()}W${String(getISOWeek(mon)).padStart(2,'0')}`,
+    label: `${fmt(mon)} ~ ${fmt(sun)}`, mon, sun
+  };
+}
+function getISOWeek(date) {
+  const d = new Date(Date.UTC(date.getFullYear(),date.getMonth(),date.getDate()));
+  const dayNum = d.getUTCDay()||7; d.setUTCDate(d.getUTCDate()+4-dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+  return Math.ceil((((d-yearStart)/86400000)+1)/7);
+}
+
+let curDate = new Date();
+function updateWeekLabel() {
+  document.getElementById('weekLabel').textContent = getWeekKey(curDate).label;
+}
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+async function loadWeekSchedules(mon, sun) {
+  const monStr = mon.toISOString().slice(0,10);
+  const sunStr = sun.toISOString().slice(0,10);
+  try {
+    const snap = await getDocs(query(collection(db,'schedules'), orderBy('startDate','asc')));
+    return snap.docs.map(d=>({id:d.id,...d.data()}))
+      .filter(ev => ev.startDate<=sunStr && (ev.endDate||ev.startDate)>=monStr);
+  } catch(e) { return []; }
+}
+
+async function render() {
+  const { key, mon, sun } = getWeekKey(curDate);
+  document.getElementById('contentWrap').innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3)">불러오는 중...</div>';
+
+  const [allSchedules, mgrNoteSnap, ...reportResults] = await Promise.all([
+    loadWeekSchedules(mon, sun),
+    getDoc(doc(db,'weeklyMgrNote',key)).catch(()=>null),
+    ...MEMBER_IDS.map(id =>
+      getDoc(doc(db,'weeklyReports',id,'weeks',key)).then(s=>({id,data:s.exists()?s.data():null})).catch(()=>({id,data:null}))
+    )
+  ]);
+
+  const mgrNote = mgrNoteSnap?.exists() ? mgrNoteSnap.data().content||'' : '';
+  const d2s = str => { const d=new Date(str+'T00:00:00'); return `${d.getMonth()+1}/${d.getDate()}`; };
+  const dateRange = ev => ev.startDate===ev.endDate ? d2s(ev.startDate) : `${d2s(ev.startDate)}~${d2s(ev.endDate)}`;
+
+  // 공통일정
+  const commonEvts = allSchedules.filter(ev=>ev.type==='common');
+  const commonHtml = commonEvts.length
+    ? commonEvts.map(ev=>`<span class="evt-chip common-chip">🏢 ${dateRange(ev)} ${ev.title}</span>`).join('')
+    : '<span class="evt-empty">이번 주 공통 일정 없음</span>';
+
+  // 근태
+  const byMember = {};
+  allSchedules.filter(ev=>ev.type==='personal').forEach(ev=>{
+    const id=ev.authorId||ev.author||''; if(!id) return;
+    if(!byMember[id]) byMember[id]=[];
+    byMember[id].push(ev);
+  });
+  const attendRows = MEMBER_IDS.filter(id=>byMember[id]?.length).map(id=>
+    `<div class="attend-row"><span class="attend-name">${id}</span><span class="attend-items">${byMember[id].map(ev=>`${dateRange(ev)} ${ev.title}`).join(' · ')}</span></div>`
+  ).join('');
+
+  // 팀원 보고
+  const reportsHtml = reportResults.map(({id, data}) => {
+    const tasks = data?.tasks || [];
+    const taskMemo = data?.taskMemo || '';
+    const secs = data?.sections || {};
+    const myOrgs = MEMBER_ORGS[id] || [];
+
+    const taskListHtml = tasks.length > 0
+      ? `<div class="task-list-view">${tasks.map((t,ti)=>
+          `<div class="task-view-row">
+            <div class="task-view-num">${ti+1}</div>
+            <div class="task-view-name">${t.name}</div>
+            <div class="task-view-memo">${t.memo||'—'}</div>
+          </div>`).join('')}</div>`
+      : '';
+
+    const orgHtml = myOrgs.map((name,oi) => {
+      const i = oi+1;
+      return secs[i]?.trim() ? `
+        <div style="border-top:0.5px solid var(--border)">
+          <div style="padding:6px 14px 4px;font-size:10px;font-weight:700;color:#0C447C;background:#F5F8FB">${name}</div>
+          <div style="padding:6px 14px 10px;font-size:12px;line-height:1.8;word-break:break-word">${secs[i]}</div>
+        </div>` : '';
+    }).join('');
+
+    const hasContent = tasks.length || taskMemo || myOrgs.some((_,oi)=>secs[oi+1]?.trim());
+
+    return `
+      <div class="mgr-report-row">
+        <div class="mgr-report-name">${id}</div>
+        <div class="mgr-report-body">
+          <div class="mgr-report-card">
+            ${!hasContent
+              ? '<div class="report-empty">보고 내용이 없어요</div>'
+              : `<div style="padding:6px 14px 4px;font-size:10px;font-weight:700;color:#0C447C;background:#F5F8FB;border-bottom:0.5px solid var(--border)">추진 업무</div>
+                 ${taskListHtml}
+                 ${taskMemo ? `<div style="padding:8px 14px;font-size:12px;color:var(--text2);border-top:0.5px solid var(--border);line-height:1.7;white-space:pre-wrap">${taskMemo}</div>` : ''}
+                 ${orgHtml}`
+            }
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('contentWrap').innerHTML = `
+    <div class="top-section-card">
+      <div class="top-section-title">📌 주요업무 및 일정</div>
+      <div class="mgr-note-box">${mgrNote || '<span style="color:var(--text3);font-size:12px">팀장님이 아직 작성하지 않았어요</span>'}</div>
+    </div>
+    <div class="top-section-card">
+      <div class="top-section-title">🏢 공통 일정</div>
+      <div class="evt-chips">${commonHtml}</div>
+    </div>
+    <div class="top-section-card">
+      <div class="top-section-title">📅 근태 일정</div>
+      <div class="attend-list">${attendRows || '<span class="evt-empty">이번 주 개별 일정 없음</span>'}</div>
+    </div>
+    <div class="section-divider"></div>
+    ${reportsHtml}
+  `;
+}
+
+// 네비
+document.getElementById('prevBtn').onclick = () => { curDate.setDate(curDate.getDate()-7); updateWeekLabel(); render(); };
+document.getElementById('nextBtn').onclick = () => { curDate.setDate(curDate.getDate()+7); updateWeekLabel(); render(); };
+document.getElementById('todayBtn').onclick = () => { curDate=new Date(); updateWeekLabel(); render(); };
+
+// 사이드바
+(function(){
+  function openSB(){document.querySelector('.sidebar').classList.add('open');document.getElementById('sidebarDim').classList.add('show');document.body.style.overflow='hidden';}
+  function closeSB(){document.querySelector('.sidebar').classList.remove('open');document.getElementById('sidebarDim').classList.remove('show');document.body.style.overflow='';}
+  document.getElementById('hamburgerBtn').onclick=openSB;
+  document.getElementById('sidebarDim').onclick=closeSB;
+  document.querySelectorAll('.sidebar [data-nav]').forEach(el=>{
+    el.addEventListener('click',()=>{location.href=el.dataset.nav;});
+  });
+  document.getElementById('logoutBtn').onclick=()=>{localStorage.removeItem('tt_user');sessionStorage.clear();location.href='index.html';};
+})();
+
+updateWeekLabel();
+render();
+</script>
+</body>
+</html>

@@ -164,6 +164,36 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 .attend-items{color:var(--text2);line-height:1.6}
 .section-divider{height:1px;background:var(--border);margin:8px 0 20px}
 
+/* ── 추진업무 셀 ── */
+.task-table{width:100%;border-collapse:collapse}
+.task-table th{padding:6px 10px;font-size:10px;font-weight:600;color:var(--text2);background:var(--bg2);border-bottom:0.5px solid var(--border);text-align:left}
+.task-table th:first-child{width:28px;text-align:center}
+.task-table th:last-child{width:120px}
+.task-input{width:100%;border:none;background:transparent;outline:none;font-size:12px;color:var(--text);font-family:inherit;padding:8px 10px}
+.task-input::placeholder{color:var(--text3)}
+.task-table tr{border-bottom:0.5px solid var(--border)}
+.task-table tr:hover td{background:var(--bg2)}
+.task-table td:first-child{width:28px;text-align:center;font-size:11px;color:var(--text3)}
+.task-table td:last-child{border-left:0.5px solid var(--border)}
+.task-memo-input{width:100%;border:none;background:transparent;outline:none;font-size:11px;color:var(--text2);font-family:inherit;padding:8px 10px}
+.task-memo-input::placeholder{color:var(--text3)}
+.task-add-btn{width:100%;padding:7px 10px 7px 38px;font-size:11px;color:var(--text3);background:transparent;border:none;cursor:pointer;text-align:left;border-bottom:0.5px solid var(--border)}
+.task-add-btn:hover{background:var(--bg2);color:var(--text2)}
+.task-memo-area{width:100%;padding:10px 14px;font-size:12px;line-height:1.8;border:none;outline:none;resize:none;font-family:inherit;color:var(--text);background:#fff;min-height:70px}
+.task-memo-area::placeholder{color:var(--text3)}
+.task-memo-label{padding:5px 14px;font-size:10px;color:var(--text3);background:var(--bg2);border-top:0.5px solid var(--border);border-bottom:0.5px solid var(--border)}
+
+/* 팀장 추진업무 등록 */
+.mgr-tasks-wrap{padding:0}
+.mgr-task-row{display:flex;align-items:center;gap:8px;padding:8px 14px;border-bottom:0.5px solid var(--border)}
+.mgr-task-row:last-child{border-bottom:none}
+.mgr-task-name{flex:1;font-size:12px;color:var(--text)}
+.mgr-task-sub{font-size:11px;color:var(--text2);width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0}
+.reg-btn{font-size:10px;padding:3px 8px;border:0.5px solid #0C447C;border-radius:4px;color:#0C447C;cursor:pointer;background:transparent;white-space:nowrap;flex-shrink:0;font-family:inherit}
+.reg-btn:hover{background:#E6F1FB}
+.reg-btn.done{border-color:var(--border);color:var(--text3);cursor:default}
+.reg-btn.done:hover{background:transparent}
+
 /* ── 리치텍스트 에디터 ── */
 .editor-wrap{border-bottom:0.5px solid var(--border)}
 .editor-wrap:last-child{border-bottom:none}
@@ -320,7 +350,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import {
-  getFirestore, collection, doc, getDoc, setDoc, getDocs, orderBy, query, where
+  getFirestore, collection, doc, getDoc, setDoc, getDocs, addDoc, updateDoc, orderBy, query, where
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 const FIREBASE_CONFIG = {
@@ -473,15 +503,39 @@ async function loadReport(memberId, weekKey) {
   } catch(e) { return null; }
 }
 
-async function saveReport(memberId, weekKey, content, sections) {
+async function saveReport(memberId, weekKey, content, sections, tasks, taskMemo) {
   await setDoc(reportDoc(memberId, weekKey), {
     content: content || '',
     sections: sections || {},
+    tasks: tasks || [],
+    taskMemo: taskMemo || '',
     memberId,
     weekKey,
     updatedAt: new Date().toISOString(),
     displayName: ME.displayName || ME.id
   });
+}
+
+async function registerTask(memberId, weekKey, taskName, taskMemo) {
+  // taskPool에 담당자 없이 등록
+  await addDoc(collection(db,'taskPool'), {
+    title: taskName,
+    desc: taskMemo || '',
+    priority: 3,
+    status: 'todo',
+    createdAt: new Date().toISOString(),
+    createdBy: ME.displayName,
+    source: 'weeklyReport',
+    sourceMember: memberId,
+    sourceWeek: weekKey,
+  });
+  // 등록이력 저장
+  const snap = await getDoc(reportDoc(memberId, weekKey));
+  const existing = snap.exists() ? (snap.data().registeredTasks || []) : [];
+  if (!existing.includes(taskName)) {
+    existing.push(taskName);
+    await updateDoc(reportDoc(memberId, weekKey), { registeredTasks: existing });
+  }
 }
 
 async function loadHistory(memberId) {
@@ -509,8 +563,31 @@ async function renderMemberView() {
   const COLORS = ['#1a1a1a','#A32D2D','#0C447C','#639922','#633806','#6B5FCC'];
   const COLOR_NAMES = ['기본','빨강','파랑','초록','주황','보라'];
 
-  const sectionsHtml = sections.map((sec, i) => {
-    const placeholder = sec === '추진 업무' ? 'o 업무명\n  - 세부 내용' : '주요 사항을 입력하세요';
+  const savedTasks = data?.tasks || [{ name:'', memo:'' }];
+  const savedTaskMemo = data?.taskMemo || '';
+
+  // 추진업무 셀 HTML
+  const taskRows = savedTasks.map((t, ti) => `
+    <tr>
+      <td style="text-align:center;font-size:11px;color:var(--text3)">${ti+1}</td>
+      <td><input class="task-input" data-tidx="${ti}" data-field="name" value="${(t.name||'').replace(/"/g,'&quot;')}" placeholder="업무명 입력..."/></td>
+      <td><input class="task-memo-input" data-tidx="${ti}" data-field="memo" value="${(t.memo||'').replace(/"/g,'&quot;')}" placeholder="메모"/></td>
+    </tr>`).join('');
+
+  const taskSectionHtml = `
+    <div style="border-bottom:0.5px solid var(--border)">
+      <div class="org-section-title">추진 업무</div>
+      <table class="task-table">
+        <thead><tr><th></th><th>업무명</th><th>메모 / 비고</th></tr></thead>
+        <tbody id="taskTbody">${taskRows}</tbody>
+      </table>
+      <button class="task-add-btn" id="taskAddBtn">+ 행 추가</button>
+      <div class="task-memo-label">기타 / 추가 메모</div>
+      <textarea class="task-memo-area" id="taskMemoArea" placeholder="셀에 넣기 애매한 내용, 특이사항 등 자유롭게...">${savedTaskMemo}</textarea>
+    </div>`;
+
+  const orgSectionsHtml = myOrgs.map((sec, oi) => {
+    const i = oi + 1;
     const savedHtml = savedSections[i] || '';
     const colorBtns = COLORS.map((col, ci) =>
       `<div class="tb-color" style="background:${col}" title="${COLOR_NAMES[ci]}" onclick="applyColor('${col}',${i})"></div>`
@@ -519,9 +596,9 @@ async function renderMemberView() {
     <div class="editor-wrap">
       <div class="org-section-title">${sec}</div>
       <div class="editor-toolbar">
-        <button class="tb-btn" title="굵게 (Ctrl+B)" onclick="execCmd('bold',${i})"><b>B</b></button>
-        <button class="tb-btn" title="기울임 (Ctrl+I)" onclick="execCmd('italic',${i})"><i>I</i></button>
-        <button class="tb-btn" title="밑줄 (Ctrl+U)" onclick="execCmd('underline',${i})" style="text-decoration:underline">U</button>
+        <button class="tb-btn" title="굵게" onclick="execCmd('bold',${i})"><b>B</b></button>
+        <button class="tb-btn" title="기울임" onclick="execCmd('italic',${i})"><i>I</i></button>
+        <button class="tb-btn" title="밑줄" onclick="execCmd('underline',${i})" style="text-decoration:underline">U</button>
         <div class="tb-divider"></div>
         <span style="font-size:10px;color:var(--text3);flex-shrink:0">글자색</span>
         ${colorBtns}
@@ -543,9 +620,11 @@ async function renderMemberView() {
         <button class="tb-btn" title="초기화" onclick="execCmd('removeFormat',${i})" style="font-size:11px;color:var(--red)">✕</button>
       </div>
       <div class="editor-content" id="editor_${i}" contenteditable="true"
-        data-sec="${i}" data-placeholder="${placeholder}">${savedHtml}</div>
+        data-sec="${i}" data-placeholder="주요 사항을 입력하세요">${savedHtml}</div>
     </div>`;
   }).join('');
+
+  const sectionsHtml = taskSectionHtml + orgSectionsHtml;
 
   document.getElementById('contentWrap').innerHTML = `
     <div class="report-card">
@@ -583,7 +662,24 @@ async function renderMemberView() {
     </div>` : ''}
   `;
 
+  // 행 추가 버튼
+  document.getElementById('taskAddBtn').onclick = () => {
+    const tbody = document.getElementById('taskTbody');
+    const idx = tbody.rows.length;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td style="text-align:center;font-size:11px;color:var(--text3)">${idx+1}</td><td><input class="task-input" data-tidx="${idx}" data-field="name" placeholder="업무명 입력..."/></td><td><input class="task-memo-input" data-tidx="${idx}" data-field="memo" placeholder="메모"/></td>`;
+    tbody.appendChild(tr);
+  };
+
   document.getElementById('saveBtn').onclick = async () => {
+    // 셀 데이터 수집
+    const tasks = [];
+    document.querySelectorAll('#taskTbody tr').forEach(tr => {
+      const name = tr.querySelector('[data-field="name"]')?.value || '';
+      const memo = tr.querySelector('[data-field="memo"]')?.value || '';
+      if (name.trim()) tasks.push({ name, memo });
+    });
+    const taskMemo = document.getElementById('taskMemoArea')?.value || '';
     const sectionData = {};
     document.querySelectorAll('.editor-content').forEach(el => {
       sectionData[el.dataset.sec] = el.innerHTML;
@@ -591,7 +687,7 @@ async function renderMemberView() {
     document.getElementById('saveBtn').disabled = true;
     document.getElementById('saveBtn').textContent = '저장 중...';
     try {
-      await saveReport(ME.id, key, '', sectionData);
+      await saveReport(ME.id, key, '', sectionData, tasks, taskMemo);
       const now = new Date().toLocaleString('ko-KR', {month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
       document.getElementById('saveStatus').textContent = `저장됨 · ${now}`;
       document.getElementById('saveBtn').textContent = '✓ 저장됨';
@@ -687,25 +783,46 @@ async function renderManagerView() {
 
   // 팀원 보고
   const reportsHtml = reportResults.map(({ id, data }) => {
-    const content = data?.content || '';
+    const tasks = data?.tasks || [];
+    const taskMemo = data?.taskMemo || '';
+    const registeredTasks = data?.registeredTasks || [];
+    const secs = data?.sections || {};
+    const myOrgs = MEMBER_ORGS[id] || [];
+
+    // 추진업무 셀
+    const taskRowsHtml = tasks.length > 0
+      ? tasks.map(t => {
+          const isReg = registeredTasks.includes(t.name);
+          return `<div class="mgr-task-row">
+            <div class="mgr-task-name">${t.name}</div>
+            <div class="mgr-task-sub">${t.memo || '—'}</div>
+            <button class="reg-btn${isReg ? ' done' : ''}"
+              ${isReg ? 'disabled' : `onclick="window.registerTaskClick('${id}','${key}','${t.name.replace(/'/g,"\'")}','${(t.memo||'').replace(/'/g,"\'")}', this)"`}>
+              ${isReg ? '등록됨' : '업무등록 →'}
+            </button>
+          </div>`;
+        }).join('')
+      : '<div style="padding:10px 14px;font-size:12px;color:var(--text3)">추진업무가 없어요</div>';
+
+    // 조직별 섹션
+    const orgHtml = myOrgs.map((name, oi) => {
+      const i = oi + 1;
+      return secs[i]?.trim() ? `
+        <div style="border-top:0.5px solid var(--border)">
+          <div style="padding:8px 14px 4px;font-size:10px;font-weight:700;color:#0C447C;background:#F5F8FB">${name}</div>
+          <div style="padding:8px 14px 12px;font-size:12px;line-height:1.8;word-break:break-word">${secs[i]}</div>
+        </div>` : '';
+    }).join('');
+
     return `
       <div class="mgr-report-row">
         <div class="mgr-report-name">${id}</div>
         <div class="mgr-report-body">
           <div class="mgr-report-card" style="padding:0;overflow:hidden">
-            ${(() => {
-              const secs = data?.sections || {};
-              const myOrgs = MEMBER_ORGS[id] || [];
-              const secNames = ['추진 업무', ...myOrgs];
-              const hasContent = secNames.some((_, i) => secs[i]?.trim());
-              if (!hasContent) return `<div class="report-empty" style="padding:16px 18px;text-align:left">보고 내용이 없어요</div>`;
-              return secNames.map((name, i) => `
-                <div style="border-bottom:0.5px solid var(--border);last-child:border-none">
-                  <div style="padding:8px 14px 4px;font-size:10px;font-weight:700;color:#0C447C;background:#F5F8FB;letter-spacing:.04em">${name}</div>
-                  <div style="padding:8px 14px 12px;font-size:12px;line-height:1.8;color:${secs[i]?.trim() ? 'var(--text)' : 'var(--text3)'};word-break:break-word;min-height:36px">${secs[i]?.trim() || '—'}</div>
-                </div>`
-              ).join('');
-            })()}
+            <div style="padding:6px 14px;font-size:10px;font-weight:700;color:#0C447C;background:#F5F8FB;border-bottom:0.5px solid var(--border)">추진 업무</div>
+            <div class="mgr-tasks-wrap">${taskRowsHtml}</div>
+            ${taskMemo ? `<div style="padding:8px 14px;font-size:12px;color:var(--text2);border-top:0.5px solid var(--border);line-height:1.7;white-space:pre-wrap">${taskMemo}</div>` : ''}
+            ${orgHtml || (!tasks.length && !taskMemo ? '<div class="report-empty" style="padding:16px 18px;text-align:left">보고 내용이 없어요</div>' : '')}
           </div>
         </div>
       </div>`;
@@ -810,6 +927,21 @@ window.mgrBg = (color) => {
   document.execCommand(cmd, false, color);
 };
 window.mgrSize = (size) => { if(size) document.execCommand('fontSize', false, size); };
+
+window.registerTaskClick = async (memberId, weekKey, taskName, taskMemo, btn) => {
+  btn.disabled = true;
+  btn.textContent = '등록 중...';
+  try {
+    await registerTask(memberId, weekKey, taskName, taskMemo);
+    btn.textContent = '등록됨';
+    btn.className = 'reg-btn done';
+    toast(`업무관리에 등록됐어요 ✓`);
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = '업무등록 →';
+    toast('오류: ' + e.message);
+  }
+};
 
 window.toggleMgrNote = () => {
   const view = document.getElementById('mgrNoteView');

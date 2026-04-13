@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<link rel="manifest" href="./manifest.json"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="GZ기획팀"/>
+<meta name="theme-color" content="#ffffff"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>GZ Plan — 주간 보고</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#fff;--bg2:#F0F4F8;--bg3:#DDE3EA;
+  --text:#1a1a1a;--text2:#6b6b6b;--text3:#a8a8a8;
+  --border:#DDE3EA;--border2:#B8C6D6;
+  --radius:10px;--radius-sm:6px;--pill:999px;
+  --blue:#378ADD;--blue-bg:#E6F1FB;--blue-t:#0C447C;
+  --amber-bg:#FAEEDA;--amber-t:#633806;
+  --green:#639922;--green-bg:#EAF3DE;--green-t:#27500A;
+  --red:#A32D2D;--red-bg:#FCEBEB;
+  --orange:#EF9F27;
+  --sw:220px;--topbar-h:52px;--touch-min:44px;
+}
+html,body{height:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-serif;
+  background:var(--bg2);color:var(--text);min-height:100vh;font-size:14px}
+.app{display:flex;min-height:100vh}
+
+/* ── 사이드바 ── */
+.sidebar{
+  width:var(--sw);flex-shrink:0;
+  background:#0C447C;border-right:none;
+  display:flex;flex-direction:column;
+  position:fixed;top:0;left:0;height:100vh;z-index:300;
+  transition:transform .25s ease;overflow:hidden;
+}
+.sb-brand{padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,0.1);flex-shrink:0}
+.sb-brand-name{font-size:15px;font-weight:600;color:#fff;letter-spacing:-.3px}
+.sb-brand-sub{font-size:11px;color:rgba(255,255,255,0.45);margin-top:2px}
+.sb-user{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.1);flex-shrink:0}
+.sb-avatar{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.15);
+  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;flex-shrink:0}
+.sb-user-name{font-size:13px;font-weight:500;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-user-role{font-size:11px;color:rgba(255,255,255,0.45)}
+.sb-nav{flex:1;padding:8px 0;overflow-y:auto;overflow-x:hidden}
+.sb-sec{padding:4px 16px;font-size:10px;font-weight:600;color:rgba(255,255,255,0.35);
+  letter-spacing:.08em;text-transform:uppercase;margin-top:10px}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 16px;
+  cursor:pointer;margin:1px 8px;border-radius:var(--radius-sm);
+  transition:background .12s;min-height:var(--touch-min)}
+.sb-item:hover{background:rgba(255,255,255,0.1)}
+.sb-item.active{background:rgba(255,255,255,0.15)}
+.sb-item.active .sb-label,.sb-item.active .sb-icon{color:#fff;font-weight:500}
+.sb-icon{font-size:15px;width:22px;text-align:center;color:rgba(255,255,255,0.6);flex-shrink:0;display:flex;align-items:center}
+.sb-label{font-size:13px;color:rgba(255,255,255,0.6);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-bottom{padding:12px 16px;border-top:1px solid rgba(255,255,255,0.1);display:flex;flex-direction:column;gap:8px;flex-shrink:0}
+.sb-sync{display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,0.45)}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:#639922;flex-shrink:0}
+
+/* ── 메인 ── */
+.main-wrap{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;min-height:100vh;min-width:0}
+
+/* ── 탑바 ── */
+.topbar{
+  background:var(--bg);border-bottom:0.5px solid var(--border);
+  padding:0 24px;height:var(--topbar-h);
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:50;flex-shrink:0;gap:12px;
+}
+.page-title{font-size:15px;font-weight:600;color:var(--text);flex:1}
+.topbar-right{display:flex;gap:8px;align-items:center;flex-shrink:0}
+
+/* ── 햄버거 ── */
+.hamburger{display:none;width:36px;height:36px;border:none;background:transparent;
+  cursor:pointer;flex-direction:column;align-items:center;justify-content:center;
+  gap:5px;padding:4px;border-radius:var(--radius-sm);flex-shrink:0}
+.hamburger span{display:block;width:20px;height:2px;background:var(--text);border-radius:2px}
+.sidebar-dim{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:290}
+.sidebar-dim.show{display:block}
+
+/* ── 버튼 ── */
+.btn-solid{background:#0C447C;color:#fff;border:none;border-radius:var(--radius-sm);
+  padding:0 14px;height:32px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+.btn-solid:hover{background:#0a3a6a}
+.btn-ghost{background:transparent;color:var(--text2);border:0.5px solid var(--border);
+  border-radius:var(--radius-sm);padding:0 14px;height:32px;font-size:13px;cursor:pointer;font-family:inherit}
+.btn-ghost:hover{background:var(--bg2)}
+
+/* ── 주차 네비 ── */
+.week-nav{display:flex;align-items:center;gap:10px}
+.nav-btn{width:28px;height:28px;border:0.5px solid var(--border);border-radius:var(--radius-sm);
+  background:#fff;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center}
+.nav-btn:hover{background:var(--bg2)}
+.week-label{font-size:14px;font-weight:600;color:var(--text);min-width:180px;text-align:center}
+
+/* ── 팀원 탭 (팀장용) ── */
+.member-tabs{display:flex;gap:4px;flex-wrap:wrap;padding:16px 24px 0}
+.member-tab{padding:6px 14px;font-size:12px;font-weight:500;border:0.5px solid var(--border);
+  border-radius:var(--pill);background:#fff;cursor:pointer;color:var(--text2);transition:all .12s}
+.member-tab:hover{background:var(--bg2)}
+.member-tab.active{background:#0C447C;color:#fff;border-color:#0C447C}
+
+/* ── 콘텐츠 영역 ── */
+.content-wrap{padding:20px 24px 80px;flex:1}
+
+/* ── 보고 작성 카드 ── */
+.report-card{background:#fff;border:0.5px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.report-card-head{padding:16px 20px;border-bottom:0.5px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between}
+.report-card-title{font-size:14px;font-weight:600;color:var(--text)}
+.report-card-meta{font-size:11px;color:var(--text3)}
+.report-textarea{
+  width:100%;min-height:400px;padding:20px;
+  font-size:13px;line-height:1.8;color:var(--text);
+  border:none;outline:none;resize:vertical;font-family:inherit;
+  background:#fff;
+}
+.report-textarea::placeholder{color:var(--text3)}
+.report-card-footer{padding:12px 20px;border-top:0.5px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;background:var(--bg2)}
+.save-status{font-size:11px;color:var(--text3)}
+
+/* ── 팀장 조회용 보고 내용 ── */
+.report-view{padding:20px;font-size:13px;line-height:1.9;color:var(--text);
+  white-space:pre-wrap;word-break:break-word;min-height:200px}
+.report-empty{padding:40px 20px;text-align:center;color:var(--text3);font-size:13px}
+
+/* ── 히스토리 ── */
+.history-section{margin-top:20px}
+.history-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;
+  letter-spacing:.08em;margin-bottom:12px}
+.history-item{background:#fff;border:0.5px solid var(--border);border-radius:var(--radius);
+  margin-bottom:10px;overflow:hidden}
+.history-head{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;
+  cursor:pointer;border-bottom:0.5px solid var(--border)}
+.history-head:hover{background:var(--bg2)}
+.history-week{font-size:12px;font-weight:600;color:var(--text)}
+.history-date{font-size:11px;color:var(--text3)}
+.history-body{padding:16px;font-size:12px;line-height:1.8;color:var(--text2);
+  white-space:pre-wrap;word-break:break-word;display:none}
+.history-body.open{display:block}
+
+/* ── 토스트 ── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:#1a1a1a;color:#fff;padding:10px 20px;border-radius:var(--pill);
+  font-size:13px;opacity:0;pointer-events:none;transition:all .25s;z-index:999;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── 반응형 ── */
+@media(max-width:767px){
+  :root{--sw:240px}
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .hamburger{display:flex}
+  .main-wrap{margin-left:0}
+  .topbar{padding:0 14px}
+  .content-wrap{padding:14px 14px 80px}
+  .member-tabs{padding:12px 14px 0}
+  .week-label{min-width:140px;font-size:13px}
+}
+</style>
+</head>
+<body>
+<div class="sidebar-dim" id="sidebarDim"></div>
+<div class="app">
+  <div class="sidebar">
+    <div class="sb-brand">
+      <div class="sb-brand-name">GZ Plan</div>
+      <div class="sb-brand-sub">경영기획팀</div>
+    </div>
+    <div class="sb-user">
+      <div class="sb-avatar" id="sbAvatar">--</div>
+      <div>
+        <div class="sb-user-name" id="sbUserName"></div>
+        <div class="sb-user-role" id="sbUserRole"></div>
+      </div>
+    </div>
+    <div class="sb-nav" id="sbNav">
+      <div class="sb-sec">업무</div>
+      <div class="sb-item" data-nav="member.html" id="sbTaskItem">
+        <div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg></div>
+        <div class="sb-label" id="sbTaskLabel">내 업무</div>
+      </div>
+      <div class="sb-item active" data-nav="report.html">
+        <div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 1 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+        <div class="sb-label">주간 보고</div>
+      </div>
+      <div class="sb-sec">도구</div>
+      <div class="sb-item" data-nav="calendar.html">
+        <div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+        <div class="sb-label">캘린더</div>
+      </div>
+      <div class="sb-item" data-nav="weekly.html">
+        <div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg></div>
+        <div class="sb-label">주간 스케줄</div>
+      </div>
+      <div class="sb-item" data-nav="meeting.html">
+        <div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <div class="sb-label">회의록</div>
+      </div>
+      <div class="sb-item" data-nav="memo.html">
+        <div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+        <div class="sb-label">메모장</div>
+      </div>
+    </div>
+    <div class="sb-bottom">
+      <div class="sb-sync"><div class="sync-dot" id="syncDot"></div><span>실시간 동기화</span></div>
+      <button class="btn-ghost" id="logoutBtn" style="width:100%;font-size:11px;padding:5px;color:rgba(255,255,255,0.6);border-color:rgba(255,255,255,0.2)">로그아웃</button>
+    </div>
+  </div>
+
+  <div class="main-wrap">
+    <div class="topbar">
+      <button class="hamburger" id="hamburgerBtn" aria-label="메뉴"><span></span><span></span><span></span></button>
+      <div class="page-title">주간 보고</div>
+      <div class="topbar-right">
+        <div class="week-nav">
+          <button class="nav-btn" id="prevBtn">‹</button>
+          <div class="week-label" id="weekLabel"></div>
+          <button class="nav-btn" id="nextBtn">›</button>
+          <button class="btn-ghost" id="todayBtn" style="font-size:12px">이번 주</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 팀장용: 팀원 탭 -->
+    <div id="memberTabsWrap" style="display:none">
+      <div class="member-tabs" id="memberTabs"></div>
+    </div>
+
+    <div class="content-wrap" id="contentWrap"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import {
+  getFirestore, collection, doc, getDoc, setDoc, getDocs, orderBy, query
+} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const FIREBASE_CONFIG = {
+  apiKey:            "AIzaSyA7KylsSyT3_0oQvhBtcrPc-gcdfVq90IQ",
+  authDomain:        "gzplan.firebaseapp.com",
+  projectId:         "gzplan",
+  storageBucket:     "gzplan.firebasestorage.app",
+  messagingSenderId: "186255862586",
+  appId:             "1:186255862586:web:f36d21f76012ca43b8fe03",
+};
+
+const MEMBER_IDS = ["강신욱","김용욱","오문식","이길우","이도영","이상현","이영찬","이윤형"];
+
+const db = getFirestore(initializeApp(FIREBASE_CONFIG));
+const sess = localStorage.getItem('tt_user');
+if (!sess) { location.href = 'index.html'; throw ''; }
+let ME;
+try { ME = JSON.parse(sess); } catch { localStorage.removeItem('tt_user'); location.href = 'index.html'; throw ''; }
+if (!ME?.id || !ME?.role) { localStorage.removeItem('tt_user'); location.href = 'index.html'; throw ''; }
+
+const isMgr = ME.role === 'manager' || ME.role === 'admin';
+
+// ── 사이드바 초기화 ──
+document.getElementById('sbAvatar').textContent = (ME.displayName || ME.id || '--').slice(0,1);
+document.getElementById('sbUserName').textContent = ME.displayName || ME.id || '';
+document.getElementById('sbUserRole').textContent = isMgr ? '팀장' : '팀원';
+
+const taskItem = document.getElementById('sbTaskItem');
+const taskLabel = document.getElementById('sbTaskLabel');
+if (taskItem) taskItem.dataset.nav = isMgr ? 'manager.html' : 'member.html';
+if (taskLabel) taskLabel.textContent = isMgr ? '팀 업무 현황' : '내 업무';
+
+// ── 주차 계산 ──
+function getWeekKey(date) {
+  const d = new Date(date);
+  d.setHours(0,0,0,0);
+  const day = d.getDay();
+  const mon = new Date(d);
+  mon.setDate(d.getDate() - (day === 0 ? 6 : day - 1));
+  const sun = new Date(mon);
+  sun.setDate(mon.getDate() + 6);
+  const fmt = d => `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+  return {
+    key: `${mon.getFullYear()}W${String(getISOWeek(mon)).padStart(2,'0')}`,
+    label: `${fmt(mon)} ~ ${fmt(sun)}`,
+    mon, sun
+  };
+}
+
+function getISOWeek(date) {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+  return Math.ceil((((d - yearStart) / 86400000) + 1)/7);
+}
+
+let curDate = new Date();
+let curMember = isMgr ? MEMBER_IDS[0] : ME.id;
+
+function updateWeekLabel() {
+  const { label } = getWeekKey(curDate);
+  document.getElementById('weekLabel').textContent = label;
+}
+
+// ── 토스트 ──
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ── Firestore ──
+function reportDoc(memberId, weekKey) {
+  return doc(db, 'weeklyReports', memberId, 'weeks', weekKey);
+}
+
+async function loadReport(memberId, weekKey) {
+  try {
+    const snap = await getDoc(reportDoc(memberId, weekKey));
+    return snap.exists() ? snap.data() : null;
+  } catch(e) { return null; }
+}
+
+async function saveReport(memberId, weekKey, content) {
+  await setDoc(reportDoc(memberId, weekKey), {
+    content,
+    memberId,
+    weekKey,
+    updatedAt: new Date().toISOString(),
+    displayName: ME.displayName || ME.id
+  });
+}
+
+async function loadHistory(memberId) {
+  try {
+    const q = query(collection(db, 'weeklyReports', memberId, 'weeks'), orderBy('weekKey', 'desc'));
+    const snap = await getDocs(q);
+    return snap.docs.map(d => d.data());
+  } catch(e) { return []; }
+}
+
+// ── 팀원 화면 ──
+async function renderMemberView() {
+  const { key, label } = getWeekKey(curDate);
+  const data = await loadReport(ME.id, key);
+  const content = data?.content || '';
+  const updatedAt = data?.updatedAt ? new Date(data.updatedAt).toLocaleString('ko-KR', {month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+
+  const history = await loadHistory(ME.id);
+  const pastHistory = history.filter(h => h.weekKey !== key);
+
+  document.getElementById('contentWrap').innerHTML = `
+    <div class="report-card">
+      <div class="report-card-head">
+        <div class="report-card-title">📋 ${label} 주간 업무 보고</div>
+        <div class="report-card-meta">${updatedAt ? `마지막 저장: ${updatedAt}` : '아직 작성하지 않았어요'}</div>
+      </div>
+      <textarea class="report-textarea" id="reportInput" placeholder="이번 주 추진 업무와 주요 사항을 자유롭게 작성해주세요.
+
+예시)
+o 26년 4월 월간자료 준비
+  - 취합메일 발송(4/7)
+o 사업계획 보고 자료 작성
+  - 초안 작성 완료, 검토 중
+
+담당 조직 주요사항
+< 운영 >
+  - 3월 프로모션 현황 점검
+  - 남부지방 매출 증대 방안 검토">${content}</textarea>
+      <div class="report-card-footer">
+        <div class="save-status" id="saveStatus">${updatedAt ? `저장됨 · ${updatedAt}` : ''}</div>
+        <button class="btn-solid" id="saveBtn">💾 저장</button>
+      </div>
+    </div>
+
+    ${pastHistory.length > 0 ? `
+    <div class="history-section">
+      <div class="history-title">이전 보고 히스토리</div>
+      ${pastHistory.slice(0,8).map(h => `
+        <div class="history-item">
+          <div class="history-head" onclick="this.nextElementSibling.classList.toggle('open')">
+            <div class="history-week">${h.weekKey}</div>
+            <div class="history-date">${h.updatedAt ? new Date(h.updatedAt).toLocaleDateString('ko-KR') : ''}</div>
+          </div>
+          <div class="history-body">${h.content || ''}</div>
+        </div>
+      `).join('')}
+    </div>` : ''}
+  `;
+
+  document.getElementById('saveBtn').onclick = async () => {
+    const content = document.getElementById('reportInput').value;
+    document.getElementById('saveBtn').disabled = true;
+    document.getElementById('saveBtn').textContent = '저장 중...';
+    try {
+      await saveReport(ME.id, key, content);
+      const now = new Date().toLocaleString('ko-KR', {month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
+      document.getElementById('saveStatus').textContent = `저장됨 · ${now}`;
+      document.getElementById('saveBtn').textContent = '✓ 저장됨';
+      setTimeout(() => {
+        document.getElementById('saveBtn').disabled = false;
+        document.getElementById('saveBtn').textContent = '💾 저장';
+      }, 2000);
+      toast('저장됐어요 ✓');
+    } catch(e) {
+      toast('저장 실패: ' + e.message);
+      document.getElementById('saveBtn').disabled = false;
+      document.getElementById('saveBtn').textContent = '💾 저장';
+    }
+  };
+
+  // Ctrl+S / Cmd+S 단축키
+  document.getElementById('reportInput').addEventListener('keydown', e => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+      e.preventDefault();
+      document.getElementById('saveBtn').click();
+    }
+  });
+}
+
+// ── 팀장 화면 ──
+async function renderManagerView() {
+  const { key, label } = getWeekKey(curDate);
+
+  // 팀원 탭
+  document.getElementById('memberTabsWrap').style.display = '';
+  const tabsEl = document.getElementById('memberTabs');
+  tabsEl.innerHTML = MEMBER_IDS.map(id =>
+    `<div class="member-tab${id === curMember ? ' active' : ''}" onclick="window.selectMember('${id}')">${id}</div>`
+  ).join('');
+
+  // 보고 내용 로드
+  const data = await loadReport(curMember, key);
+  const content = data?.content || '';
+  const updatedAt = data?.updatedAt ? new Date(data.updatedAt).toLocaleString('ko-KR', {month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+
+  const history = await loadHistory(curMember);
+  const pastHistory = history.filter(h => h.weekKey !== key);
+
+  document.getElementById('contentWrap').innerHTML = `
+    <div class="report-card">
+      <div class="report-card-head">
+        <div class="report-card-title">📋 ${curMember} · ${label} 주간 업무 보고</div>
+        <div class="report-card-meta">${updatedAt ? `마지막 작성: ${updatedAt}` : '아직 작성하지 않았어요'}</div>
+      </div>
+      ${content
+        ? `<div class="report-view">${content}</div>`
+        : `<div class="report-empty">이번 주 보고가 없어요</div>`
+      }
+    </div>
+
+    ${pastHistory.length > 0 ? `
+    <div class="history-section">
+      <div class="history-title">이전 보고 히스토리</div>
+      ${pastHistory.slice(0,8).map(h => `
+        <div class="history-item">
+          <div class="history-head" onclick="this.nextElementSibling.classList.toggle('open')">
+            <div class="history-week">${h.weekKey}</div>
+            <div class="history-date">${h.updatedAt ? new Date(h.updatedAt).toLocaleDateString('ko-KR') : ''}</div>
+          </div>
+          <div class="history-body">${h.content || ''}</div>
+        </div>
+      `).join('')}
+    </div>` : ''}
+  `;
+}
+
+window.selectMember = (id) => {
+  curMember = id;
+  renderManagerView();
+};
+
+// ── 주차 네비 ──
+document.getElementById('prevBtn').onclick = () => {
+  curDate.setDate(curDate.getDate() - 7);
+  updateWeekLabel();
+  isMgr ? renderManagerView() : renderMemberView();
+};
+document.getElementById('nextBtn').onclick = () => {
+  curDate.setDate(curDate.getDate() + 7);
+  updateWeekLabel();
+  isMgr ? renderManagerView() : renderMemberView();
+};
+document.getElementById('todayBtn').onclick = () => {
+  curDate = new Date();
+  updateWeekLabel();
+  isMgr ? renderManagerView() : renderMemberView();
+};
+
+// ── 사이드바 햄버거 ──
+(function() {
+  function openSB() {
+    document.querySelector('.sidebar').classList.add('open');
+    document.getElementById('sidebarDim').classList.add('show');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeSB() {
+    document.querySelector('.sidebar').classList.remove('open');
+    document.getElementById('sidebarDim').classList.remove('show');
+    document.body.style.overflow = '';
+  }
+  document.getElementById('hamburgerBtn').onclick = openSB;
+  document.getElementById('sidebarDim').onclick = closeSB;
+  document.querySelectorAll('.sidebar [data-nav]').forEach(el => {
+    el.addEventListener('click', () => { location.href = el.dataset.nav; });
+  });
+  document.getElementById('logoutBtn').onclick = () => {
+    localStorage.removeItem('tt_user'); sessionStorage.clear(); location.href = 'index.html';
+  };
+})();
+
+// ── 초기 렌더 ──
+updateWeekLabel();
+if (isMgr) {
+  renderManagerView();
+} else {
+  renderMemberView();
+}
+</script>
+</body>
+</html>

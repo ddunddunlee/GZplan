@@ -326,10 +326,19 @@ if (!ME?.id || !ME?.role) { localStorage.removeItem('tt_user'); location.href = 
 
 const isMgr = ME.role === 'manager' || ME.role === 'admin';
 
-// Firestore에서 담당 조직 로드
+// Firestore에서 설정 로드 (순서 + 담당 조직)
 try {
-  const orgSnap = await getDoc(doc(db, 'config', 'memberOrgs'));
+  const [orgSnap, orderSnap] = await Promise.all([
+    getDoc(doc(db, 'config', 'memberOrgs')),
+    getDoc(doc(db, 'config', 'memberOrder'))
+  ]);
   if (orgSnap.exists()) MEMBER_ORGS = orgSnap.data().orgs || MEMBER_ORGS;
+  if (orderSnap.exists() && orderSnap.data().order?.length) {
+    const savedOrder = orderSnap.data().order;
+    // MEMBER_IDS 순서 업데이트
+    MEMBER_IDS.length = 0;
+    savedOrder.forEach(id => MEMBER_IDS.push(id));
+  }
 } catch(e) {}
 
 // ── 사이드바 초기화 ──

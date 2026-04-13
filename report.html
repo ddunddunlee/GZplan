@@ -525,15 +525,23 @@ async function renderMemberView() {
     ${pastHistory.length > 0 ? `
     <div class="history-section">
       <div class="history-title">이전 보고 히스토리</div>
-      ${pastHistory.slice(0,8).map(h => `
+      ${pastHistory.slice(0,8).map(h => {
+        const secs = h.sections || {};
+        const myOrgs = MEMBER_ORGS[ME.id] || [];
+        const secNames = ['추진 업무', ...myOrgs];
+        const bodyHtml = secNames.map((name, i) => secs[i]?.trim()
+          ? `<div style="margin-bottom:10px"><div style="font-size:10px;font-weight:700;color:#0C447C;margin-bottom:3px">${name}</div><div style="font-size:12px;line-height:1.8;word-break:break-word">${secs[i]}</div></div>`
+          : ''
+        ).join('') || h.content || '내용 없음';
+        return `
         <div class="history-item">
           <div class="history-head" onclick="this.nextElementSibling.classList.toggle('open')">
             <div class="history-week">${h.weekKey}</div>
-            <div class="history-date">${h.updatedAt ? new Date(h.updatedAt).toLocaleDateString('ko-KR') : ''}</div>
+            <div class="history-date">${h.updatedAt ? new Date(h.updatedAt).toLocaleDateString('ko-KR') : ''} ▾</div>
           </div>
-          <div class="history-body">${h.content || ''}</div>
-        </div>
-      `).join('')}
+          <div class="history-body">${bodyHtml}</div>
+        </div>`;
+      }).join('')}
     </div>` : ''}
   `;
 

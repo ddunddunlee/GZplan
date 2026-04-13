@@ -141,6 +141,42 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
   white-space:pre-wrap;word-break:break-word;display:none}
 .history-body.open{display:block}
 
+/* ── 요약 섹션 ── */
+.summary-wrap{background:#fff;border:0.5px solid var(--border);border-radius:var(--radius);margin-bottom:20px;overflow:hidden}
+.summary-section{padding:16px 20px}
+.summary-label{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+.summary-body{display:flex;flex-direction:column;gap:6px}
+.attend-row{display:flex;align-items:baseline;gap:10px;font-size:13px}
+.attend-name{font-weight:700;color:#0C447C;width:60px;flex-shrink:0}
+.attend-items{color:var(--text2);line-height:1.6}
+.attend-empty{font-size:12px;color:var(--text3)}
+
+/* ── 공통/근태 섹션 ── */
+.top-section-card{background:#fff;border:0.5px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:12px}
+.top-section-title{font-size:12px;font-weight:700;color:var(--text);margin-bottom:10px;text-transform:uppercase;letter-spacing:.04em}
+.evt-chips{display:flex;flex-wrap:wrap;gap:6px}
+.evt-chip{font-size:12px;padding:4px 10px;border-radius:var(--pill);font-weight:500}
+.common-chip{background:#EDEDF5;color:#3C3489}
+.evt-empty{font-size:12px;color:var(--text3)}
+.attend-list{display:flex;flex-direction:column;gap:6px}
+.attend-row{display:flex;align-items:baseline;gap:10px;font-size:12px}
+.attend-name{font-weight:700;color:#0C447C;flex-shrink:0;width:52px}
+.attend-items{color:var(--text2);line-height:1.6}
+.section-divider{height:1px;background:var(--border);margin:8px 0 20px}
+
+/* ── 팀장 전체보기 ── */
+.mgr-report-row{display:flex;gap:0;border-bottom:0.5px solid var(--border);padding:20px 0}
+.mgr-report-row:first-child{padding-top:0}
+.mgr-report-row:last-child{border-bottom:none}
+.mgr-report-name{
+  width:80px;flex-shrink:0;
+  font-size:13px;font-weight:700;color:#0C447C;
+  padding-top:2px;
+}
+.mgr-report-body{flex:1;min-width:0}
+.mgr-report-card{background:#fff;border:0.5px solid var(--border);border-radius:var(--radius);padding:14px 18px}
+.mgr-report-meta{font-size:11px;color:var(--text3)}
+
 /* ── 토스트 ── */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
   background:#1a1a1a;color:#fff;padding:10px 20px;border-radius:var(--pill);
@@ -238,7 +274,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import {
-  getFirestore, collection, doc, getDoc, setDoc, getDocs, orderBy, query
+  getFirestore, collection, doc, getDoc, setDoc, getDocs, orderBy, query, where
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 const FIREBASE_CONFIG = {
@@ -312,6 +348,7 @@ function toast(msg) {
   setTimeout(() => el.classList.remove('show'), 2500);
 }
 
+// ── 이번 주 개별 일정 로드 ──
 // ── Firestore ──
 function reportDoc(memberId, weekKey) {
   return doc(db, 'weeklyReports', memberId, 'weeks', weekKey);
@@ -421,52 +458,143 @@ o 사업계획 보고 자료 작성
   });
 }
 
+// ── 팀장 주요업무 로드/저장 ──
+function mgrNoteDoc(weekKey) {
+  return doc(db, 'weeklyMgrNote', weekKey);
+}
+async function loadMgrNote(weekKey) {
+  try {
+    const snap = await getDoc(mgrNoteDoc(weekKey));
+    return snap.exists() ? snap.data().content || '' : '';
+  } catch(e) { return ''; }
+}
+async function saveMgrNote(weekKey, content) {
+  await setDoc(mgrNoteDoc(weekKey), { content, updatedAt: new Date().toISOString() });
+}
+
+// ── 이번 주 일정 로드 ──
+async function loadWeekSchedules(monDate, sunDate) {
+  const monStr = monDate.toISOString().slice(0,10);
+  const sunStr = sunDate.toISOString().slice(0,10);
+  try {
+    const snap = await getDocs(query(collection(db,'schedules'), orderBy('startDate','asc')));
+    const all = snap.docs.map(d => ({id:d.id,...d.data()}));
+    return all.filter(ev => ev.startDate <= sunStr && (ev.endDate || ev.startDate) >= monStr);
+  } catch(e) { return []; }
+}
+
+function fmtDate(str) {
+  if (!str) return '';
+  const d = new Date(str + 'T00:00:00');
+  return `${d.getMonth()+1}/${d.getDate()}`;
+}
+
 // ── 팀장 화면 ──
 async function renderManagerView() {
-  const { key, label } = getWeekKey(curDate);
+  const { key, mon, sun } = getWeekKey(curDate);
+  document.getElementById('memberTabsWrap').style.display = 'none';
 
-  // 팀원 탭
-  document.getElementById('memberTabsWrap').style.display = '';
-  const tabsEl = document.getElementById('memberTabs');
-  tabsEl.innerHTML = MEMBER_IDS.map(id =>
-    `<div class="member-tab${id === curMember ? ' active' : ''}" onclick="window.selectMember('${id}')">${id}</div>`
+  // 병렬 로드
+  const [allSchedules, mgrNote, ...reportResults] = await Promise.all([
+    loadWeekSchedules(mon, sun),
+    loadMgrNote(key),
+    ...MEMBER_IDS.map(id => loadReport(id, key).then(data => ({ id, data })))
+  ]);
+
+  const d2s = str => { const d = new Date(str+'T00:00:00'); return `${d.getMonth()+1}/${d.getDate()}`; };
+  const dateRange = ev => ev.startDate === ev.endDate ? d2s(ev.startDate) : `${d2s(ev.startDate)}~${d2s(ev.endDate)}`;
+
+  // 공통 일정
+  const commonEvts = allSchedules.filter(ev => ev.type === 'common');
+  const commonHtml = commonEvts.length
+    ? commonEvts.map(ev => `<span class="evt-chip common-chip">🏢 ${dateRange(ev)} ${ev.title}</span>`).join('')
+    : '<span class="evt-empty">이번 주 공통 일정 없음</span>';
+
+  // 근태 일정 - 팀원별 그룹핑
+  const personalEvts = allSchedules.filter(ev => ev.type === 'personal');
+  const byMember = {};
+  personalEvts.forEach(ev => {
+    const id = ev.authorId || ev.author || '';
+    if (!id) return;
+    if (!byMember[id]) byMember[id] = [];
+    byMember[id].push(ev);
+  });
+  const attendRows = MEMBER_IDS.filter(id => byMember[id]?.length).map(id =>
+    `<div class="attend-row">
+      <span class="attend-name">${id}</span>
+      <span class="attend-items">${byMember[id].map(ev => `${dateRange(ev)} ${ev.title}`).join(' · ')}</span>
+    </div>`
   ).join('');
+  const attendHtml = attendRows || '<span class="evt-empty">이번 주 개별 일정 없음</span>';
 
-  // 보고 내용 로드
-  const data = await loadReport(curMember, key);
-  const content = data?.content || '';
-  const updatedAt = data?.updatedAt ? new Date(data.updatedAt).toLocaleString('ko-KR', {month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
-
-  const history = await loadHistory(curMember);
-  const pastHistory = history.filter(h => h.weekKey !== key);
+  // 팀원 보고
+  const reportsHtml = reportResults.map(({ id, data }) => {
+    const content = data?.content || '';
+    const updatedAt = data?.updatedAt
+      ? new Date(data.updatedAt).toLocaleString('ko-KR', {month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})
+      : '';
+    return `
+      <div class="mgr-report-row">
+        <div class="mgr-report-name">${id}</div>
+        <div class="mgr-report-body">
+          <div class="mgr-report-card">
+            <div class="mgr-report-meta">${updatedAt ? `마지막 작성: ${updatedAt}` : '아직 작성하지 않았어요'}</div>
+            ${content
+              ? `<div class="report-view" style="padding:14px 0 0;min-height:unset">${content}</div>`
+              : `<div class="report-empty" style="padding:16px 0;text-align:left">보고 내용이 없어요</div>`}
+          </div>
+        </div>
+      </div>`;
+  }).join('');
 
   document.getElementById('contentWrap').innerHTML = `
-    <div class="report-card">
-      <div class="report-card-head">
-        <div class="report-card-title">📋 ${curMember} · 주간 업무 보고</div>
-        <div class="report-card-meta">${updatedAt ? `마지막 작성: ${updatedAt}` : '아직 작성하지 않았어요'}</div>
+    <div class="top-section-card">
+      <div class="top-section-title" style="display:flex;align-items:center;justify-content:space-between">
+        <span>📌 주요업무 및 일정</span>
+        <button onclick="window.toggleMgrNote()" style="font-size:11px;padding:3px 10px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:#fff;cursor:pointer;color:var(--text2)">✎ 편집</button>
       </div>
-      ${content
-        ? `<div class="report-view">${content}</div>`
-        : `<div class="report-empty">이번 주 보고가 없어요</div>`
-      }
-    </div>
-
-    ${pastHistory.length > 0 ? `
-    <div class="history-section">
-      <div class="history-title">이전 보고 히스토리</div>
-      ${pastHistory.slice(0,8).map(h => `
-        <div class="history-item">
-          <div class="history-head" onclick="this.nextElementSibling.classList.toggle('open')">
-            <div class="history-week">${h.weekKey}</div>
-            <div class="history-date">${h.updatedAt ? new Date(h.updatedAt).toLocaleDateString('ko-KR') : ''}</div>
-          </div>
-          <div class="history-body">${h.content || ''}</div>
+      <div id="mgrNoteView" style="margin-top:10px;font-size:13px;line-height:1.8;color:var(--text);white-space:pre-wrap;word-break:break-word;min-height:40px">${mgrNote || '<span style="color:var(--text3);font-size:12px">주요업무 및 일정을 입력해주세요</span>'}</div>
+      <div id="mgrNoteEdit" style="display:none;margin-top:10px">
+        <textarea id="mgrNoteInput" style="width:100%;min-height:120px;padding:10px;font-size:13px;line-height:1.8;border:0.5px solid var(--border);border-radius:var(--radius-sm);resize:vertical;font-family:inherit;outline:none">${mgrNote}</textarea>
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px">
+          <button onclick="window.cancelMgrNote()" class="btn-ghost" style="font-size:12px;height:28px;padding:0 12px">취소</button>
+          <button onclick="window.saveMgrNoteClick('${key}')" class="btn-solid" style="font-size:12px;height:28px;padding:0 12px">저장</button>
         </div>
-      `).join('')}
-    </div>` : ''}
+      </div>
+    </div>
+    <div class="top-section-card">
+      <div class="top-section-title">🏢 공통 일정</div>
+      <div class="evt-chips">${commonHtml}</div>
+    </div>
+    <div class="top-section-card">
+      <div class="top-section-title">📅 근태 일정</div>
+      <div class="attend-list">${attendHtml}</div>
+    </div>
+    <div class="section-divider"></div>
+    ${reportsHtml}
   `;
 }
+
+window.toggleMgrNote = () => {
+  const view = document.getElementById('mgrNoteView');
+  const edit = document.getElementById('mgrNoteEdit');
+  view.style.display = 'none';
+  edit.style.display = '';
+  document.getElementById('mgrNoteInput').focus();
+};
+window.cancelMgrNote = () => {
+  document.getElementById('mgrNoteView').style.display = '';
+  document.getElementById('mgrNoteEdit').style.display = 'none';
+};
+window.saveMgrNoteClick = async (weekKey) => {
+  const content = document.getElementById('mgrNoteInput').value;
+  await saveMgrNote(weekKey, content);
+  const view = document.getElementById('mgrNoteView');
+  view.innerHTML = content ? content.replace(/</g,'&lt;') : '<span style="color:var(--text3);font-size:12px">주요업무 및 일정을 입력해주세요</span>';
+  view.style.display = '';
+  document.getElementById('mgrNoteEdit').style.display = 'none';
+  toast('저장됐어요 ✓');
+};
 
 window.selectMember = (id) => {
   curMember = id;

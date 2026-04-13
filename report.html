@@ -164,6 +164,34 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 .attend-items{color:var(--text2);line-height:1.6}
 .section-divider{height:1px;background:var(--border);margin:8px 0 20px}
 
+/* ── 리치텍스트 에디터 ── */
+.editor-wrap{border-bottom:0.5px solid var(--border)}
+.editor-wrap:last-child{border-bottom:none}
+.editor-toolbar{
+  display:flex;gap:2px;padding:6px 12px;
+  background:#F8FAFB;border-bottom:0.5px solid var(--border);
+  flex-wrap:wrap;align-items:center;
+}
+.tb-btn{
+  width:28px;height:28px;border:none;background:transparent;
+  border-radius:4px;cursor:pointer;font-size:13px;font-weight:600;
+  display:flex;align-items:center;justify-content:center;color:var(--text2);
+  transition:background .1s;flex-shrink:0;
+}
+.tb-btn:hover{background:var(--border)}
+.tb-btn.active{background:var(--border);color:var(--text)}
+.tb-divider{width:1px;height:18px;background:var(--border);margin:0 4px;flex-shrink:0}
+.tb-color{width:22px;height:22px;border-radius:50%;border:2px solid #fff;cursor:pointer;outline:2px solid var(--border);flex-shrink:0}
+.tb-color:hover{outline-color:var(--text3)}
+.tb-color.active{outline-color:#0C447C}
+.editor-content{
+  min-height:120px;padding:12px 20px;
+  font-size:13px;line-height:1.9;color:var(--text);
+  outline:none;word-break:break-word;
+  font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-serif;
+}
+.editor-content:empty:before{content:attr(data-placeholder);color:var(--text3);pointer-events:none}
+
 /* ── 조직별 섹션 ── */
 .org-sections{padding:4px 0}
 .org-section{border-bottom:0.5px solid var(--border)}
@@ -438,12 +466,31 @@ async function renderMemberView() {
   const sections = ['추진 업무', ...myOrgs];
   const savedSections = data?.sections || {};
 
-  const sectionsHtml = sections.map((sec, i) => `
-    <div class="org-section">
+  const COLORS = ['#1a1a1a','#A32D2D','#0C447C','#639922','#633806','#6B5FCC'];
+  const COLOR_NAMES = ['기본','빨강','파랑','초록','주황','보라'];
+
+  const sectionsHtml = sections.map((sec, i) => {
+    const placeholder = sec === '추진 업무' ? 'o 업무명\n  - 세부 내용' : '주요 사항을 입력하세요';
+    const savedHtml = savedSections[i] || '';
+    const colorBtns = COLORS.map((col, ci) =>
+      `<div class="tb-color" style="background:${col}" title="${COLOR_NAMES[ci]}" onclick="applyColor('${col}',${i})"></div>`
+    ).join('');
+    return `
+    <div class="editor-wrap">
       <div class="org-section-title">${sec}</div>
-      <textarea class="org-textarea" data-sec="${i}" placeholder="${sec === '추진 업무' ? 'o 업무명\n  - 세부 내용' : '주요 사항을 입력하세요'}">${savedSections[i] || ''}</textarea>
-    </div>
-  `).join('');
+      <div class="editor-toolbar">
+        <button class="tb-btn" title="굵게 (Ctrl+B)" onclick="execCmd('bold',${i})"><b>B</b></button>
+        <button class="tb-btn" title="기울임 (Ctrl+I)" onclick="execCmd('italic',${i})"><i>I</i></button>
+        <button class="tb-btn" title="밑줄 (Ctrl+U)" onclick="execCmd('underline',${i})" style="text-decoration:underline">U</button>
+        <div class="tb-divider"></div>
+        ${colorBtns}
+        <div class="tb-divider"></div>
+        <button class="tb-btn" title="초기화" onclick="execCmd('removeFormat',${i})" style="font-size:11px">✕</button>
+      </div>
+      <div class="editor-content" id="editor_${i}" contenteditable="true"
+        data-sec="${i}" data-placeholder="${placeholder}">${savedHtml}</div>
+    </div>`;
+  }).join('');
 
   document.getElementById('contentWrap').innerHTML = `
     <div class="report-card">
@@ -475,8 +522,8 @@ async function renderMemberView() {
 
   document.getElementById('saveBtn').onclick = async () => {
     const sectionData = {};
-    document.querySelectorAll('.org-textarea').forEach(el => {
-      sectionData[el.dataset.sec] = el.value;
+    document.querySelectorAll('.editor-content').forEach(el => {
+      sectionData[el.dataset.sec] = el.innerHTML;
     });
     document.getElementById('saveBtn').disabled = true;
     document.getElementById('saveBtn').textContent = '저장 중...';
@@ -592,7 +639,7 @@ async function renderManagerView() {
               return secNames.map((name, i) => `
                 <div style="border-bottom:0.5px solid var(--border);last-child:border-none">
                   <div style="padding:8px 14px 4px;font-size:10px;font-weight:700;color:#0C447C;background:#F5F8FB;letter-spacing:.04em">${name}</div>
-                  <div style="padding:8px 14px 12px;font-size:12px;line-height:1.8;color:${secs[i]?.trim() ? 'var(--text)' : 'var(--text3)'};white-space:pre-wrap;word-break:break-word;min-height:36px">${secs[i]?.trim() || '—'}</div>
+                  <div style="padding:8px 14px 12px;font-size:12px;line-height:1.8;color:${secs[i]?.trim() ? 'var(--text)' : 'var(--text3)'};word-break:break-word;min-height:36px">${secs[i]?.trim() || '—'}</div>
                 </div>`
               ).join('');
             })()}
@@ -628,6 +675,18 @@ async function renderManagerView() {
     ${reportsHtml}
   `;
 }
+
+// ── 리치텍스트 에디터 함수 ──
+window.execCmd = (cmd, idx) => {
+  const el = document.getElementById('editor_' + idx);
+  if (el) el.focus();
+  document.execCommand(cmd, false, null);
+};
+window.applyColor = (color, idx) => {
+  const el = document.getElementById('editor_' + idx);
+  if (el) el.focus();
+  document.execCommand('foreColor', false, color);
+};
 
 window.toggleMgrNote = () => {
   const view = document.getElementById('mgrNoteView');

@@ -171,6 +171,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
   display:flex;gap:2px;padding:6px 12px;
   background:#F8FAFB;border-bottom:0.5px solid var(--border);
   flex-wrap:wrap;align-items:center;
+  user-select:none;
 }
 .tb-btn{
   width:28px;height:28px;border:none;background:transparent;
@@ -692,6 +693,13 @@ async function renderManagerView() {
 }
 
 // ── 리치텍스트 에디터 함수 ──
+// 툴바 클릭 시 selection 유지 (mousedown preventDefault)
+document.addEventListener('mousedown', e => {
+  if (e.target.closest('.editor-toolbar')) {
+    e.preventDefault();
+  }
+});
+
 window.execCmd = (cmd, idx) => {
   const el = document.getElementById('editor_' + idx);
   if (el) el.focus();

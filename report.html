@@ -695,7 +695,7 @@ async function renderManagerView() {
 // ── 리치텍스트 에디터 함수 ──
 // 툴바 클릭 시 selection 유지 (mousedown preventDefault)
 document.addEventListener('mousedown', e => {
-  if (e.target.closest('.editor-toolbar')) {
+  if (e.target.closest('.editor-toolbar') && e.target.tagName !== 'SELECT') {
     e.preventDefault();
   }
 });

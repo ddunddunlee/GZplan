@@ -569,26 +569,22 @@ async function renderManagerView() {
   // 팀원 보고
   const reportsHtml = reportResults.map(({ id, data }) => {
     const content = data?.content || '';
-    const updatedAt = data?.updatedAt
-      ? new Date(data.updatedAt).toLocaleString('ko-KR', {month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})
-      : '';
     return `
       <div class="mgr-report-row">
         <div class="mgr-report-name">${id}</div>
         <div class="mgr-report-body">
-          <div class="mgr-report-card">
-            <div class="mgr-report-meta">${updatedAt ? `마지막 작성: ${updatedAt}` : '아직 작성하지 않았어요'}</div>
+          <div class="mgr-report-card" style="padding:0;overflow:hidden">
             ${(() => {
               const secs = data?.sections || {};
               const myOrgs = MEMBER_ORGS[id] || [];
               const secNames = ['추진 업무', ...myOrgs];
               const hasContent = secNames.some((_, i) => secs[i]?.trim());
-              if (!hasContent) return `<div class="report-empty" style="padding:16px 0;text-align:left">보고 내용이 없어요</div>`;
-              return secNames.map((name, i) => secs[i]?.trim() ? `
-                <div style="margin-top:12px">
-                  <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">${name}</div>
-                  <div style="font-size:12px;line-height:1.8;color:var(--text);white-space:pre-wrap;word-break:break-word">${secs[i]}</div>
-                </div>` : ''
+              if (!hasContent) return `<div class="report-empty" style="padding:16px 18px;text-align:left">보고 내용이 없어요</div>`;
+              return secNames.map((name, i) => `
+                <div style="border-bottom:0.5px solid var(--border);last-child:border-none">
+                  <div style="padding:8px 14px 4px;font-size:10px;font-weight:700;color:#0C447C;background:#F5F8FB;letter-spacing:.04em">${name}</div>
+                  <div style="padding:8px 14px 12px;font-size:12px;line-height:1.8;color:${secs[i]?.trim() ? 'var(--text)' : 'var(--text3)'};white-space:pre-wrap;word-break:break-word;min-height:36px">${secs[i]?.trim() || '—'}</div>
+                </div>`
               ).join('');
             })()}
           </div>

@@ -355,7 +355,7 @@ async function renderMemberView() {
   document.getElementById('contentWrap').innerHTML = `
     <div class="report-card">
       <div class="report-card-head">
-        <div class="report-card-title">📋 ${label} 주간 업무 보고</div>
+        <div class="report-card-title">📋 주간 업무 보고</div>
         <div class="report-card-meta">${updatedAt ? `마지막 저장: ${updatedAt}` : '아직 작성하지 않았어요'}</div>
       </div>
       <textarea class="report-textarea" id="reportInput" placeholder="이번 주 추진 업무와 주요 사항을 자유롭게 작성해주세요.
@@ -443,7 +443,7 @@ async function renderManagerView() {
   document.getElementById('contentWrap').innerHTML = `
     <div class="report-card">
       <div class="report-card-head">
-        <div class="report-card-title">📋 ${curMember} · ${label} 주간 업무 보고</div>
+        <div class="report-card-title">📋 ${curMember} · 주간 업무 보고</div>
         <div class="report-card-meta">${updatedAt ? `마지막 작성: ${updatedAt}` : '아직 작성하지 않았어요'}</div>
       </div>
       ${content

@@ -485,6 +485,16 @@ async function renderMemberView() {
         <div class="tb-divider"></div>
         ${colorBtns}
         <div class="tb-divider"></div>
+        <div class="tb-divider"></div>
+        <select onchange="applyFontSize(this.value,${i})" style="font-size:11px;border:0.5px solid var(--border);border-radius:4px;padding:3px 4px;background:#fff;color:var(--text2);cursor:pointer;height:26px">
+          <option value="">크기</option>
+          <option value="1">10px</option>
+          <option value="2">11px</option>
+          <option value="3">13px (기본)</option>
+          <option value="4">15px</option>
+          <option value="5">18px</option>
+        </select>
+        <div class="tb-divider"></div>
         <button class="tb-btn" title="초기화" onclick="execCmd('removeFormat',${i})" style="font-size:11px">✕</button>
       </div>
       <div class="editor-content" id="editor_${i}" contenteditable="true"
@@ -681,6 +691,12 @@ window.execCmd = (cmd, idx) => {
   const el = document.getElementById('editor_' + idx);
   if (el) el.focus();
   document.execCommand(cmd, false, null);
+};
+window.applyFontSize = (size, idx) => {
+  if (!size) return;
+  const el = document.getElementById('editor_' + idx);
+  if (el) el.focus();
+  document.execCommand('fontSize', false, size);
 };
 window.applyColor = (color, idx) => {
   const el = document.getElementById('editor_' + idx);

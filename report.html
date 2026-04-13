@@ -164,6 +164,22 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 .attend-items{color:var(--text2);line-height:1.6}
 .section-divider{height:1px;background:var(--border);margin:8px 0 20px}
 
+/* ── 조직별 섹션 ── */
+.org-sections{padding:4px 0}
+.org-section{border-bottom:0.5px solid var(--border)}
+.org-section:last-child{border-bottom:none}
+.org-section-title{
+  font-size:11px;font-weight:700;color:var(--text2);
+  padding:12px 20px 4px;text-transform:uppercase;letter-spacing:.04em;
+  background:var(--bg2);
+}
+.org-textarea{
+  width:100%;padding:12px 20px;min-height:100px;
+  font-size:13px;line-height:1.8;color:var(--text);
+  border:none;outline:none;resize:vertical;font-family:inherit;background:#fff;
+}
+.org-textarea::placeholder{color:var(--text3)}
+
 /* ── 팀장 전체보기 ── */
 .mgr-report-row{display:flex;gap:0;border-bottom:0.5px solid var(--border);padding:20px 0}
 .mgr-report-row:first-child{padding-top:0}
@@ -288,6 +304,28 @@ const FIREBASE_CONFIG = {
 
 const MEMBER_IDS = ["강신욱","김용욱","오문식","이길우","이도영","이상현","이영찬","이윤형"];
 
+// 담당 조직 (Firestore에서 덮어씀)
+let MEMBER_ORGS = {
+  "강신욱": ["IR/이사회 등","시장/경쟁사","보도자료 일정","사업지원본부(인프라지원실)","사업지원본부(경영지원실)","CISO","GLA"],
+  "김용욱": ["중국","신규사업본부(시티골프사업부)","글로벌사업팀","글로벌사업개척TF"],
+  "오문식": ["신규사업본부(카트사업부)","신규사업본부(시티골프사업부)","기술개발본부(NX개발실)","NX개발실(베트남R&D)"],
+  "이길우": ["GS사업본부","AI센서개발실"],
+  "이도영": ["미국","베트남"],
+  "이상현": ["신규사업본부(플랫폼사업부)","기술개발본부(모바일개발실)","기술개발본부(GDR개발실)"],
+  "이영찬": ["GDR직영사업","골프존 클라우드"],
+  "이윤형": ["일본","사업지원본부(기획실)"]
+};
+const MEMBER_ORGS = {
+  "강신욱": ["IR/이사회 등","시장/경쟁사","보도자료 일정","사업지원본부(인프라지원실)","사업지원본부(경영지원실)","CISO","GLA"],
+  "김용욱": ["중국","신규사업본부(시티골프사업부)","글로벌사업팀","글로벌사업개척TF"],
+  "오문식": ["신규사업본부(카트사업부)","신규사업본부(시티골프사업부)","기술개발본부(NX개발실)","NX개발실(베트남R&D)"],
+  "이길우": ["GS사업본부","AI센서개발실"],
+  "이도영": ["미국","베트남"],
+  "이상현": ["신규사업본부(플랫폼사업부)","기술개발본부(모바일개발실)","기술개발본부(GDR개발실)"],
+  "이영찬": ["GDR직영사업","골프존 클라우드"],
+  "이윤형": ["일본","사업지원본부(기획실)"],
+};
+
 const db = getFirestore(initializeApp(FIREBASE_CONFIG));
 const sess = localStorage.getItem('tt_user');
 if (!sess) { location.href = 'index.html'; throw ''; }
@@ -296,6 +334,12 @@ try { ME = JSON.parse(sess); } catch { localStorage.removeItem('tt_user'); locat
 if (!ME?.id || !ME?.role) { localStorage.removeItem('tt_user'); location.href = 'index.html'; throw ''; }
 
 const isMgr = ME.role === 'manager' || ME.role === 'admin';
+
+// Firestore에서 담당 조직 로드
+try {
+  const orgSnap = await getDoc(doc(db, 'config', 'memberOrgs'));
+  if (orgSnap.exists()) MEMBER_ORGS = orgSnap.data().orgs || MEMBER_ORGS;
+} catch(e) {}
 
 // ── 사이드바 초기화 ──
 document.getElementById('sbAvatar').textContent = (ME.displayName || ME.id || '--').slice(0,1);
@@ -361,9 +405,10 @@ async function loadReport(memberId, weekKey) {
   } catch(e) { return null; }
 }
 
-async function saveReport(memberId, weekKey, content) {
+async function saveReport(memberId, weekKey, content, sections) {
   await setDoc(reportDoc(memberId, weekKey), {
-    content,
+    content: content || '',
+    sections: sections || {},
     memberId,
     weekKey,
     updatedAt: new Date().toISOString(),
@@ -389,24 +434,24 @@ async function renderMemberView() {
   const history = await loadHistory(ME.id);
   const pastHistory = history.filter(h => h.weekKey !== key);
 
+  const myOrgs = MEMBER_ORGS[ME.id] || [];
+  const sections = ['추진 업무', ...myOrgs];
+  const savedSections = data?.sections || {};
+
+  const sectionsHtml = sections.map((sec, i) => `
+    <div class="org-section">
+      <div class="org-section-title">${sec}</div>
+      <textarea class="org-textarea" data-sec="${i}" placeholder="${sec === '추진 업무' ? 'o 업무명\n  - 세부 내용' : '주요 사항을 입력하세요'}">${savedSections[i] || ''}</textarea>
+    </div>
+  `).join('');
+
   document.getElementById('contentWrap').innerHTML = `
     <div class="report-card">
       <div class="report-card-head">
         <div class="report-card-title">📋 주간 업무 보고</div>
         <div class="report-card-meta">${updatedAt ? `마지막 저장: ${updatedAt}` : '아직 작성하지 않았어요'}</div>
       </div>
-      <textarea class="report-textarea" id="reportInput" placeholder="이번 주 추진 업무와 주요 사항을 자유롭게 작성해주세요.
-
-예시)
-o 26년 4월 월간자료 준비
-  - 취합메일 발송(4/7)
-o 사업계획 보고 자료 작성
-  - 초안 작성 완료, 검토 중
-
-담당 조직 주요사항
-< 운영 >
-  - 3월 프로모션 현황 점검
-  - 남부지방 매출 증대 방안 검토">${content}</textarea>
+      <div class="org-sections">${sectionsHtml}</div>
       <div class="report-card-footer">
         <div class="save-status" id="saveStatus">${updatedAt ? `저장됨 · ${updatedAt}` : ''}</div>
         <button class="btn-solid" id="saveBtn">💾 저장</button>
@@ -429,11 +474,14 @@ o 사업계획 보고 자료 작성
   `;
 
   document.getElementById('saveBtn').onclick = async () => {
-    const content = document.getElementById('reportInput').value;
+    const sectionData = {};
+    document.querySelectorAll('.org-textarea').forEach(el => {
+      sectionData[el.dataset.sec] = el.value;
+    });
     document.getElementById('saveBtn').disabled = true;
     document.getElementById('saveBtn').textContent = '저장 중...';
     try {
-      await saveReport(ME.id, key, content);
+      await saveReport(ME.id, key, '', sectionData);
       const now = new Date().toLocaleString('ko-KR', {month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
       document.getElementById('saveStatus').textContent = `저장됨 · ${now}`;
       document.getElementById('saveBtn').textContent = '✓ 저장됨';
@@ -449,11 +497,11 @@ o 사업계획 보고 자료 작성
     }
   };
 
-  // Ctrl+S / Cmd+S 단축키
-  document.getElementById('reportInput').addEventListener('keydown', e => {
+  // Ctrl+S 단축키
+  document.addEventListener('keydown', e => {
     if ((e.metaKey || e.ctrlKey) && e.key === 's') {
       e.preventDefault();
-      document.getElementById('saveBtn').click();
+      document.getElementById('saveBtn')?.click();
     }
   });
 }
@@ -539,9 +587,19 @@ async function renderManagerView() {
         <div class="mgr-report-body">
           <div class="mgr-report-card">
             <div class="mgr-report-meta">${updatedAt ? `마지막 작성: ${updatedAt}` : '아직 작성하지 않았어요'}</div>
-            ${content
-              ? `<div class="report-view" style="padding:14px 0 0;min-height:unset">${content}</div>`
-              : `<div class="report-empty" style="padding:16px 0;text-align:left">보고 내용이 없어요</div>`}
+            ${(() => {
+              const secs = data?.sections || {};
+              const myOrgs = MEMBER_ORGS[id] || [];
+              const secNames = ['추진 업무', ...myOrgs];
+              const hasContent = secNames.some((_, i) => secs[i]?.trim());
+              if (!hasContent) return `<div class="report-empty" style="padding:16px 0;text-align:left">보고 내용이 없어요</div>`;
+              return secNames.map((name, i) => secs[i]?.trim() ? `
+                <div style="margin-top:12px">
+                  <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">${name}</div>
+                  <div style="font-size:12px;line-height:1.8;color:var(--text);white-space:pre-wrap;word-break:break-word">${secs[i]}</div>
+                </div>` : ''
+              ).join('');
+            })()}
           </div>
         </div>
       </div>`;

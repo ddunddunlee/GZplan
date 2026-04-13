@@ -444,6 +444,7 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
     <div class="sb-item" data-nav="report.html"><div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 1 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div><div class="sb-label">주간 보고</div></div>
     <div class="sb-sec">관리</div>
     <div class="sb-item active" id="navAccounts" onclick="if(window.switchAdminTab)window.switchAdminTab('accounts')" style="cursor:pointer"><div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div><div class="sb-label">계정 관리</div></div>
+    <div class="sb-item" id="navOrder" onclick="if(window.switchAdminTab)window.switchAdminTab('order')" style="cursor:pointer"><div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></div><div class="sb-label">팀원 순서 관리</div></div>
     <div class="sb-item" id="navOrgs" onclick="if(window.switchAdminTab)window.switchAdminTab('orgs')" style="cursor:pointer"><div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="6" height="14"/><rect x="9" y="3" width="6" height="18"/><rect x="16" y="10" width="6" height="11"/></svg></div><div class="sb-label">담당 조직 관리</div></div>
     <div class="sb-item" id="navReporters" onclick="if(window.switchAdminTab)window.switchAdminTab('reporters')" style="cursor:pointer"><div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div><div class="sb-label">최종보고자 목록</div></div>
   </div>
@@ -475,6 +476,18 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
       <button class="btn-solid" id="openAddAccountBtn" onclick="if(window._openAddAccount)window._openAddAccount()" style="touch-action:manipulation">+ 계정 추가</button>
     </div>
     <div id="accountList"></div>
+  </div>
+
+  <!-- 팀원 순서 관리 섹션 -->
+  <div id="tabOrder" style="display:none;padding:1.5rem 24px 6rem;max-width:600px;margin:0 auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div>
+        <div style="font-size:15px;font-weight:700;color:var(--text)">팀원 순서 관리</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:3px">드래그해서 순서를 바꾸고 저장하세요</div>
+      </div>
+      <button class="btn-solid" onclick="if(window.saveOrder)window.saveOrder()" style="touch-action:manipulation">💾 저장</button>
+    </div>
+    <div id="orderList" style="display:flex;flex-direction:column;gap:8px"></div>
   </div>
 
   <!-- 담당 조직 관리 섹션 -->
@@ -611,10 +624,13 @@ window.switchAdminTab = function(tab) {
   document.getElementById('tabAccounts').style.display = tab==='accounts' ? '' : 'none';
   document.getElementById('tabReporters').style.display = tab==='reporters' ? '' : 'none';
   document.getElementById('tabOrgs').style.display = tab==='orgs' ? '' : 'none';
+  document.getElementById('tabOrder').style.display = tab==='order' ? '' : 'none';
   document.getElementById('navAccounts').classList.toggle('active', tab==='accounts');
   document.getElementById('navReporters').classList.toggle('active', tab==='reporters');
   document.getElementById('navOrgs').classList.toggle('active', tab==='orgs');
+  document.getElementById('navOrder').classList.toggle('active', tab==='order');
   if (tab === 'orgs') window.loadOrgs?.();
+  if (tab === 'order') window.loadOrder?.();
 };
 
 const MEMBER_IDS = ["강신욱","김용욱","오문식","이길우","이도영","이상현","이영찬","이윤형"];
@@ -629,6 +645,67 @@ const DEFAULT_ORGS = {
   "이윤형": ["일본","사업지원본부(기획실)"]
 };
 let currentOrgs = {...DEFAULT_ORGS};
+
+// ── 팀원 순서 관리 ──
+let currentOrder = [...MEMBER_IDS];
+let dragSrcIdx = null;
+
+window.loadOrder = async function() {
+  try {
+    const snap = await getDoc(doc(db,'config','memberOrder'));
+    if (snap.exists()) currentOrder = snap.data().order || [...MEMBER_IDS];
+  } catch(e) {}
+  renderOrder();
+};
+
+function renderOrder() {
+  const el = document.getElementById('orderList');
+  if (!el) return;
+  el.innerHTML = currentOrder.map((name, i) => `
+    <div class="order-item" draggable="true" data-idx="${i}"
+      style="display:flex;align-items:center;gap:12px;background:#fff;border:0.5px solid var(--border);border-radius:10px;padding:14px 18px;cursor:grab;user-select:none">
+      <span style="color:var(--text3);font-size:16px">⠿</span>
+      <span style="font-size:14px;font-weight:600;color:var(--text)">${name}</span>
+      <span style="margin-left:auto;font-size:12px;color:var(--text3)">${i+1}</span>
+    </div>
+  `).join('');
+
+  // 드래그 이벤트
+  el.querySelectorAll('.order-item').forEach(item => {
+    item.addEventListener('dragstart', e => {
+      dragSrcIdx = parseInt(item.dataset.idx);
+      item.style.opacity = '0.4';
+    });
+    item.addEventListener('dragend', e => {
+      item.style.opacity = '1';
+    });
+    item.addEventListener('dragover', e => {
+      e.preventDefault();
+      item.style.background = '#F0F4F8';
+    });
+    item.addEventListener('dragleave', e => {
+      item.style.background = '#fff';
+    });
+    item.addEventListener('drop', e => {
+      e.preventDefault();
+      item.style.background = '#fff';
+      const targetIdx = parseInt(item.dataset.idx);
+      if (dragSrcIdx === null || dragSrcIdx === targetIdx) return;
+      const moved = currentOrder.splice(dragSrcIdx, 1)[0];
+      currentOrder.splice(targetIdx, 0, moved);
+      renderOrder();
+    });
+  });
+}
+
+window.saveOrder = async function() {
+  try {
+    await setDoc(doc(db,'config','memberOrder'), { order: currentOrder, updatedAt: new Date().toISOString() });
+    toast('순서가 저장됐어요 ✓');
+  } catch(e) {
+    toast('저장 실패: ' + e.message);
+  }
+};
 
 window.loadOrgs = async function() {
   try {

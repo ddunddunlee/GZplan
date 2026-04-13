@@ -444,6 +444,7 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
     <div class="sb-item" data-nav="report.html"><div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 1 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div><div class="sb-label">주간 보고</div></div>
     <div class="sb-sec">관리</div>
     <div class="sb-item active" id="navAccounts" onclick="if(window.switchAdminTab)window.switchAdminTab('accounts')" style="cursor:pointer"><div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div><div class="sb-label">계정 관리</div></div>
+    <div class="sb-item" id="navOrgs" onclick="if(window.switchAdminTab)window.switchAdminTab('orgs')" style="cursor:pointer"><div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="6" height="14"/><rect x="9" y="3" width="6" height="18"/><rect x="16" y="10" width="6" height="11"/></svg></div><div class="sb-label">담당 조직 관리</div></div>
     <div class="sb-item" id="navReporters" onclick="if(window.switchAdminTab)window.switchAdminTab('reporters')" style="cursor:pointer"><div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div><div class="sb-label">최종보고자 목록</div></div>
   </div>
   <div class="sb-bottom">
@@ -474,6 +475,18 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
       <button class="btn-solid" id="openAddAccountBtn" onclick="if(window._openAddAccount)window._openAddAccount()" style="touch-action:manipulation">+ 계정 추가</button>
     </div>
     <div id="accountList"></div>
+  </div>
+
+  <!-- 담당 조직 관리 섹션 -->
+  <div id="tabOrgs" style="display:none;padding:1.5rem 24px 6rem;max-width:900px;margin:0 auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div>
+        <div style="font-size:15px;font-weight:700;color:var(--text)">담당 조직 관리</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:3px">팀원별 담당 조직을 설정해요. 주간 보고 작성 시 섹션으로 표시돼요.</div>
+      </div>
+      <button class="btn-solid" onclick="if(window.saveOrgs)window.saveOrgs()" style="touch-action:manipulation">💾 저장</button>
+    </div>
+    <div id="orgsList"></div>
   </div>
 
   <!-- 최종보고자 목록 섹션 -->
@@ -597,8 +610,82 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelect
 window.switchAdminTab = function(tab) {
   document.getElementById('tabAccounts').style.display = tab==='accounts' ? '' : 'none';
   document.getElementById('tabReporters').style.display = tab==='reporters' ? '' : 'none';
+  document.getElementById('tabOrgs').style.display = tab==='orgs' ? '' : 'none';
   document.getElementById('navAccounts').classList.toggle('active', tab==='accounts');
   document.getElementById('navReporters').classList.toggle('active', tab==='reporters');
+  document.getElementById('navOrgs').classList.toggle('active', tab==='orgs');
+  if (tab === 'orgs') window.loadOrgs?.();
+};
+
+const MEMBER_IDS = ["강신욱","김용욱","오문식","이길우","이도영","이상현","이영찬","이윤형"];
+const DEFAULT_ORGS = {
+  "강신욱": ["IR/이사회 등","시장/경쟁사","보도자료 일정","사업지원본부(인프라지원실)","사업지원본부(경영지원실)","CISO","GLA"],
+  "김용욱": ["중국","신규사업본부(시티골프사업부)","글로벌사업팀","글로벌사업개척TF"],
+  "오문식": ["신규사업본부(카트사업부)","신규사업본부(시티골프사업부)","기술개발본부(NX개발실)","NX개발실(베트남R&D)"],
+  "이길우": ["GS사업본부","AI센서개발실"],
+  "이도영": ["미국","베트남"],
+  "이상현": ["신규사업본부(플랫폼사업부)","기술개발본부(모바일개발실)","기술개발본부(GDR개발실)"],
+  "이영찬": ["GDR직영사업","골프존 클라우드"],
+  "이윤형": ["일본","사업지원본부(기획실)"]
+};
+let currentOrgs = {...DEFAULT_ORGS};
+
+window.loadOrgs = async function() {
+  try {
+    const snap = await getDoc(doc(db,'config','memberOrgs'));
+    if (snap.exists()) currentOrgs = snap.data().orgs || DEFAULT_ORGS;
+  } catch(e) {}
+  renderOrgs();
+};
+
+function renderOrgs() {
+  const el = document.getElementById('orgsList');
+  if (!el) return;
+  el.innerHTML = MEMBER_IDS.map(id => {
+    const orgs = currentOrgs[id] || [];
+    return `
+      <div style="background:#fff;border:0.5px solid var(--border);border-radius:10px;padding:16px 20px;margin-bottom:12px">
+        <div style="font-size:13px;font-weight:700;color:#0C447C;margin-bottom:10px">${id}</div>
+        <div id="orgItems_${id}" style="display:flex;flex-direction:column;gap:6px">
+          ${orgs.map((org, i) => `
+            <div style="display:flex;gap:8px;align-items:center">
+              <input value="${org}" data-member="${id}" data-idx="${i}"
+                style="flex:1;padding:7px 10px;font-size:12px;border:0.5px solid var(--border);border-radius:6px;outline:none;font-family:inherit"
+                oninput="updateOrg(this)"/>
+              <button onclick="removeOrg('${id}',${i})" style="width:28px;height:28px;border:0.5px solid var(--border);border-radius:6px;background:#fff;cursor:pointer;font-size:14px;color:var(--text3);flex-shrink:0">✕</button>
+            </div>`).join('')}
+        </div>
+        <button onclick="addOrg('${id}')" style="margin-top:8px;font-size:12px;color:var(--blue-t);border:none;background:transparent;cursor:pointer;padding:4px 0">+ 조직 추가</button>
+      </div>`;
+  }).join('');
+}
+
+window.updateOrg = function(input) {
+  const member = input.dataset.member;
+  const idx = parseInt(input.dataset.idx);
+  if (!currentOrgs[member]) currentOrgs[member] = [];
+  currentOrgs[member][idx] = input.value;
+};
+
+window.addOrg = function(member) {
+  if (!currentOrgs[member]) currentOrgs[member] = [];
+  currentOrgs[member].push('');
+  renderOrgs();
+};
+
+window.removeOrg = function(member, idx) {
+  if (!currentOrgs[member]) return;
+  currentOrgs[member].splice(idx, 1);
+  renderOrgs();
+};
+
+window.saveOrgs = async function() {
+  try {
+    await setDoc(doc(db,'config','memberOrgs'), { orgs: currentOrgs, updatedAt: new Date().toISOString() });
+    toast('담당 조직이 저장됐어요 ✓');
+  } catch(e) {
+    toast('저장 실패: ' + e.message);
+  }
 };
 
 async function init(){

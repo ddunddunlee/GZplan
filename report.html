@@ -186,10 +186,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 .tb-color:hover{outline-color:var(--text3)}
 .tb-color.active{outline-color:#0C447C}
 .editor-content{
-  min-height:120px;padding:12px 20px;
+  min-height:80px;padding:12px 20px;
   font-size:11px;line-height:1.9;color:var(--text);
   outline:none;word-break:break-word;
   font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-serif;
+  height:auto;overflow:visible;
 }
 .editor-content:empty:before{content:attr(data-placeholder);color:var(--text3);pointer-events:none}
 
@@ -702,7 +703,7 @@ async function renderManagerView() {
           <button class="tb-btn" title="초기화" onclick="mgrCmd('removeFormat')" style="font-size:11px;color:var(--red)">✕</button>
         </div>
         <div id="mgrNoteInput" contenteditable="true"
-          style="min-height:120px;padding:12px;font-size:11px;line-height:1.8;outline:none;word-break:break-word;font-family:inherit"
+          style="min-height:80px;padding:12px;font-size:11px;line-height:1.8;outline:none;word-break:break-word;font-family:inherit;height:auto;overflow:visible"
           data-placeholder="주요업무 및 일정을 입력해주세요"></div>
         <div style="display:flex;justify-content:flex-end;gap:8px;padding:10px 12px;background:var(--bg2);border-top:0.5px solid var(--border)">
           <button onclick="window.cancelMgrNote()" class="btn-ghost" style="font-size:12px;height:28px;padding:0 12px">취소</button>
@@ -773,6 +774,8 @@ window.toggleMgrNote = () => {
   // 현재 내용 에디터에 로드
   input.innerHTML = view.innerHTML.includes('주요업무 및 일정을 입력해주세요') ? '' : view.innerHTML;
   input.focus();
+  // 높이 자동 조절
+  input.style.minHeight = Math.max(80, view.scrollHeight) + 'px';
 };
 window.cancelMgrNote = () => {
   document.getElementById('mgrNoteView').style.display = '';

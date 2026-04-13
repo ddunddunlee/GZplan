@@ -670,10 +670,41 @@ async function renderManagerView() {
         <span>📌 주요업무 및 일정</span>
         <button onclick="window.toggleMgrNote()" style="font-size:11px;padding:3px 10px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:#fff;cursor:pointer;color:var(--text2)">✎ 편집</button>
       </div>
-      <div id="mgrNoteView" style="margin-top:10px;font-size:13px;line-height:1.8;color:var(--text);white-space:pre-wrap;word-break:break-word;min-height:40px">${mgrNote || '<span style="color:var(--text3);font-size:12px">주요업무 및 일정을 입력해주세요</span>'}</div>
-      <div id="mgrNoteEdit" style="display:none;margin-top:10px">
-        <textarea id="mgrNoteInput" style="width:100%;min-height:120px;padding:10px;font-size:13px;line-height:1.8;border:0.5px solid var(--border);border-radius:var(--radius-sm);resize:vertical;font-family:inherit;outline:none">${mgrNote}</textarea>
-        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px">
+      <div id="mgrNoteView" style="margin-top:10px;font-size:11px;line-height:1.8;color:var(--text);word-break:break-word;min-height:40px">${mgrNote || '<span style="color:var(--text3);font-size:12px">주요업무 및 일정을 입력해주세요</span>'}</div>
+      <div id="mgrNoteEdit" style="display:none;margin-top:10px;border:0.5px solid var(--border);border-radius:var(--radius-sm);overflow:hidden">
+        <div class="editor-toolbar" id="mgrToolbar">
+          <button class="tb-btn" title="굵게" onmousedown="e=>e.preventDefault()" onclick="mgrCmd('bold')"><b>B</b></button>
+          <button class="tb-btn" title="기울임" onclick="mgrCmd('italic')"><i>I</i></button>
+          <button class="tb-btn" title="밑줄" onclick="mgrCmd('underline')" style="text-decoration:underline">U</button>
+          <div class="tb-divider"></div>
+          <span style="font-size:10px;color:var(--text3);flex-shrink:0">글자색</span>
+          <div class="tb-color" style="background:#1a1a1a" title="기본" onclick="mgrColor('#1a1a1a')"></div>
+          <div class="tb-color" style="background:#A32D2D" title="빨강" onclick="mgrColor('#A32D2D')"></div>
+          <div class="tb-color" style="background:#0C447C" title="파랑" onclick="mgrColor('#0C447C')"></div>
+          <div class="tb-color" style="background:#639922" title="초록" onclick="mgrColor('#639922')"></div>
+          <div class="tb-color" style="background:#633806" title="주황" onclick="mgrColor('#633806')"></div>
+          <div class="tb-color" style="background:#6B5FCC" title="보라" onclick="mgrColor('#6B5FCC')"></div>
+          <div class="tb-divider"></div>
+          <span style="font-size:10px;color:var(--text3);flex-shrink:0">배경색</span>
+          <div class="tb-color" style="background:linear-gradient(135deg,#fff 45%,#ccc 45%)" title="없음" onclick="mgrBg('transparent')"></div>
+          <div class="tb-color" style="background:#E8E8E8" title="회색" onclick="mgrBg('#E8E8E8')"></div>
+          <div class="tb-color" style="background:#FFF9C4" title="노랑" onclick="mgrBg('#FFF9C4')"></div>
+          <div class="tb-divider"></div>
+          <select onchange="mgrSize(this.value)" style="font-size:11px;border:0.5px solid var(--border);border-radius:4px;padding:3px 4px;background:#fff;color:var(--text2);cursor:pointer;height:26px">
+            <option value="">크기</option>
+            <option value="1">10px</option>
+            <option value="2">11px (기본)</option>
+            <option value="3">13px</option>
+            <option value="4">15px</option>
+            <option value="5">18px</option>
+          </select>
+          <div class="tb-divider"></div>
+          <button class="tb-btn" title="초기화" onclick="mgrCmd('removeFormat')" style="font-size:11px;color:var(--red)">✕</button>
+        </div>
+        <div id="mgrNoteInput" contenteditable="true"
+          style="min-height:120px;padding:12px;font-size:11px;line-height:1.8;outline:none;word-break:break-word;font-family:inherit"
+          data-placeholder="주요업무 및 일정을 입력해주세요"></div>
+        <div style="display:flex;justify-content:flex-end;gap:8px;padding:10px 12px;background:var(--bg2);border-top:0.5px solid var(--border)">
           <button onclick="window.cancelMgrNote()" class="btn-ghost" style="font-size:12px;height:28px;padding:0 12px">취소</button>
           <button onclick="window.saveMgrNoteClick('${key}')" class="btn-solid" style="font-size:12px;height:28px;padding:0 12px">저장</button>
         </div>
@@ -724,22 +755,35 @@ window.applyColor = (color, idx) => {
   document.execCommand('foreColor', false, color);
 };
 
+// 팀장 주요업무 에디터 함수
+window.mgrCmd = (cmd) => { document.execCommand(cmd, false, null); };
+window.mgrColor = (color) => { document.execCommand('foreColor', false, color); };
+window.mgrBg = (color) => {
+  const cmd = document.queryCommandSupported('backColor') ? 'backColor' : 'hiliteColor';
+  document.execCommand(cmd, false, color);
+};
+window.mgrSize = (size) => { if(size) document.execCommand('fontSize', false, size); };
+
 window.toggleMgrNote = () => {
   const view = document.getElementById('mgrNoteView');
   const edit = document.getElementById('mgrNoteEdit');
+  const input = document.getElementById('mgrNoteInput');
   view.style.display = 'none';
   edit.style.display = '';
-  document.getElementById('mgrNoteInput').focus();
+  // 현재 내용 에디터에 로드
+  input.innerHTML = view.innerHTML.includes('주요업무 및 일정을 입력해주세요') ? '' : view.innerHTML;
+  input.focus();
 };
 window.cancelMgrNote = () => {
   document.getElementById('mgrNoteView').style.display = '';
   document.getElementById('mgrNoteEdit').style.display = 'none';
 };
 window.saveMgrNoteClick = async (weekKey) => {
-  const content = document.getElementById('mgrNoteInput').value;
+  const input = document.getElementById('mgrNoteInput');
+  const content = input.innerHTML;
   await saveMgrNote(weekKey, content);
   const view = document.getElementById('mgrNoteView');
-  view.innerHTML = content ? content.replace(/</g,'&lt;') : '<span style="color:var(--text3);font-size:12px">주요업무 및 일정을 입력해주세요</span>';
+  view.innerHTML = content && content !== '<br>' ? content : '<span style="color:var(--text3);font-size:12px">주요업무 및 일정을 입력해주세요</span>';
   view.style.display = '';
   document.getElementById('mgrNoteEdit').style.display = 'none';
   toast('저장됐어요 ✓');

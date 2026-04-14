@@ -799,7 +799,7 @@ async function renderManagerView() {
           const isReg = registeredTasks.includes(t.name);
           return `<div class="mgr-task-row">
             <div style="flex:1;display:flex;align-items:baseline;gap:0;min-width:0;overflow:hidden">
-              <div class="mgr-task-name" style="flex-shrink:0;max-width:55%">${t.name}</div>
+              <div class="mgr-task-name" style="flex-shrink:0;max-width:35%">${t.name}</div>
               ${t.memo ? `<div class="mgr-task-sub">${t.memo}</div>` : ''}
             </div>
             <button class="reg-btn${isReg ? ' done' : ''}"

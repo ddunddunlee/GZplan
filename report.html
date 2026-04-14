@@ -614,11 +614,11 @@ async function renderMemberView() {
         <div class="tb-divider"></div>
         <select onchange="applyFontSize(this.value,${i})" style="font-size:11px;border:0.5px solid var(--border);border-radius:4px;padding:3px 4px;background:#fff;color:var(--text2);cursor:pointer;height:26px">
           <option value="">크기</option>
-          <option value="1">10px</option>
-          <option value="2">11px (기본)</option>
-          <option value="3">13px</option>
-          <option value="4">15px</option>
-          <option value="5">18px</option>
+          <option value="10">10px</option>
+          <option value="11">11px (기본)</option>
+          <option value="13">13px</option>
+          <option value="15">15px</option>
+          <option value="18">18px</option>
         </select>
         <div class="tb-divider"></div>
         <button class="tb-btn" title="초기화" onclick="execCmd('removeFormat',${i})" style="font-size:11px;color:var(--red)">✕</button>
@@ -917,7 +917,16 @@ window.applyFontSize = (size, idx) => {
   if (!size) return;
   const el = document.getElementById('editor_' + idx);
   if (el) el.focus();
-  document.execCommand('fontSize', false, size);
+  const sel = window.getSelection();
+  if (!sel || sel.rangeCount === 0) return;
+  const range = sel.getRangeAt(0);
+  if (range.collapsed) return;
+  const span = document.createElement('span');
+  span.style.fontSize = size + 'px';
+  try { range.surroundContents(span); } catch(e) {
+    span.appendChild(range.extractContents());
+    range.insertNode(span);
+  }
 };
 window.applyColor = (color, idx) => {
   const el = document.getElementById('editor_' + idx);

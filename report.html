@@ -169,6 +169,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 .task-table th{padding:6px 10px;font-size:10px;font-weight:600;color:var(--text2);background:var(--bg2);border-bottom:0.5px solid var(--border);text-align:left}
 .task-table th:first-child{width:28px;text-align:center}
 .task-table th:last-child{width:200px}
+.task-col-resizer{width:4px;cursor:col-resize;background:transparent;position:absolute;right:0;top:0;height:100%;z-index:1;user-select:none}
+.task-col-resizer:hover,.task-col-resizer.dragging{background:var(--blue)}
+.task-table th{position:relative}
 .task-input{width:100%;border:none;background:transparent;outline:none;font-size:13px;color:var(--text);font-family:inherit;padding:8px 10px}
 .task-input::placeholder{color:var(--text3)}
 .task-table tr{border-bottom:0.5px solid var(--border)}
@@ -581,8 +584,20 @@ async function renderMemberView() {
   const taskSectionHtml = `
     <div style="border-bottom:0.5px solid var(--border)">
       <div class="org-section-title">추진 업무</div>
-      <table class="task-table">
-        <thead><tr><th></th><th>업무명</th><th>메모 / 비고</th></tr></thead>
+      <table class="task-table" id="taskTable">
+        <colgroup>
+          <col style="width:28px"/>
+          <col id="colName" style="width:calc(100% - 228px)"/>
+          <col id="colMemo" style="width:200px"/>
+        </colgroup>
+        <thead><tr>
+          <th></th>
+          <th>업무명</th>
+          <th style="position:relative">
+            메모 / 비고
+            <div class="task-col-resizer" id="taskColResizer"></div>
+          </th>
+        </tr></thead>
         <tbody id="taskTbody">${taskRows}</tbody>
       </table>
       <button class="task-add-btn" id="taskAddBtn">+ 행 추가</button>
@@ -667,6 +682,53 @@ async function renderMemberView() {
   `;
 
   // 행 추가 버튼
+  // 컬럼 리사이저
+  (function() {
+    const resizer = document.getElementById('taskColResizer');
+    const colMemo = document.getElementById('colMemo');
+    const table = document.getElementById('taskTable');
+    if (!resizer || !colMemo || !table) return;
+    let startX, startW;
+    resizer.addEventListener('mousedown', e => {
+      e.preventDefault();
+      startX = e.clientX;
+      startW = colMemo.offsetWidth;
+      resizer.classList.add('dragging');
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+      const onMove = e => {
+        const diff = startX - e.clientX;
+        const newW = Math.max(80, Math.min(500, startW + diff));
+        colMemo.style.width = newW + 'px';
+      };
+      const onUp = () => {
+        resizer.classList.remove('dragging');
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+      };
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+    });
+    // 터치 지원
+    resizer.addEventListener('touchstart', e => {
+      startX = e.touches[0].clientX;
+      startW = colMemo.offsetWidth;
+      const onMove = e => {
+        const diff = startX - e.touches[0].clientX;
+        const newW = Math.max(80, Math.min(500, startW + diff));
+        colMemo.style.width = newW + 'px';
+      };
+      const onUp = () => {
+        document.removeEventListener('touchmove', onMove);
+        document.removeEventListener('touchend', onUp);
+      };
+      document.addEventListener('touchmove', onMove);
+      document.addEventListener('touchend', onUp);
+    });
+  })();
+
   document.getElementById('taskAddBtn').onclick = () => {
     const tbody = document.getElementById('taskTbody');
     const idx = tbody.rows.length;

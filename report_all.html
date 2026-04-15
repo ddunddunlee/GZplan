@@ -295,7 +295,7 @@ async function render() {
 
   // 근태
   const byMember = {};
-  allSchedules.filter(ev=>ev.type==='personal').forEach(ev=>{
+  allSchedules.filter(ev=>ev.type==='personal'&&ev.source!=='meeting'&&!(ev.category==='meeting'&&ev.title?.startsWith('📋'))).forEach(ev=>{
     const id=ev.authorId||ev.author||''; if(!id) return;
     if(!byMember[id]) byMember[id]=[];
     byMember[id].push(ev);

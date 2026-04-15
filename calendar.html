@@ -805,7 +805,7 @@ window.updCatColor=async(id,color)=>{const c=CAT_LIST.find(x=>x.id===id);if(c)c.
 window.updCatLabel=async(id,label)=>{const c=CAT_LIST.find(x=>x.id===id);if(!c||!label.trim())return;c.label=label.trim();await saveCats();rebuildCatMap();renderCatSelect();renderLegend();renderCalendar();toast('이름 변경됐어요 ✓')};
 window.addCategory=async()=>{const n=document.getElementById('newCatName').value.trim(),color=document.getElementById('newCatColor').value;if(!n){toast('이름을 입력해주세요');return}CAT_LIST.push({id:'cat_'+Date.now(),label:n,color});await saveCats();rebuildCatMap();renderCatSelect();renderCatList();renderLegend();document.getElementById('newCatName').value='';toast(`"${n}" 추가됐어요 ✓`)};
 window.delCat=async(id)=>{const c=CAT_LIST.find(x=>x.id===id);if(!c||!confirm(`"${c.label}" 삭제할까요?`))return;CAT_LIST=CAT_LIST.filter(x=>x.id!==id);await saveCats();rebuildCatMap();renderCatSelect();renderCatList();renderLegend();renderCalendar();toast('삭제됐어요')};
-onSnapshot(query(collection(db,'schedules'),orderBy('startDate','asc')),snap=>{schedules=[...DEMO_SCHEDULES,...snap.docs.map(d=>({id:d.id,...d.data()})).filter(d=>d.source!=='meeting')];renderCalendar()});
+onSnapshot(query(collection(db,'schedules'),orderBy('startDate','asc')),snap=>{schedules=[...DEMO_SCHEDULES,...snap.docs.map(d=>({id:d.id,...d.data()})).filter(d=>d.source!=='meeting'&&!(d.category==='meeting'&&d.title?.startsWith('📋')))];renderCalendar()});
 function subTasks(){
   const members=isMgr?MEMBER_IDS:[ME.id];
   members.forEach(mid=>{

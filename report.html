@@ -178,7 +178,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 .task-table tr:hover td{background:var(--bg2)}
 .task-table td:first-child{width:28px;text-align:center;font-size:11px;color:var(--text3)}
 .task-table td:last-child{border-left:0.5px solid var(--border)}
-.task-memo-input{width:100%;border:none;background:transparent;outline:none;font-size:13px;color:var(--text2);font-family:inherit;padding:8px 10px}
+.task-memo-input{width:100%;border:none;background:transparent;outline:none;font-size:13px;color:var(--text2);font-family:inherit;padding:8px 10px;resize:none;min-height:36px;line-height:1.6;overflow:hidden}
 .task-memo-input::placeholder{color:var(--text3)}
 .task-add-btn{width:100%;padding:7px 10px 7px 38px;font-size:11px;color:var(--text3);background:transparent;border:none;cursor:pointer;text-align:left;border-bottom:0.5px solid var(--border)}
 .task-add-btn:hover{background:var(--bg2);color:var(--text2)}
@@ -578,7 +578,7 @@ async function renderMemberView() {
     <tr>
       <td style="text-align:center;font-size:11px;color:var(--text3)">${ti+1}</td>
       <td><input class="task-input" data-tidx="${ti}" data-field="name" value="${(t.name||'').replace(/"/g,'&quot;')}" placeholder="업무명 입력..."/></td>
-      <td><input class="task-memo-input" data-tidx="${ti}" data-field="memo" value="${(t.memo||'').replace(/"/g,'&quot;')}" placeholder="메모"/></td>
+      <td><textarea class="task-memo-input" data-tidx="${ti}" data-field="memo" placeholder="메모" rows="1" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'">${t.memo||''}</textarea></td>
     </tr>`).join('');
 
   const taskSectionHtml = `
@@ -733,7 +733,7 @@ async function renderMemberView() {
     const tbody = document.getElementById('taskTbody');
     const idx = tbody.rows.length;
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td style="text-align:center;font-size:11px;color:var(--text3)">${idx+1}</td><td><input class="task-input" data-tidx="${idx}" data-field="name" placeholder="업무명 입력..."/></td><td><input class="task-memo-input" data-tidx="${idx}" data-field="memo" placeholder="메모"/></td>`;
+    tr.innerHTML = `<td style="text-align:center;font-size:11px;color:var(--text3)">${idx+1}</td><td><input class="task-input" data-tidx="${idx}" data-field="name" placeholder="업무명 입력..."/></td><td><textarea class="task-memo-input" data-tidx="${idx}" data-field="memo" placeholder="메모" rows="1" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea></td>`;
     tbody.appendChild(tr);
   };
 

@@ -243,6 +243,7 @@ button, [onclick], [data-nav], .sb-item, .task-card, .chip {
     <div class="sb-sec">업무</div>
     <div class="sb-item active" data-nav="manager.html"><div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg></div><div class="sb-label">팀 업무 현황</div></div>
     <div class="sb-item" data-nav="report.html"><div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 1 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div><div class="sb-label">주간 보고</div></div>
+      <div class="sb-item" data-nav="report_all.html"><div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="sb-label">주간보고(전체)</div></div>
     <div class="sb-sec">도구</div>
     <div class="sb-item" data-nav="calendar.html"><div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="sb-label">캘린더</div></div>
     <div class="sb-item" data-nav="weekly.html"><div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg></div><div class="sb-label">주간 스케줄</div></div>
@@ -338,7 +339,7 @@ button, [onclick], [data-nav], .sb-item, .task-card, .chip {
         <option value="">-- 담당자 선택 --</option><option value="강신욱">강신욱</option><option value="김용욱">김용욱</option><option value="오문식">오문식</option><option value="이길우">이길우</option><option value="이도영">이도영</option><option value="이상현">이상현</option><option value="이영찬">이영찬</option><option value="이윤형">이윤형</option>      </select>
     </div>
     <div class="fg"><label>업무명</label><input id="iTitle" placeholder="업무 내용을 입력하세요"/></div>
-    <div class="fg"><label>설명 (선택)</label><input id="iDesc" placeholder="상세 설명"/></div>
+    <div class="fg"><label>설명 (선택)</label><textarea id="iDesc" placeholder="상세 설명" rows="2" style="width:100%;padding:10px 12px;font-size:14px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:inherit;outline:none;resize:vertical;line-height:1.6"></textarea></div>
     <div class="fg"><label>중요도</label>
       <select id="iPriority">
         <option value="3">3 — 보통</option><option value="5">5 — 매우 긴급</option>
@@ -367,7 +368,7 @@ button, [onclick], [data-nav], .sb-item, .task-card, .chip {
   <div class="modal">
     <h3>업무 추가 (담당자 미지정)</h3>
     <div class="fg"><label>업무명</label><input id="pTitle" placeholder="업무 내용을 입력하세요"/></div>
-    <div class="fg"><label>설명 (선택)</label><input id="pDesc" placeholder="상세 설명"/></div>
+    <div class="fg"><label>설명 (선택)</label><textarea id="pDesc" placeholder="상세 설명" rows="2" style="width:100%;padding:10px 12px;font-size:14px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:inherit;outline:none;resize:vertical;line-height:1.6"></textarea></div>
     <div class="fg"><label>중요도</label>
       <select id="pPriority">
         <option value="3">3 — 보통</option><option value="5">5 — 매우 긴급</option>

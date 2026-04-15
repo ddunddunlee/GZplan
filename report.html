@@ -729,6 +729,12 @@ async function renderMemberView() {
     });
   })();
 
+  // 저장된 메모 textarea 높이 자동 조절
+  document.querySelectorAll('.task-memo-input').forEach(el => {
+    el.style.height = 'auto';
+    el.style.height = el.scrollHeight + 'px';
+  });
+
   document.getElementById('taskAddBtn').onclick = () => {
     const tbody = document.getElementById('taskTbody');
     const idx = tbody.rows.length;

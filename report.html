@@ -837,7 +837,7 @@ async function renderManagerView() {
     : '<span class="evt-empty">이번 주 공통 일정 없음</span>';
 
   // 근태 일정 - 팀원별 그룹핑
-  const personalEvts = allSchedules.filter(ev => ev.type === 'personal');
+  const personalEvts = allSchedules.filter(ev => ev.type === 'personal' && ev.source !== 'meeting' && !(ev.category === 'meeting' && ev.title?.startsWith('📋')));
   const byMember = {};
   personalEvts.forEach(ev => {
     const id = ev.authorId || ev.author || '';

@@ -875,12 +875,14 @@ function renderDetail(t) {
   document.getElementById('dpTitle').value = t.title;
 
   const statusLabel = { todo: '대기', inprogress: '진행 중', done: '완료' };
-  const descRow = t.desc
-    ? `<div class="dp-row" style="align-items:flex-start;gap:8px">
-        <span class="dp-lbl" style="flex-shrink:0">설명</span>
-        <span class="dp-val" style="text-align:right;word-break:break-all;line-height:1.5">${t.desc}</span>
-       </div>`
-    : '';
+  const descRow = `<div class="dp-row" style="align-items:flex-start;gap:8px;flex-direction:column;padding-bottom:4px">
+      <span class="dp-lbl">설명</span>
+      <textarea id="dpDesc" data-id="${t._id}" data-mid="${t._mid}"
+        style="width:100%;padding:8px 10px;font-size:13px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:inherit;outline:none;resize:vertical;line-height:1.6;min-height:60px"
+        placeholder="설명 입력..."
+        onblur="if(window.updateDesc&&this.dataset.id)window.updateDesc(this.dataset.id,this.dataset.mid,this.value)"
+      >${t.desc||''}</textarea>
+    </div>`;
 
   const priorityOpts = [5,4,3,2,1].map(p =>
     `<option value="${p}" ${(t.priority||3)==p?'selected':''}>${p} — ${{5:'매우 긴급',4:'긴급',3:'보통',2:'낮음',1:'매우 낮음'}[p]}</option>`
@@ -1011,6 +1013,19 @@ window.selTask = id => {
   document.getElementById('detailPanel').classList.add('open');
   renderDetail(t);
   render();
+};
+
+window.updateDesc = async (docId, memberId, val) => {
+  const t = tasks.find(t => t._id === docId);
+  if (!t || t.desc === val) return;
+  const ts = new Date().toISOString();
+  await fsUpd(docId, {
+    desc: val, updated: ts,
+    history: [...(t.history||[]), {
+      id: Date.now()+'', type:'edit',
+      text: `설명 변경`, date: ts, author: ME.displayName
+    }]
+  });
 };
 
 window.closeDetail = () => {

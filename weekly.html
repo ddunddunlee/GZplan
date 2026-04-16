@@ -1052,7 +1052,28 @@ window.openDetail=(id,instanceDate,type,mid)=>{
   if(type==='task'){
     const t=taskEvents.find(x=>x.id===id&&x._mid===mid);if(!t)return;
     const sl={todo:'대기',inprogress:'진행 중',done:'완료'};
-    document.getElementById('detailContent').innerHTML=`<div class="detail-cat" style="background:${PRIORITY_COLORS[t.priority||3]}">업무 스케줄</div><h3 style="font-size:16px;font-weight:600;margin-bottom:12px">${t.title}</h3><div class="detail-row"><span class="detail-lbl">담당자</span><span class="detail-val">${t._mid}</span></div><div class="detail-row"><span class="detail-lbl">기간</span><span class="detail-val">${fmt(t.startDate)} ~ ${fmt(t.endDate)}</span></div><div class="detail-row"><span class="detail-lbl">상태</span><span class="detail-val">${sl[t.status]||'-'}</span></div><div class="detail-row"><span class="detail-lbl">중요도</span><span class="detail-val">${t.priority||3}</span></div>`;
+    const PL={5:'매우 긴급',4:'긴급',3:'보통',2:'낮음',1:'매우 낮음'};
+    const fmtDt=d=>{if(!d)return'-';const x=new Date(d);return`${x.getFullYear()}.${x.getMonth()+1}.${x.getDate()} ${String(x.getHours()).padStart(2,'0')}:${String(x.getMinutes()).padStart(2,'0')}`;};
+    const histHtml=h=>`<div style="display:flex;gap:10px;padding:6px 0;border-bottom:0.5px solid #f0f0f0">
+      <div style="width:8px;height:8px;border-radius:50%;background:${h.type==='create'?'#378ADD':h.type==='status'?'#639922':'#EF9F27'};flex-shrink:0;margin-top:5px"></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;color:#1a1a1a;line-height:1.5">${h.text||''}</div>
+        <div style="font-size:10px;color:#a8a8a8;margin-top:2px">${fmtDt(h.date)}${h.author?' · '+h.author:''}</div>
+      </div>
+    </div>`;
+    const history=(t.history||[]).slice().reverse();
+    document.getElementById('detailContent').innerHTML=`
+      <div class="detail-cat" style="background:${PRIORITY_COLORS[t.priority||3]}">업무 스케줄</div>
+      <h3 style="font-size:15px;font-weight:700;margin-bottom:14px;line-height:1.4">${t.title}</h3>
+      <div class="detail-row"><span class="detail-lbl">담당자</span><span class="detail-val">${t._mid}</span></div>
+      <div class="detail-row"><span class="detail-lbl">기간</span><span class="detail-val">${fmt(t.startDate)} ~ ${fmt(t.endDate)}</span></div>
+      <div class="detail-row"><span class="detail-lbl">상태</span><span class="detail-val">${sl[t.status]||'-'}</span></div>
+      <div class="detail-row"><span class="detail-lbl">중요도</span><span class="detail-val">${PL[t.priority||3]}</span></div>
+      ${t.desc?`<div class="detail-row"><span class="detail-lbl">설명</span><span class="detail-val" style="line-height:1.6">${t.desc}</span></div>`:''}
+      ${t.reporter?`<div class="detail-row"><span class="detail-lbl">최종보고자</span><span class="detail-val">${t.reporter}</span></div>`:''}
+      ${history.length?`<div style="font-size:10px;font-weight:600;color:#a8a8a8;letter-spacing:.06em;text-transform:uppercase;margin:14px 0 8px">히스토리</div>
+      <div>${history.map(histHtml).join('')}</div>`:''}
+    `;
     document.getElementById('detailBtns').innerHTML=`<button class="btn-cancel" onclick="closeModal('detailOverlay')" style="margin-left:auto">닫기</button>`;
     document.getElementById('detailOverlay').classList.add('show');return;
   }

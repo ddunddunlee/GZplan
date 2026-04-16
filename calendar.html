@@ -848,7 +848,7 @@ function subTasks(){
   members.forEach(mid=>{
     onSnapshot(query(collection(db,'tasks',mid,'items'),orderBy('order','asc')),snap=>{
       taskEvents=taskEvents.filter(t=>t._mid!==mid);
-      snap.docs.forEach(d=>{const t=d.data();if(t.startDate||t.due)taskEvents.push({id:d.id,_mid:mid,title:t.title,startDate:t.startDate||t.due,endDate:t.due||t.startDate,status:t.status,priority:t.priority||3,isTask:true})});
+      snap.docs.forEach(d=>{const t=d.data();if(t.startDate||t.due)taskEvents.push({id:d.id,_mid:mid,title:t.title,startDate:t.startDate||t.due,endDate:t.due||t.startDate,status:t.status,priority:t.priority||3,desc:t.desc||'',reporter:t.reporter||'',occurredDate:t.occurredDate||'',updated:t.updated||'',history:t.history||[],isTask:true});});
       renderCalendar();
     });
   });

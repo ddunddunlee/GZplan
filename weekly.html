@@ -511,6 +511,40 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
   .gantt-bar { font-size: 10px; padding: 0 4px; }
   .gantt-user-col { width: 70px; font-size: 12px; }
 }
+
+/* ── 업무 상세 모달 ── */
+.task-detail-modal{
+  background:#fff;border-radius:12px;
+  width:100%;max-width:440px;
+  max-height:85vh;overflow-y:auto;
+  display:flex;flex-direction:column;
+}
+.task-detail-head{
+  padding:16px 18px 12px;
+  border-bottom:0.5px solid var(--border);
+  position:sticky;top:0;background:#fff;z-index:1;
+}
+.task-detail-member{font-size:11px;font-weight:600;color:var(--blue);margin-bottom:4px}
+.task-detail-title{font-size:15px;font-weight:700;color:var(--text);line-height:1.4;margin-right:28px}
+.task-detail-close{position:absolute;top:14px;right:14px;width:28px;height:28px;border:none;background:transparent;cursor:pointer;font-size:16px;color:var(--text3);display:flex;align-items:center;justify-content:center;border-radius:4px}
+.task-detail-close:hover{background:var(--bg2)}
+.task-detail-body{padding:14px 18px;display:flex;flex-direction:column;gap:0}
+.td-row{display:flex;align-items:baseline;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid var(--bg2)}
+.td-row:last-child{border-bottom:none}
+.td-lbl{font-size:12px;color:var(--text3);flex-shrink:0}
+.td-val{font-size:13px;color:var(--text);text-align:right;line-height:1.5}
+.td-desc{padding:8px 0;border-bottom:0.5px solid var(--bg2)}
+.td-desc .td-lbl{display:block;margin-bottom:4px}
+.td-desc .td-val{text-align:left;font-size:13px;line-height:1.7;white-space:pre-wrap;word-break:break-word}
+.task-detail-hist{padding:14px 18px}
+.task-detail-hist-title{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.td-hist-item{display:flex;gap:10px;padding:6px 0;border-bottom:0.5px solid var(--bg2)}
+.td-hist-item:last-child{border-bottom:none}
+.td-hist-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.td-hist-text{font-size:12px;color:var(--text);line-height:1.5}
+.td-hist-date{font-size:10px;color:var(--text3);margin-top:2px}
+.td-progress{padding:8px 0;border-bottom:0.5px solid var(--bg2)}
+
 </style>
 </head>
 <body>
@@ -613,6 +647,9 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
       <button class="btn-ok" id="addSubmitBtn">추가하기</button>
     </div>
   </div>
+</div>
+<div class="overlay" id="taskDetailOverlay" style="align-items:center">
+  <div class="task-detail-modal" id="taskDetailContent"></div>
 </div>
 <div class="overlay" id="detailOverlay">
   <div class="modal" style="max-width:380px"><div id="detailContent"></div><div class="modal-btns" id="detailBtns"></div></div>
@@ -1048,34 +1085,80 @@ window.goToday = () => {
   curWeekStart = getMonday(new Date());
   renderWeeklySchedule();
 };
+
+window.openTaskDetailModal = (t) => {
+  const sl = {todo:'대기', inprogress:'진행 중', done:'완료'};
+  const PL = {5:'매우 긴급',4:'긴급',3:'보통',2:'낮음',1:'매우 낮음'};
+  const PC = {5:'#A32D2D',4:'#EF9F27',3:'#378ADD',2:'#639922',1:'#888'};
+  const fmtD = s => { if(!s) return '-'; const d=new Date(s+'T00:00:00'); return `${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()}`; };
+  const fmtDt = s => { if(!s) return '-'; const d=new Date(s); return `${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; };
+  const daysElapsed = s => { if(!s) return 0; return Math.floor((Date.now()-new Date(s+'T00:00:00').getTime())/86400000); };
+
+  // 진행바
+  const progressBar = (() => {
+    if (!t.startDate || !t.due) return '';
+    const start = new Date(t.startDate+'T00:00:00');
+    const end   = new Date(t.due+'T00:00:00');
+    const today = new Date(); today.setHours(0,0,0,0);
+    const total   = Math.ceil((end-start)/86400000);
+    const elapsed = Math.ceil((today-start)/86400000);
+    if (total <= 0) return '';
+    const pct = Math.min(100,Math.max(0,Math.round(elapsed/total*100)));
+    const isDone = t.status==='done';
+    const isOver = elapsed>total && !isDone;
+    const color  = isDone?'var(--green)':isOver?'var(--red)':'var(--blue)';
+    const label  = isDone?'완료':isOver?`기한 초과 +${elapsed-total}일`:`${Math.max(0,elapsed)}일 / ${total}일 (${pct}%)`;
+    return `<div class="td-progress">
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:6px"><span>진행</span><span>${label}</span></div>
+      <div style="height:4px;background:var(--border);border-radius:2px"><div style="height:4px;background:${color};border-radius:2px;width:${pct}%"></div></div>
+    </div>`;
+  })();
+
+  // 히스토리
+  const history = [...(t.history||[])].sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const histHtml = history.map(h => {
+    const dotColor = h.type==='create'?'#378ADD':h.type==='status'?'#639922':'#EF9F27';
+    return `<div class="td-hist-item">
+      <div class="td-hist-dot" style="background:${dotColor}"></div>
+      <div>
+        <div class="td-hist-text">${h.author?`<strong>${h.author}</strong> `:''} ${h.text||''}</div>
+        <div class="td-hist-date">${fmtDt(h.date)}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const el = document.getElementById('taskDetailContent');
+  el.innerHTML = `
+    <div class="task-detail-head" style="position:relative">
+      <div class="task-detail-member">${t._mid||''}</div>
+      <div class="task-detail-title">${t.title}</div>
+      <button class="task-detail-close" onclick="document.getElementById('taskDetailOverlay').classList.remove('show')">✕</button>
+    </div>
+    <div class="task-detail-body">
+      ${t.desc ? `<div class="td-desc"><span class="td-lbl">설명</span><div class="td-val">${t.desc}</div></div>` : ''}
+      <div class="td-row"><span class="td-lbl">중요도</span><span class="td-val" style="color:${PC[t.priority||3]};font-weight:600">${PL[t.priority||3]}</span></div>
+      <div class="td-row"><span class="td-lbl">업무 발생일</span><span class="td-val">${fmtD(t.occurredDate)}${t.occurredDate&&daysElapsed(t.occurredDate)>0?` <span style="color:#EF9F27;font-size:11px;font-weight:600">${daysElapsed(t.occurredDate)}일 경과</span>`:''}</span></div>
+      <div class="td-row"><span class="td-lbl">업무 시작일</span><span class="td-val">${fmtD(t.startDate)}</span></div>
+      <div class="td-row"><span class="td-lbl">업무 타겟일</span><span class="td-val">${fmtD(t.due)}</span></div>
+      <div class="td-row"><span class="td-lbl">마지막 업데이트</span><span class="td-val">${fmtDt(t.updated)}</span></div>
+      ${progressBar}
+      <div class="td-row"><span class="td-lbl">상태</span><span class="td-val" style="font-weight:600">${sl[t.status]||'-'}</span></div>
+      ${t.reporter?`<div class="td-row"><span class="td-lbl">최종보고자</span><span class="td-val">${t.reporter}</span></div>`:''}
+      <div class="td-row"><span class="td-lbl">팀원</span><span class="td-val">${t._mid||'-'}</span></div>
+    </div>
+    ${histHtml ? `<div class="task-detail-hist">
+      <div class="task-detail-hist-title">히스토리</div>
+      ${histHtml}
+    </div>` : ''}
+  `;
+  document.getElementById('taskDetailOverlay').classList.add('show');
+};
+
 window.openDetail=(id,instanceDate,type,mid)=>{
   if(type==='task'){
     const t=taskEvents.find(x=>x.id===id&&x._mid===mid);if(!t)return;
     const sl={todo:'대기',inprogress:'진행 중',done:'완료'};
-    const PL={5:'매우 긴급',4:'긴급',3:'보통',2:'낮음',1:'매우 낮음'};
-    const fmtDt=d=>{if(!d)return'-';const x=new Date(d);return`${x.getFullYear()}.${x.getMonth()+1}.${x.getDate()} ${String(x.getHours()).padStart(2,'0')}:${String(x.getMinutes()).padStart(2,'0')}`;};
-    const histHtml=h=>`<div style="display:flex;gap:10px;padding:6px 0;border-bottom:0.5px solid #f0f0f0">
-      <div style="width:8px;height:8px;border-radius:50%;background:${h.type==='create'?'#378ADD':h.type==='status'?'#639922':'#EF9F27'};flex-shrink:0;margin-top:5px"></div>
-      <div style="flex:1;min-width:0">
-        <div style="font-size:12px;color:#1a1a1a;line-height:1.5">${h.text||''}</div>
-        <div style="font-size:10px;color:#a8a8a8;margin-top:2px">${fmtDt(h.date)}${h.author?' · '+h.author:''}</div>
-      </div>
-    </div>`;
-    const history=(t.history||[]).slice().reverse();
-    document.getElementById('detailContent').innerHTML=`
-      <div class="detail-cat" style="background:${PRIORITY_COLORS[t.priority||3]}">업무 스케줄</div>
-      <h3 style="font-size:15px;font-weight:700;margin-bottom:14px;line-height:1.4">${t.title}</h3>
-      <div class="detail-row"><span class="detail-lbl">담당자</span><span class="detail-val">${t._mid}</span></div>
-      <div class="detail-row"><span class="detail-lbl">기간</span><span class="detail-val">${fmt(t.startDate)} ~ ${fmt(t.endDate)}</span></div>
-      <div class="detail-row"><span class="detail-lbl">상태</span><span class="detail-val">${sl[t.status]||'-'}</span></div>
-      <div class="detail-row"><span class="detail-lbl">중요도</span><span class="detail-val">${PL[t.priority||3]}</span></div>
-      ${t.desc?`<div class="detail-row"><span class="detail-lbl">설명</span><span class="detail-val" style="line-height:1.6">${t.desc}</span></div>`:''}
-      ${t.reporter?`<div class="detail-row"><span class="detail-lbl">최종보고자</span><span class="detail-val">${t.reporter}</span></div>`:''}
-      ${history.length?`<div style="font-size:10px;font-weight:600;color:#a8a8a8;letter-spacing:.06em;text-transform:uppercase;margin:14px 0 8px">히스토리</div>
-      <div>${history.map(histHtml).join('')}</div>`:''}
-    `;
-    document.getElementById('detailBtns').innerHTML=`<button class="btn-cancel" onclick="closeModal('detailOverlay')" style="margin-left:auto">닫기</button>`;
-    document.getElementById('detailOverlay').classList.add('show');return;
+    openTaskDetailModal(t);return;
   }
   const ev=schedules.find(e=>e.id===id);if(!ev)return;
   const isC=ev.type==='common',canEdit=isC?isMgr:(isMgr||ev.authorId===ME.id);

@@ -757,7 +757,7 @@ import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase
 import {getFirestore,collection,doc,getDoc,setDoc,onSnapshot,addDoc,updateDoc,deleteDoc,query,orderBy} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 const FC={apiKey:"AIzaSyA7KylsSyT3_0oQvhBtcrPc-gcdfVq90IQ",authDomain:"gzplan.firebaseapp.com",projectId:"gzplan",storageBucket:"gzplan.firebasestorage.app",messagingSenderId:"186255862586",appId:"1:186255862586:web:f36d21f76012ca43b8fe03"};
 const MEMBER_IDS=["강신욱","김용욱","오문식","이길우","이도영","이상현","이영찬","이윤형"];
-const MEMBER_COLORS=["#378ADD","#7F77DD","#EF9F27","#639922","#E24B4A","#D4537E","#1D9E75"];
+const MEMBER_COLORS=["#378ADD","#7F77DD","#EF9F27","#639922","#E24B4A","#D4537E","#1D9E75","#D85A30"];
 const PRIORITY_COLORS={1:'#888',2:'#378ADD',3:'#EF9F27',4:'#E24B4A',5:'#a32d2d'};
 const WD=['일','월','화','수','목','금','토'];
 const DEFAULT_CATS=[{id:'meeting',label:'회의',color:'#378ADD'},{id:'report',label:'보고',color:'#7F77DD'},{id:'trip',label:'출장',color:'#EF9F27'},{id:'event',label:'행사',color:'#639922'},{id:'etc',label:'기타',color:'#888888'}];
@@ -1024,7 +1024,7 @@ function renderWeeklySchedule() {
     if(typeFilter === 'personal' && ev.type !== 'personal') return;
     if(typeFilter === 'common' && ev.type !== 'common') return;
     if(ev.type === 'personal' && memberFilter !== 'all' && ev.authorId !== memberFilter) return;
-    if(!isMgr && ev.type === 'personal' && ev.authorId !== ME.id) return;
+    if(!isMgr && ev.type === 'personal' && !activeMemberWeekly.has(ev.authorId||ev.author||ME.id)) return;
     
     if(!ev.repeat || ev.repeat.type === 'none') {
       allInst.push({...ev, _type: ev.type || 'personal'});
@@ -1039,7 +1039,7 @@ function renderWeeklySchedule() {
     }
   });
   
-  const displayMembers = isMgr ? (memberFilter === 'all' ? MEMBER_IDS : [memberFilter]) : [ME.id];
+  const displayMembers = isMgr ? (memberFilter === 'all' ? MEMBER_IDS : [memberFilter]) : [...activeMemberWeekly].sort((a,b) => MEMBER_IDS.indexOf(a) - MEMBER_IDS.indexOf(b));
   let bodyHtml = '';
   
   displayMembers.forEach((member, mIdx) => {

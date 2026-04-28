@@ -951,9 +951,10 @@ function collect(year,month){
         .filter(t=>isMgr?(memberFilter==='all'||t._mid===memberFilter):activeMemberCal.has(t._mid))
         .filter(t=>t.startDate<=ld&&t.endDate>=fd)
         .filter(t=>{
-          if(t.isShared && t.sharedTaskId){
-            if(seen.has(t.sharedTaskId)) return false;
-            seen.add(t.sharedTaskId); return true;
+          const sid = t.sharedTaskId || (t.isShared ? t.id : null);
+          if(sid){
+            if(seen.has(sid)) return false;
+            seen.add(sid); return true;
           }
           return true;
         })

@@ -877,22 +877,18 @@ window.deletePoolTask = async (poolId, e) => {
 // 렌더링
 // ════════════════════════════════════════════
 function getAllTasks() {
-  // 공통업무 중복 제거 (sharedTaskId가 같은 것은 한 번만)
   const dedupShared = (tasks) => {
-    const seenShared = new Set();
+    const seenShared = new Map();
     return tasks.filter(t => {
-      if (!t.isShared || !t.sharedTaskId) return true;
-      if (seenShared.has(t.sharedTaskId)) return false;
-      seenShared.add(t.sharedTaskId);
+      const sid = t.sharedTaskId || (t.isShared ? t._id : null);
+      if (!sid) return true;
+      if (seenShared.has(sid)) return false;
+      seenShared.set(sid, true);
       return true;
     });
   };
   if (curTab !== '__all__') {
-    const myTasks = mData[curTab]?.tasks || [];
-    // 해당 팀원이 참여한 공통업무 포함
-    const shared = sharedTasks.filter(t => t.members?.includes(curTab));
-    const allWithShared = [...myTasks, ...shared.filter(s => !myTasks.some(t => t.sharedTaskId === s._id))];
-    return allWithShared;
+    return mData[curTab]?.tasks || [];
   }
   const all = Object.values(mData).flatMap(m => m.tasks);
   const filtered = filterMember === 'all' ? all : all.filter(t => t._mid === filterMember);
@@ -1145,9 +1141,33 @@ function renderDetail(t) {
       <select class="dp-edit" style="width:160px;text-align:right"
         onchange="updateReporter('${t._id}','${t._mid}',this.value);toggleReporterEdit('${t._id}')">${reporterOpts}</select>
     </div>` : ''}
-    <div class="dp-row">
-      <span class="dp-lbl">팀원</span>
-      <span class="dp-val">${t._mid}</span>
+    <div class="dp-row" style="flex-direction:column;align-items:flex-start;gap:8px;padding:10px 0" id="dp-members-row-${t._id}">
+      <span class="dp-lbl">담당자</span>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+        ${(() => {
+          const members = t.members && t.members.length ? t.members : [t._mid];
+          return members.map(id => `
+            <span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;font-size:12px;background:#E6F1FB;color:#0C447C;border:0.5px solid #B5D4F4">
+              ${id}
+              ${!isAll && members.length > 1 ? `<span style="cursor:pointer;font-size:11px;color:#A32D2D" onclick="window.removeMember('${t._id}','${t._mid}','${id}')">✕</span>` : ''}
+            </span>`).join('');
+        })()}
+        ${!isAll ? `<button onclick="window.toggleAddMember('${t._id}')" 
+          style="padding:3px 10px;border-radius:999px;font-size:12px;border:0.5px dashed var(--border);background:transparent;color:var(--text3);cursor:pointer">+ 팀원 추가</button>` : ''}
+      </div>
+      <div id="dp-add-member-${t._id}" style="display:none;width:100%">
+        <select id="dp-member-select-${t._id}" style="width:100%;padding:8px;font-size:13px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2)">
+          <option value="">-- 팀원 선택 --</option>
+          ${MEMBER_IDS.filter(id => {
+            const members = t.members && t.members.length ? t.members : [t._mid];
+            return !members.includes(id);
+          }).map(id => `<option value="${id}">${id}</option>`).join('')}
+        </select>
+        <div style="display:flex;gap:6px;margin-top:6px">
+          <button onclick="window.addMember('${t._id}','${t._mid}')" class="btn-solid" style="font-size:12px;height:30px;padding:0 14px">추가</button>
+          <button onclick="window.toggleAddMember('${t._id}')" class="btn-ghost" style="font-size:12px;height:30px;padding:0 14px">취소</button>
+        </div>
+      </div>
     </div>
     <div class="dp-row" style="padding:10px 0">
       <span class="dp-lbl">비공개 업무</span>
@@ -1335,6 +1355,86 @@ window.updatePriority = async (docId, memberId, val) => {
       date: ts, author: '팀장'
     }]
   });
+};
+
+// 담당자 추가/제거
+window.toggleAddMember = (docId) => {
+  const el = document.getElementById('dp-add-member-' + docId);
+  if (el) el.style.display = el.style.display === 'none' ? '' : 'none';
+};
+
+window.addMember = async (docId, ownerMid) => {
+  const sel = document.getElementById('dp-member-select-' + docId);
+  const newMid = sel?.value;
+  if (!newMid) { toast('팀원을 선택해주세요'); return; }
+
+  const t = (mData[ownerMid]?.tasks||[]).find(t => t._id === docId);
+  if (!t) return;
+
+  const ts = now();
+  const sharedId = t.sharedTaskId || docId; // 기존 sharedTaskId 또는 현재 docId를 공유 키로
+  const currentMembers = t.members && t.members.length ? t.members : [ownerMid];
+  const newMembers = [...new Set([...currentMembers, newMid])];
+
+  try {
+    // 원본 업무 members 업데이트
+    await fsUpd(ownerMid, docId, {
+      members: newMembers, isShared: true, sharedTaskId: sharedId,
+      updated: ts,
+      history: [...(t.history||[]), { id:Date.now()+'', type:'edit', text:`${newMid} 담당자 추가`, date:ts, author:ME.displayName }]
+    });
+    // 새 팀원 tasks에 복사
+    await fsAdd(newMid, {
+      title: t.title, desc: t.desc||'', priority: t.priority||3,
+      occurredDate: t.occurredDate||'', startDate: t.startDate||'',
+      due: t.due||'', reporter: t.reporter||'', status: 'todo',
+      assignee: newMid, isShared: true, sharedTaskId: sharedId,
+      members: newMembers, isPrivate: t.isPrivate||false,
+      pinned: false, order: Date.now(), updated: ts,
+      history: [{ id:Date.now()+'', type:'create', text:`공통업무 참여 (${ownerMid}에서 추가)`, date:ts, author:ME.displayName }]
+    });
+    // 기존 공유 멤버들도 members 업데이트
+    const otherMembers = currentMembers.filter(id => id !== ownerMid);
+    await Promise.all(otherMembers.map(async mid => {
+      const snap = await getDocs(query(collection(db,'tasks',mid,'items')));
+      const linked = snap.docs.find(d => d.data().sharedTaskId === sharedId);
+      if (linked) await updateDoc(doc(db,'tasks',mid,'items',linked.id), { members: newMembers });
+    }));
+    toast(`${newMid} 담당자로 추가됐어요 ✓`);
+    window.toggleAddMember(docId);
+  } catch(e) { toast('오류: ' + e.message); }
+};
+
+window.removeMember = async (docId, ownerMid, targetMid) => {
+  const t = (mData[ownerMid]?.tasks||[]).find(t => t._id === docId);
+  if (!t) return;
+  if (!confirm(`${targetMid}을(를) 담당자에서 제거할까요?`)) return;
+
+  const ts = now();
+  const sharedId = t.sharedTaskId || docId;
+  const newMembers = (t.members||[t._mid]).filter(id => id !== targetMid);
+
+  try {
+    // 원본 업무 members 업데이트
+    await fsUpd(ownerMid, docId, {
+      members: newMembers, isShared: newMembers.length > 1,
+      updated: ts,
+      history: [...(t.history||[]), { id:Date.now()+'', type:'edit', text:`${targetMid} 담당자 제거`, date:ts, author:ME.displayName }]
+    });
+    // 제거된 팀원 tasks에서 삭제
+    if (targetMid !== ownerMid) {
+      const snap = await getDocs(query(collection(db,'tasks',targetMid,'items')));
+      const linked = snap.docs.find(d => d.data().sharedTaskId === sharedId);
+      if (linked) await deleteDoc(doc(db,'tasks',targetMid,'items',linked.id));
+    }
+    // 나머지 멤버들 members 업데이트
+    await Promise.all(newMembers.filter(id=>id!==ownerMid).map(async mid => {
+      const snap = await getDocs(query(collection(db,'tasks',mid,'items')));
+      const linked = snap.docs.find(d => d.data().sharedTaskId === sharedId);
+      if (linked) await updateDoc(doc(db,'tasks',mid,'items',linked.id), { members: newMembers, isShared: newMembers.length > 1 });
+    }));
+    toast(`${targetMid} 담당자에서 제거됐어요`);
+  } catch(e) { toast('오류: ' + e.message); }
 };
 
 window.updatePrivate = async (docId, memberId, val) => {

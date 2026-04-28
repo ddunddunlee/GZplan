@@ -1005,7 +1005,10 @@ function renderCalendar(){
       if(r.event._type==='task'){
         bc+=' task-bar';
         const p=r.event.priority||3;
-        color=r.event.status==='done'?'#bbb':(PRIORITY_COLORS[p]||'#888');
+        // 팀원 색 우선, 완료는 회색
+        const memberColorIdx = MEMBER_IDS.indexOf(r.event._mid);
+        const memberColor = memberColorIdx >= 0 ? MEMBER_COLORS[memberColorIdx] : (PRIORITY_COLORS[p]||'#888');
+        color = r.event.status==='done' ? '#bbb' : memberColor;
         if(isMgr&&memberFilter==='all'){const mi=MEMBER_IDS.indexOf(r.event._mid);if(mi>=0)color=MEMBER_COLORS[mi]}
         label=showTxt?`${(r.event.isShared&&r.event.members?.length>1)?'[공통] ':(isMgr?`[${r.event._mid}] `:'')}${r.event.title}`:'';
       }else if(r.event._type==='common'){bc+=' common-bar';color='#5F5E5A';label=showTxt?`🏢 ${r.event.title}`:''}

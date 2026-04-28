@@ -1127,7 +1127,7 @@ function renderWeeklySchedule() {
 
     bodyHtml += `
       <div class="gantt-row" style="height:${layerHeight}px;">
-        <div class="gantt-user-col" style="color:${MEMBER_COLORS[mIdx]||'var(--text)'};">${member}</div>
+        <div class="gantt-user-col" style="color:${MEMBER_COLORS[MEMBER_IDS.indexOf(member)]||'var(--text)'};font-weight:600;">${member}</div>
         <div class="gantt-days-wrap" style="height:${layerHeight}px;">
           ${colLines}
           <div style="position:absolute;inset:0;pointer-events:none;z-index:10;">

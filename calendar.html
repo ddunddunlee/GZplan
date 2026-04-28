@@ -710,7 +710,7 @@ import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase
 import {getFirestore,collection,doc,getDoc,setDoc,onSnapshot,addDoc,updateDoc,deleteDoc,query,orderBy} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 const FC={apiKey:"AIzaSyA7KylsSyT3_0oQvhBtcrPc-gcdfVq90IQ",authDomain:"gzplan.firebaseapp.com",projectId:"gzplan",storageBucket:"gzplan.firebasestorage.app",messagingSenderId:"186255862586",appId:"1:186255862586:web:f36d21f76012ca43b8fe03"};
 const MEMBER_IDS=["강신욱","김용욱","오문식","이길우","이도영","이상현","이영찬","이윤형"];
-const MEMBER_COLORS=["#378ADD","#7F77DD","#EF9F27","#639922","#E24B4A","#D4537E","#1D9E75"];
+const MEMBER_COLORS=["#378ADD","#7F77DD","#EF9F27","#639922","#E24B4A","#D4537E","#1D9E75","#D85A30"];
 const PRIORITY_COLORS={1:'#888',2:'#378ADD',3:'#EF9F27',4:'#E24B4A',5:'#a32d2d'};
 const WD=['일','월','화','수','목','금','토'];
 const DEFAULT_CATS=[{id:'meeting',label:'회의',color:'#378ADD'},{id:'report',label:'보고',color:'#7F77DD'},{id:'trip',label:'출장',color:'#EF9F27'},{id:'event',label:'행사',color:'#639922'},{id:'etc',label:'기타',color:'#888888'}];
@@ -946,19 +946,27 @@ function collect(year,month){
   const fd=toStr(new Date(year,month,1)),ld=toStr(new Date(year,month+1,0)),inst=[];
   if(typeFilter==='all'||typeFilter==='task'){
     (()=>{
-      const seen = new Set();
+      const seen = new Map();
       taskEvents
         .filter(t=>isMgr?(memberFilter==='all'||t._mid===memberFilter):activeMemberCal.has(t._mid))
         .filter(t=>t.startDate<=ld&&t.endDate>=fd)
-        .filter(t=>{
+        .forEach(t=>{
           const sid = t.sharedTaskId || (t.isShared ? t.id : null);
           if(sid){
-            if(seen.has(sid)) return false;
-            seen.add(sid); return true;
+            if(seen.has(sid)){
+              // 기존 항목에 멤버 추가
+              const existing = seen.get(sid);
+              if(!existing.members) existing.members = [existing._mid];
+              if(!existing.members.includes(t._mid)) existing.members.push(t._mid);
+            } else {
+              const merged = {...t, members: t.members?.length ? t.members : [t._mid]};
+              seen.set(sid, merged);
+              inst.push({...merged, _type:'task'});
+            }
+          } else {
+            inst.push({...t, _type:'task'});
           }
-          return true;
-        })
-        .forEach(t=>inst.push({...t,_type:'task'}));
+        });
     })();
   }
   schedules.forEach(ev=>{
@@ -999,7 +1007,7 @@ function renderCalendar(){
         const p=r.event.priority||3;
         color=r.event.status==='done'?'#bbb':(PRIORITY_COLORS[p]||'#888');
         if(isMgr&&memberFilter==='all'){const mi=MEMBER_IDS.indexOf(r.event._mid);if(mi>=0)color=MEMBER_COLORS[mi]}
-        label=showTxt?`${r.event.isShared?'👥 ':''}${isMgr?`[${r.event._mid}] `:''}${r.event.title}`:'';
+        label=showTxt?`${(r.event.isShared&&r.event.members?.length>1)?'[공통] ':(isMgr?`[${r.event._mid}] `:'')}${r.event.title}`:'';
       }else if(r.event._type==='common'){bc+=' common-bar';color='#5F5E5A';label=showTxt?`🏢 ${r.event.title}`:''}
       else{const cat=CAT_MAP[r.event.category]||{color:'#888'};color=cat.color;label=showTxt?`${r.event.isRepeatInstance?'🔁 ':''}${isMgr?`[${r.event.author||''}] `:''}${r.event.title}`:''}
       const op=r.event.status==='done'?'opacity:.5;':'';

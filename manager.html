@@ -99,6 +99,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 /* ── 통계 ── */
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
 .stat{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px 16px}
+.shared-badge{font-size:10px;padding:2px 8px;border-radius:999px;background:#E6F1FB;color:#0C447C;border:0.5px solid #B5D4F4;display:inline-flex;align-items:center;gap:3px}
+.member-avatars{display:flex;gap:3px;flex-wrap:wrap}
+.member-avatar{width:22px;height:22px;border-radius:50%;background:#0C447C;color:#fff;font-size:9px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.multi-member-select{display:flex;flex-wrap:wrap;gap:6px;padding:8px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);min-height:40px}
+.multi-member-chip{padding:4px 10px;font-size:12px;border-radius:999px;border:0.5px solid var(--border);background:#fff;cursor:pointer;color:var(--text2)}
+.multi-member-chip.selected{background:#0C447C;color:#fff;border-color:#0C447C}
 .stat-card{background:#fff;border:0.5px solid var(--border);border-radius:var(--radius);padding:14px 18px;display:flex;flex-direction:column;gap:6px;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
 .stat-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.04em}
 .stat-value{font-size:26px;font-weight:700;color:var(--text);line-height:1}
@@ -333,10 +339,22 @@ button, [onclick], [data-nav], .sb-item, .task-card, .chip {
 <div class="overlay" id="overlay">
   <div class="modal">
     <h3>새 업무 추가</h3>
+    <div class="fg" style="display:flex;align-items:center;justify-content:space-between;padding:4px 0 8px">
+      <label style="margin:0;font-size:12px;color:var(--text2)">공통업무 <span style="font-size:11px;color:var(--text3)">(여러 팀원 동시 배정)</span></label>
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+        <input type="checkbox" id="iIsShared" style="width:16px;height:16px;cursor:pointer" onchange="window.toggleSharedMode(this.checked)"/>
+      </label>
+    </div>
     <div class="fg" id="iMemberRow">
       <label>담당 팀원</label>
       <select id="iMember">
         <option value="">-- 담당자 선택 --</option><option value="강신욱">강신욱</option><option value="김용욱">김용욱</option><option value="오문식">오문식</option><option value="이길우">이길우</option><option value="이도영">이도영</option><option value="이상현">이상현</option><option value="이영찬">이영찬</option><option value="이윤형">이윤형</option>      </select>
+    </div>
+    <div class="fg" id="iSharedMembersRow" style="display:none">
+      <label>참여 팀원 (복수 선택)</label>
+      <div class="multi-member-select" id="iSharedMembers">
+        <span style="font-size:12px;color:var(--text3)">팀원을 선택하세요</span>
+      </div>
     </div>
     <div class="fg"><label>업무명</label><input id="iTitle" placeholder="업무 내용을 입력하세요"/></div>
     <div class="fg"><label>설명 (선택)</label><textarea id="iDesc" placeholder="상세 설명" rows="2" style="width:100%;padding:10px 12px;font-size:14px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:inherit;outline:none;resize:vertical;line-height:1.6"></textarea></div>
@@ -669,6 +687,13 @@ window.switchViewTab = function(tab) {
 };
 
 // ════════════════════════════════════════════
+// sharedTasks 컬렉션
+let sharedTasks = [];
+onSnapshot(query(collection(db,'sharedTasks'), orderBy('createdAt','desc')), snap => {
+  sharedTasks = snap.docs.map(d => ({_id:d.id, ...d.data()}));
+  renderAllMemberTasks();
+});
+
 // 업무 관리 풀 (taskPool)
 // ════════════════════════════════════════════
 let poolTasks = [];
@@ -757,6 +782,19 @@ function renderTaskPool() {
   }).join('') + '</div>';
 }
 
+// 공통업무 모드 토글
+window.toggleSharedMode = (isShared) => {
+  document.getElementById('iMemberRow').style.display = isShared ? 'none' : '';
+  document.getElementById('iSharedMembersRow').style.display = isShared ? '' : 'none';
+  if (isShared) {
+    // 팀원 칩 렌더링
+    const el = document.getElementById('iSharedMembers');
+    el.innerHTML = MEMBER_IDS.map(id => 
+      `<div class="multi-member-chip" data-mid="${id}" onclick="this.classList.toggle('selected')">${id}</div>`
+    ).join('');
+  }
+};
+
 window.openPoolModal = () => {
   ['pTitle','pDesc','pStart','pDue','pOccurred'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
   document.getElementById('pPriority').value = '3';
@@ -839,9 +877,26 @@ window.deletePoolTask = async (poolId, e) => {
 // 렌더링
 // ════════════════════════════════════════════
 function getAllTasks() {
-  if (curTab !== '__all__') return mData[curTab]?.tasks || [];
+  // 공통업무 중복 제거 (sharedTaskId가 같은 것은 한 번만)
+  const dedupShared = (tasks) => {
+    const seenShared = new Set();
+    return tasks.filter(t => {
+      if (!t.isShared || !t.sharedTaskId) return true;
+      if (seenShared.has(t.sharedTaskId)) return false;
+      seenShared.add(t.sharedTaskId);
+      return true;
+    });
+  };
+  if (curTab !== '__all__') {
+    const myTasks = mData[curTab]?.tasks || [];
+    // 해당 팀원이 참여한 공통업무 포함
+    const shared = sharedTasks.filter(t => t.members?.includes(curTab));
+    const allWithShared = [...myTasks, ...shared.filter(s => !myTasks.some(t => t.sharedTaskId === s._id))];
+    return allWithShared;
+  }
   const all = Object.values(mData).flatMap(m => m.tasks);
-  return filterMember === 'all' ? all : all.filter(t => t._mid === filterMember);
+  const filtered = filterMember === 'all' ? all : all.filter(t => t._mid === filterMember);
+  return dedupShared(filtered);
 }
 
 function renderMemberTabs() {
@@ -934,9 +989,11 @@ function renderTaskList() {
     if (selDocId === t._id) cls += ' selected';
 
     let flag = '';
-    if (t.pinned)    flag = '<span class="flag flag-pinned">📌 고정됨</span>';
-    else if (ov)     flag = '<span class="flag flag-overdue">기한 초과</span>';
-    else if (st)     flag = '<span class="flag flag-stale">업데이트 필요</span>';
+    if (t.isPrivate) flag += '<span style="font-size:10px;padding:2px 7px;border-radius:999px;background:#1a1a1a;color:#fff;margin-right:4px">🔒 비공개</span>';
+    if (t.isShared)  flag += `<span class="shared-badge">👥 공통 · ${(t.members||[]).join(', ')}</span>`;
+    if (t.pinned)    flag += '<span class="flag flag-pinned">📌 고정됨</span>';
+    else if (ov)     flag += '<span class="flag flag-overdue">기한 초과</span>';
+    else if (st)     flag += '<span class="flag flag-stale">업데이트 필요</span>';
 
     const ago     = timeAgo(t.updated);
     const agoText = ago === '방금' ? '방금 업데이트' : `${ago} 전 업데이트`;
@@ -1379,6 +1436,7 @@ window.openModal = () => {
 };
 window.closeModal = () => {
   document.getElementById('overlay').classList.remove('show');
+  const cb = document.getElementById('iIsShared'); if(cb) { cb.checked=false; window.toggleSharedMode(false); }
   ['iTitle', 'iDesc', 'iStart', 'iDue'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('iPriority').value = '3';
   document.getElementById('iReporter').value = '';
@@ -1387,40 +1445,53 @@ window.closeModal = () => {
 window.addTask = async () => {
   const title = document.getElementById('iTitle').value.trim();
   if (!title) { toast('업무명을 입력해주세요'); return; }
-  const assignee = curTab === '__all__'
-    ? (document.getElementById('iMember')?.value || '')
-    : curTab;
-  if (!assignee) { toast('담당 팀원을 선택해주세요'); return; }
+  const isShared = document.getElementById('iIsShared')?.checked || false;
   const btn = document.querySelector('#overlay .btn-ok');
-  btn.disabled = true;
-  btn.textContent = '추가 중...';
+  btn.disabled = true; btn.textContent = '추가 중...';
+
   try {
     const ts = now();
-    await fsAdd(assignee, {
+    const base = {
       title,
       desc:        document.getElementById('iDesc').value.trim(),
-      assignee: curTab === '__all__'
-      ? (document.getElementById('iMember')?.value || '')
-      : curTab,
       occurredDate: document.getElementById('iOccurred')?.value || '',
       startDate:   document.getElementById('iStart').value || '',
       due:         document.getElementById('iDue').value || '',
       priority:    Number(document.getElementById('iPriority')?.value) || 3,
       reporter:    document.getElementById('iReporter')?.value || '',
-      status:      'todo',
-      updated:  ts,
-      pinned:   false,
-      order:    Date.now(),
-      history:  [{ id: Date.now() + '', type: 'create', text: '업무가 등록되었습니다. (팀장)', date: ts, author: '팀장' }]
-    });
+      status:      'todo', updated: ts, pinned: false, order: Date.now(),
+      history: [{ id: Date.now()+'', type:'create', text:'업무가 등록되었습니다. (팀장)', date:ts, author:'팀장' }]
+    };
+
+    if (isShared) {
+      // 공통업무: 참여 팀원 선택 확인
+      const selected = [...document.querySelectorAll('#iSharedMembers .multi-member-chip.selected')].map(el => el.dataset.mid);
+      if (selected.length < 2) { toast('공통업무는 2명 이상 선택해주세요'); btn.disabled=false; btn.textContent='추가하기'; return; }
+      // sharedTasks 컬렉션에 저장
+      const sharedRef = await addDoc(collection(db,'sharedTasks'), {
+        ...base, members: selected, isShared: true,
+        memberStatus: Object.fromEntries(selected.map(id => [id, 'todo'])),
+        createdBy: ME.displayName, createdAt: ts
+      });
+      // 각 팀원 tasks에도 sharedTaskId 참조로 추가
+      await Promise.all(selected.map(id => fsAdd(id, {
+        ...base, assignee: id, isShared: true, sharedTaskId: sharedRef.id,
+        members: selected
+      })));
+      toast(`공통업무를 ${selected.join(', ')}에게 추가했어요 ✓`);
+    } else {
+      const assignee = curTab === '__all__'
+        ? (document.getElementById('iMember')?.value || '')
+        : curTab;
+      if (!assignee) { toast('담당 팀원을 선택해주세요'); btn.disabled=false; btn.textContent='추가하기'; return; }
+      await fsAdd(assignee, { ...base, assignee });
+      toast(`${assignee}에게 업무를 추가했어요 ✓`);
+    }
     window.closeModal();
-    toast(`${curTab}에게 업무를 추가했어요 ✓`);
   } catch (e) {
     toast('오류: ' + (e.code || e.message));
-    console.error(e);
   } finally {
-    btn.disabled = false;
-    btn.textContent = '추가하기';
+    btn.disabled = false; btn.textContent = '추가하기';
   }
 };
 

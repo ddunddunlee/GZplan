@@ -880,7 +880,21 @@ function subTasks(){
   members.forEach(mid=>{
     onSnapshot(query(collection(db,'tasks',mid,'items'),orderBy('order','asc')),snap=>{
       taskEvents=taskEvents.filter(t=>t._mid!==mid);
-      snap.docs.forEach(d=>{const t=d.data();if(t.startDate||t.due)taskEvents.push({id:d.id,_mid:mid,title:t.title,startDate:t.startDate||t.due,endDate:t.due||t.startDate,status:t.status,priority:t.priority||3,desc:t.desc||'',reporter:t.reporter||'',occurredDate:t.occurredDate||'',updated:t.updated||'',history:t.history||[],isTask:true});});
+      snap.docs.forEach(d=>{const t=d.data();
+      // 비공개 업무: 본인 것만 표시
+      if(t.isPrivate && mid !== ME.id) return;
+      if(t.startDate||t.due) taskEvents.push({
+        id:d.id,_mid:mid,title:t.title,
+        startDate:t.startDate||t.due,endDate:t.due||t.startDate,
+        status:t.status,priority:t.priority||3,
+        desc:t.desc||'',reporter:t.reporter||'',
+        occurredDate:t.occurredDate||'',updated:t.updated||'',
+        history:t.history||[],isTask:true,
+        isPrivate:t.isPrivate||false,
+        isShared:t.isShared||false,
+        members:t.members||[]
+      });
+    });
       renderWeeklySchedule();
     });
   });
@@ -947,7 +961,19 @@ function renderWeeklySchedule() {
   
   const allInst = [];
   if(typeFilter === 'all' || typeFilter === 'task') {
-    taskEvents.filter(t => memberFilter === 'all' || t._mid === memberFilter).forEach(t => allInst.push({...t, _type: 'task'}));
+    (()=>{
+      const seen = new Set();
+      taskEvents
+        .filter(t => memberFilter === 'all' || t._mid === memberFilter)
+        .filter(t => {
+          if(t.isShared && t.sharedTaskId){
+            if(seen.has(t.sharedTaskId)) return false;
+            seen.add(t.sharedTaskId); return true;
+          }
+          return true;
+        })
+        .forEach(t => allInst.push({...t, _type: 'task'}));
+    })();
   }
   schedules.forEach(ev => {
     if(typeFilter === 'task') return;

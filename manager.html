@@ -1441,15 +1441,22 @@ window.updatePrivate = async (docId, memberId, val) => {
   const t = (mData[memberId]?.tasks||[]).find(t => t._id === docId);
   if (!t) return;
   const ts = now();
-  await fsUpd(memberId, docId, {
-    isPrivate: val, updated: ts,
-    history: [...(t.history||[]), {
-      id: Date.now()+'', type:'edit',
-      text: val ? '비공개로 변경됨' : '공개로 변경됨',
-      date: ts, author: ME.displayName
-    }]
-  });
-  toast(val ? '🔒 비공개로 변경됐어요' : '공개로 변경됐어요');
+  const histEntry = { id: Date.now()+'', type:'edit', text: val ? '비공개로 변경됨' : '공개로 변경됨', date: ts, author: ME.displayName };
+  await fsUpd(memberId, docId, { isPrivate: val, updated: ts, history: [...(t.history||[]), histEntry] });
+
+  // 공통업무인 경우 연결된 다른 담당자 업무도 동기화
+  if (t.isShared && t.sharedTaskId) {
+    const sharedId = t.sharedTaskId;
+    const otherMembers = (t.members||[]).filter(id => id !== memberId);
+    try {
+      await Promise.all(otherMembers.map(async mid => {
+        const snap = await getDocs(query(collection(db,'tasks',mid,'items')));
+        const linked = snap.docs.find(d => d.data().sharedTaskId === sharedId);
+        if (linked) await updateDoc(doc(db,'tasks',mid,'items',linked.id), { isPrivate: val, updated: ts });
+      }));
+    } catch(e) { console.error(e); }
+  }
+  toast(val ? '🔒 공통업무 전체 비공개로 변경됐어요' : '공통업무 전체 공개로 변경됐어요');
 };
 
 window.updateReporter = async (docId, memberId, val) => {

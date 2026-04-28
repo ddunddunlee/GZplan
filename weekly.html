@@ -838,6 +838,38 @@ const DEMO_SCHEDULES=[];
 let schedules=[...DEMO_SCHEDULES],taskEvents=[],CAT_LIST=[...DEFAULT_CATS],CAT_MAP={};
 let curYear=new Date().getFullYear(),curMonth=new Date().getMonth();
 let typeFilter='all',memberFilter='all';
+let activeMemberWeekly = new Set([ME.id]);
+const weeklySubUnsubs = {};
+
+window.toggleMemberWeekly = (id) => {
+  if(id === ME.id) return;
+  if(activeMemberWeekly.has(id)){
+    activeMemberWeekly.delete(id);
+    if(weeklySubUnsubs[id]){ weeklySubUnsubs[id](); delete weeklySubUnsubs[id]; }
+    taskEvents = taskEvents.filter(t => t._mid !== id);
+  } else {
+    activeMemberWeekly.add(id);
+    weeklySubUnsubs[id] = onSnapshot(query(collection(db,'tasks',id,'items'),orderBy('order','asc')), snap => {
+      taskEvents = taskEvents.filter(t => t._mid !== id);
+      snap.docs.forEach(d => {
+        const t = d.data();
+        if(t.isPrivate) return;
+        if(t.startDate||t.due) taskEvents.push({
+          id:d.id,_mid:id,title:t.title,
+          startDate:t.startDate||t.due,endDate:t.due||t.startDate,
+          status:t.status,priority:t.priority||3,
+          desc:t.desc||'',reporter:t.reporter||'',
+          occurredDate:t.occurredDate||'',updated:t.updated||'',
+          history:t.history||[],isTask:true,
+          isPrivate:false,isShared:t.isShared||false,members:t.members||[]
+        });
+      });
+      renderWeeklySchedule();
+    });
+  }
+  renderFilters();
+  renderWeeklySchedule();
+};
 let editingId=null,editScope=null,editInstanceDate=null,editType='personal';
 let pendingRepeatAction=null,pendingDelId=null;
 function rebuildCatMap(){CAT_MAP={};CAT_LIST.forEach(c=>{CAT_MAP[c.id]=c})}
@@ -905,10 +937,21 @@ function renderFilters(){
   tEl.innerHTML=[{v:'all',l:'전체'},{v:'task',l:'업무 스케줄'},{v:'personal',l:'개별 일정'},{v:'common',l:'공통 일정'}]
     .map(t=>`<button class="chip${typeFilter===t.v?' active':''}" onclick="setTF('${t.v}')">${t.l}</button>`).join('');
   const mEl=document.getElementById('memberFilterRow');
-  if(!isMgr){mEl.style.display='none';return}
   mEl.style.display='';
-  let h=`<button class="chip${memberFilter==='all'?' active':''}" onclick="setMF('all')">전체</button>`;
-  MEMBER_IDS.forEach((id,i)=>{h+=`<button class="chip member-chip${memberFilter===id?' active':''}" style="border-left-color:${MEMBER_COLORS[i]}" onclick="setMF('${id}')">${id}</button>`});
+  let h='';
+  if(isMgr){
+    h+=`<button class="chip${memberFilter==='all'?' active':''}" onclick="setMF('all')">전체</button>`;
+    MEMBER_IDS.forEach((id,i)=>{h+=`<button class="chip member-chip${memberFilter===id?' active':''}" style="border-left-color:${MEMBER_COLORS[i]}" onclick="setMF('${id}')">${id}</button>`});
+  } else {
+    MEMBER_IDS.forEach((id,i)=>{
+      const isMe=id===ME.id;
+      const isActive=activeMemberWeekly.has(id);
+      const bg=isActive?(isMe?'#0C447C':MEMBER_COLORS[i]):'#fff';
+      const tc=isActive?'#fff':'var(--text2)';
+      const bc=isActive?(isMe?'#0C447C':MEMBER_COLORS[i]):'var(--border)';
+      h+=`<button class="chip member-chip" style="background:${bg};color:${tc};border:0.5px solid ${bc}" onclick="toggleMemberWeekly('${id}')">${id}${isMe?' (나)':''}</button>`;
+    });
+  }
   mEl.innerHTML=h;
 }
 window.setTF=v=>{typeFilter=v;renderFilters();renderLegend();renderWeeklySchedule()};
@@ -964,7 +1007,7 @@ function renderWeeklySchedule() {
     (()=>{
       const seen = new Set();
       taskEvents
-        .filter(t => memberFilter === 'all' || t._mid === memberFilter)
+        .filter(t => isMgr?(memberFilter==='all'||t._mid===memberFilter):activeMemberWeekly.has(t._mid))
         .filter(t => {
           if(t.isShared && t.sharedTaskId){
             if(seen.has(t.sharedTaskId)) return false;

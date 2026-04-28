@@ -174,6 +174,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
 .stat{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px 16px}
 .stat-card{background:#fff;border:0.5px solid var(--border);border-radius:var(--radius);padding:14px 18px;display:flex;flex-direction:column;gap:6px;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+.member-filter-row{display:flex;gap:6px;flex-wrap:wrap;padding:8px 0 4px;align-items:center}
+.member-chip{padding:5px 12px;font-size:12px;font-weight:600;border-radius:999px;border:0.5px solid var(--border);background:#fff;cursor:pointer;color:var(--text2);transition:all .12s;display:flex;align-items:center;gap:5px}
+.member-chip.active{background:#0C447C;color:#fff;border-color:#0C447C}
+.member-chip.other-active{color:#fff;border-color:transparent}
+.shared-badge{font-size:10px;padding:2px 8px;border-radius:999px;background:#E6F1FB;color:#0C447C;border:0.5px solid #B5D4F4;display:inline-flex;align-items:center;gap:3px;margin-right:4px}
+.member-avatars{display:flex;gap:3px;flex-wrap:wrap;margin-top:4px}
+.member-avatar{width:20px;height:20px;border-radius:50%;background:#0C447C;color:#fff;font-size:8px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.private-badge{font-size:10px;padding:2px 7px;border-radius:999px;background:#F0F4F8;color:var(--text3);border:0.5px solid var(--border);display:inline-flex;align-items:center;gap:3px}
+.private-badge.on{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
+.readonly-overlay{pointer-events:none;opacity:.75}
 .stat-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
 .stat-value{font-size:26px;font-weight:700;color:var(--text);line-height:1}
 .stat-value.warn{color:#BA7517}.stat-value.danger{color:var(--red)}
@@ -479,6 +489,7 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
         <button class="chip" data-f="done">완료</button>
         <button class="chip" data-f="stale">⚠ 오래된 업무</button>
       </div>
+      <div class="member-filter-row" id="memberFilterRow"></div>
       <div class="filter-row" id="assigneeRow"></div>
       <div class="task-list" id="taskList"></div>
     </div>
@@ -523,6 +534,12 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
       </div>
     </div>
     <div class="fg"><label>최종보고자 (선택)</label><select id="iReporter"><option value="">없음</option></select></div>
+    <div class="fg" style="display:flex;align-items:center;justify-content:space-between;padding:6px 0">
+      <label style="margin:0;font-size:12px;color:var(--text2)">비공개 업무 <span style="font-size:11px;color:var(--text3)">(팀장 + 나만 볼 수 있어요)</span></label>
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+        <input type="checkbox" id="iPrivate" style="width:16px;height:16px;cursor:pointer"/>
+      </label>
+    </div>
     <div class="modal-btns">
       <button class="btn-cancel" id="modalCancelBtn" onclick="if(window.closeModal)window.closeModal()" style="touch-action:manipulation">취소</button>
       <button class="btn-ok" id="addTaskOkBtn" onclick="if(window.addTask)window.addTask()" style="touch-action:manipulation">추가하기</button>
@@ -536,7 +553,7 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import {
   getFirestore, collection, doc, getDoc,
-  onSnapshot, addDoc, updateDoc, deleteDoc,
+  onSnapshot, addDoc, updateDoc, deleteDoc, getDocs,
   serverTimestamp, query, orderBy
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
@@ -551,6 +568,7 @@ const FIREBASE_CONFIG = {
 const DAY_MS    = 86400000;
 const STALE_DAYS = 14;
 let REPORTERS   = [];
+let MEMBER_IDS = ["강신욱","김용욱","오문식","이길우","이도영","이상현","이영찬","이윤형"];
 
 const db  = getFirestore(initializeApp(FIREBASE_CONFIG));
 const sess = localStorage.getItem('tt_user');
@@ -626,9 +644,11 @@ const fsDel = id     => deleteDoc(dr(id));
 // 상태
 // ════════════════════════════════════════════
 let tasks   = [];
+let otherTasks = {};   // {memberId: [tasks]}
 let selId   = null;
-let filter  = 'active';  // 기본값: 대기+진행중
+let filter  = 'active';
 let filterA = 'all';
+let activeMemberFilters = new Set([ME.id]); // 기본: 나만
 
 let dragId  = null;
 
@@ -733,6 +753,15 @@ function statusBadge(status, id) {
 // ════════════════════════════════════════════
 // 실시간 데이터 구독
 // ════════════════════════════════════════════
+// memberOrder 로드
+try {
+  const orderSnap = await getDoc(doc(db,'config','memberOrder'));
+  if (orderSnap.exists() && orderSnap.data().order?.length) {
+    MEMBER_IDS.length = 0;
+    orderSnap.data().order.forEach(id => MEMBER_IDS.push(id));
+  }
+} catch(e) {}
+
 onSnapshot(query(col(), orderBy('order', 'asc')), snap => {
   tasks = snap.docs.map(d => ({ _id: d.id, ...d.data() }));
   if (selId) {
@@ -749,6 +778,7 @@ onSnapshot(query(col(), orderBy('order', 'asc')), snap => {
 // ════════════════════════════════════════════
 function render() {
   renderStats();
+  renderMemberFilter();
   renderAssigneeFilter();
   renderTaskList();
 }
@@ -772,6 +802,57 @@ function renderStats() {
     <div class="stat-card"><div class="stat-label">기한 초과</div><div class="stat-value danger">${overdue}</div>`;
 }
 
+// 팀원 필터 칩 렌더링
+const MEMBER_CHIP_COLORS = ['#378ADD','#A32D2D','#639922','#633806','#6B5FCC','#1D9E75','#EF9F27','#888888'];
+
+function renderMemberFilter() {
+  const row = document.getElementById('memberFilterRow');
+  if (!row) return;
+  const isMgr = ME.role === 'manager' || ME.role === 'admin';
+  if (isMgr) { row.innerHTML = ''; return; } // 팀장은 별도 뷰 있으므로 숨김
+  let html = '<span style="font-size:11px;color:var(--text3);flex-shrink:0;align-self:center">팀원</span>';
+  MEMBER_IDS.forEach((id, i) => {
+    const color = MEMBER_CHIP_COLORS[i % MEMBER_CHIP_COLORS.length];
+    const isMe = id === ME.id;
+    const isActive = activeMemberFilters.has(id);
+    const bg = isActive ? (isMe ? '#0C447C' : color) : '#fff';
+    const tc = isActive ? '#fff' : 'var(--text2)';
+    const bc = isActive ? (isMe ? '#0C447C' : color) : 'var(--border)';
+    html += `<button class="member-chip" data-mid="${id}"
+      style="background:${bg};color:${tc};border-color:${bc}">
+      ${id}${isMe ? ' (나)' : ''}
+    </button>`;
+  });
+  row.innerHTML = html;
+  row.querySelectorAll('.member-chip').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const mid = btn.dataset.mid;
+      if (mid === ME.id) return; // 나는 항상 활성
+      if (activeMemberFilters.has(mid)) activeMemberFilters.delete(mid);
+      else activeMemberFilters.add(mid);
+      loadOtherTasks();
+      renderMemberFilter();
+    });
+  });
+}
+
+async function loadOtherTasks() {
+  const others = [...activeMemberFilters].filter(id => id !== ME.id);
+  // 제거된 멤버 정리
+  for (const id of Object.keys(otherTasks)) {
+    if (!others.includes(id)) delete otherTasks[id];
+  }
+  // 새로 추가된 멤버 로드
+  await Promise.all(others.map(async id => {
+    if (otherTasks[id]) return;
+    try {
+      const snap = await getDocs(query(collection(db,'tasks',id,'items'), orderBy('order','asc')));
+      otherTasks[id] = snap.docs.map(d => ({_id:d.id, _mid:id, ...d.data()}));
+    } catch(e) { otherTasks[id] = []; }
+  }));
+  renderTaskList();
+}
+
 function renderAssigneeFilter() {
   const aRow = document.getElementById('assigneeRow');
   const assignees = [...new Set(tasks.map(t => t.assignee).filter(Boolean))];
@@ -793,10 +874,23 @@ function renderAssigneeFilter() {
 }
 
 function renderTaskList() {
-  const filtered = tasks.filter(t => {
+  // 내 업무 + 활성화된 타팀원 업무 합치기
+  const others = [...activeMemberFilters]
+    .filter(id => id !== ME.id)
+    .flatMap(id => (otherTasks[id]||[]).map(t => ({...t, _isOther:true, _isPrivate: t.isPrivate})));
+
+  const allTasks = [
+    // 내 업무: 비공개 업무는 본인만 (타팀원이 보는 경우 없음)
+    ...tasks,
+    // 타팀원: 비공개 업무 숨김
+    ...others.filter(t => !t.isPrivate)
+  ];
+
+  const filtered = allTasks.filter(t => {
     const byStatus = filter === 'active' ? t.status !== 'done' : filter === 'all' ? true : filter === 'stale' ? isStale(t) : t.status === filter;
     const byAssign = filterA === 'all' || t.assignee === filterA;
-    return byStatus && byAssign;
+    const byMember = activeMemberFilters.has(t._mid || ME.id);
+    return byStatus && byAssign && byMember;
   });
   // 중요도 내림차순 → 핀 우선 → 마감일 오름차순
   filtered.sort((a, b) => {
@@ -835,15 +929,18 @@ function renderTaskList() {
     if (selId === t._id) cls += ' selected';
 
     let flag = '';
-    if (t.pinned)    flag = '<span class="flag flag-pinned">📌 고정됨</span>';
-    else if (ov)     flag = '<span class="flag flag-overdue">기한 초과</span>';
-    else if (st)     flag = '<span class="flag flag-stale">업데이트 필요</span>';
+    if (t.isPrivate) flag += '<span class="private-badge on">🔒 비공개</span> ';
+    if (t.isShared)  flag += `<span class="shared-badge">👥 공통업무</span>`;
+    if (t._isOther)  flag += `<span class="private-badge" style="background:#E6F1FB;color:#0C447C;border-color:#B5D4F4">${t._mid}</span> `;
+    if (t.pinned)    flag += '<span class="flag flag-pinned">📌 고정됨</span>';
+    else if (ov)     flag += '<span class="flag flag-overdue">기한 초과</span>';
+    else if (st)     flag += '<span class="flag flag-stale">업데이트 필요</span>';
 
     const ago = timeAgo(t.updated);
     const agoText = ago === '방금' ? '방금 업데이트' : `${ago} 전 업데이트`;
 
     html += `
-      <div class="${cls}" draggable="true" data-id="${t._id}" onclick="selTask('${t._id}')">
+      <div class="${cls}${t._isOther?' readonly-overlay':''}" draggable="${!t._isOther}" data-id="${t._id}" data-mid="${t._mid||''}" onclick="${t._isOther?`openOtherDetail('${t._id}','${t._mid||''}')`:`selTask('${t._id}')`}">
         <div class="priority-bar" style="background:${priorityColor(t.priority)}"></div>
         <div class="drag-handle" onclick="event.stopPropagation()">⠿</div>
         <div class="task-check${t.status === 'done' ? ' done' : ''}" onclick="toggleDone('${t._id}', event)"></div>
@@ -957,6 +1054,13 @@ function renderDetail(t) {
       <span class="dp-lbl">상태</span>
       <span class="badge ${t.status==='todo'?'badge-todo':t.status==='inprogress'?'badge-inprogress':'badge-done'}">${statusLabel[t.status]||'-'}</span>
     </div>
+    ${t.isShared && t.members?.length ? `
+    <div class="dp-row" style="flex-direction:column;align-items:flex-start;gap:6px;padding:10px 0">
+      <span class="dp-lbl">공통업무 참여자</span>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center">
+        ${(t.members||[]).map(id => `<span style="padding:3px 10px;border-radius:999px;font-size:11px;background:#E6F1FB;color:#0C447C;border:0.5px solid #B5D4F4">${id}</span>`).join('')}
+      </div>
+    </div>` : ''}
     <div class="dp-row" id="dp-reporter-row-${t._id}">
       <span class="dp-lbl">최종보고자</span>
       <span class="reporter-badge" onclick="toggleReporterEdit('${t._id}')">
@@ -1010,9 +1114,69 @@ window.selTask = id => {
   selId = id;
   const t = tasks.find(t => t._id === id);
   if (!t) return;
+  // dp-note 복원
+  const note = document.querySelector('.dp-note');
+  if (note) note.style.display = '';
+  document.querySelectorAll('.dp-edit-only').forEach(el => el.style.display='');
   document.getElementById('detailPanel').classList.add('open');
   renderDetail(t);
   render();
+};
+
+// 타팀원 업무 상세 보기 (읽기 전용)
+window.openOtherDetail = (docId, memberId) => {
+  const allOther = Object.values(otherTasks).flat();
+  const t = allOther.find(t => t._id === docId && t._mid === memberId);
+  if (!t) return;
+  const sl = {todo:'대기', inprogress:'진행 중', done:'완료'};
+  const PL = {5:'매우 긴급',4:'긴급',3:'보통',2:'낮음',1:'매우 낮음'};
+  const PC = {5:'#A32D2D',4:'#EF9F27',3:'#378ADD',2:'#639922',1:'#888'};
+  const fmtD = s => { if(!s) return '-'; const d=new Date(s+'T00:00:00'); return `${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()}`; };
+  const fmtDt = s => { if(!s) return '-'; const d=new Date(s); return `${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; };
+  const history = [...(t.history||[])].sort((a,b)=>new Date(a.date)-new Date(b.date));
+
+  const dp = document.getElementById('detailPanel');
+  if (!dp) return;
+
+  // 제목
+  document.getElementById('dpTitle').value = t.title;
+
+  // dpMeta — 기존 renderDetail 방식과 동일하게
+  document.getElementById('dpMeta').innerHTML = `
+    <div style="background:#E6F1FB;border-radius:6px;padding:6px 12px;font-size:12px;color:#0C447C;margin-bottom:8px">👁 ${memberId} 업무 — 읽기 전용</div>
+    ${t.desc ? `<div class="dp-row" style="align-items:flex-start;flex-direction:column;padding-bottom:6px">
+      <span class="dp-lbl">설명</span>
+      <div style="font-size:13px;line-height:1.7;word-break:break-word;margin-top:4px">${t.desc}</div>
+    </div>` : ''}
+    <div class="dp-row"><span class="dp-lbl">중요도</span><span class="dp-val" style="color:${PC[t.priority||3]};font-weight:600">${PL[t.priority||3]}</span></div>
+    <div class="dp-row"><span class="dp-lbl">업무 발생일</span><span class="dp-val">${fmtD(t.occurredDate)}</span></div>
+    <div class="dp-row"><span class="dp-lbl">업무 시작일</span><span class="dp-val">${fmtD(t.startDate)}</span></div>
+    <div class="dp-row"><span class="dp-lbl">업무 타겟일</span><span class="dp-val">${fmtD(t.due)}</span></div>
+    <div class="dp-row"><span class="dp-lbl">마지막 업데이트</span><span class="dp-val">${fmtDt(t.updated)}</span></div>
+    <div class="dp-row"><span class="dp-lbl">상태</span><span class="dp-val">${sl[t.status]||'-'}</span></div>
+    ${t.reporter?`<div class="dp-row"><span class="dp-lbl">최종보고자</span><span class="dp-val">${t.reporter}</span></div>`:''}
+    <div class="dp-row"><span class="dp-lbl">팀원</span><span class="dp-val">${memberId}</span></div>
+  `;
+
+  // 히스토리
+  document.getElementById('dpTimeline').innerHTML = history.map((h, i) => {
+    const dot = h.type==='create'?'#378ADD':h.type==='status'?'#639922':'#EF9F27';
+    return `<div class="tl-item">
+      <div class="tl-dot" style="background:${dot}"></div>
+      <div class="tl-body">
+        <div class="tl-text">${h.author?`<strong>${h.author}</strong> `:''}${h.text||''}</div>
+        <div class="tl-date">${fmtDt(h.date)}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // 편집 요소 숨기기, 메모 입력 숨기기
+  document.querySelectorAll('.dp-edit-only').forEach(el => el.style.display='none');
+  const note = document.querySelector('.dp-note');
+  if (note) note.style.display = 'none';
+
+  dp.classList.add('open');
+  selId = null;
 };
 
 window.updateDesc = async (docId, memberId, val) => {
@@ -1212,7 +1376,7 @@ window.openModal = () => {
 };
 window.closeModal = () => {
   document.getElementById('overlay').classList.remove('show');
-  ['iTitle', 'iDesc', 'iOccurred', 'iStart', 'iDue'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  ['iTitle', 'iDesc', 'iOccurred', 'iStart', 'iDue'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; }); const _ip=document.getElementById('iPrivate'); if(_ip) _ip.checked=false;
   document.getElementById('iPriority').value = '3';
   document.getElementById('iReporter').value = '';
 };
@@ -1225,6 +1389,7 @@ window.addTask = async () => {
   await fsAdd({
     title,
     desc:    document.getElementById('iDesc').value.trim(),
+    isPrivate: document.getElementById('iPrivate')?.checked || false,
     assignee: ME.id,
     occurredDate: document.getElementById('iOccurred').value || '',
     startDate: document.getElementById('iStart').value || '',

@@ -1148,6 +1148,15 @@ function renderDetail(t) {
     <div class="dp-row">
       <span class="dp-lbl">팀원</span>
       <span class="dp-val">${t._mid}</span>
+    </div>
+    <div class="dp-row" style="padding:10px 0">
+      <span class="dp-lbl">비공개 업무</span>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+        <span style="font-size:11px;color:var(--text3)">${t.isPrivate ? '🔒 팀장+담당자만' : '전체 공개'}</span>
+        <input type="checkbox" id="dp-private-${t._id}" ${t.isPrivate?'checked':''}
+          style="width:16px;height:16px;cursor:pointer"
+          onchange="window.updatePrivate('${t._id}','${t._mid}',this.checked)"/>
+      </label>
     </div>`;
 
   const history = [...(t.history || [])].sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -1326,6 +1335,21 @@ window.updatePriority = async (docId, memberId, val) => {
       date: ts, author: '팀장'
     }]
   });
+};
+
+window.updatePrivate = async (docId, memberId, val) => {
+  const t = (mData[memberId]?.tasks||[]).find(t => t._id === docId);
+  if (!t) return;
+  const ts = now();
+  await fsUpd(memberId, docId, {
+    isPrivate: val, updated: ts,
+    history: [...(t.history||[]), {
+      id: Date.now()+'', type:'edit',
+      text: val ? '비공개로 변경됨' : '공개로 변경됨',
+      date: ts, author: ME.displayName
+    }]
+  });
+  toast(val ? '🔒 비공개로 변경됐어요' : '공개로 변경됐어요');
 };
 
 window.updateReporter = async (docId, memberId, val) => {

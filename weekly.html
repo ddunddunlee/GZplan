@@ -754,7 +754,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 <script type="module">
 import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import {getFirestore,collection,doc,getDoc,setDoc,onSnapshot,addDoc,updateDoc,deleteDoc,query,orderBy} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import {getFirestore,collection,doc,getDoc,setDoc,onSnapshot,addDoc,updateDoc,deleteDoc,query,orderBy,where} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 const FC={apiKey:"AIzaSyA7KylsSyT3_0oQvhBtcrPc-gcdfVq90IQ",authDomain:"gzplan.firebaseapp.com",projectId:"gzplan",storageBucket:"gzplan.firebasestorage.app",messagingSenderId:"186255862586",appId:"1:186255862586:web:f36d21f76012ca43b8fe03"};
 const MEMBER_IDS=["강신욱","김용욱","오문식","이길우","이도영","이상현","이영찬","이윤형"];
 const MEMBER_COLORS=["#378ADD","#7F77DD","#EF9F27","#639922","#E24B4A","#D4537E","#1D9E75","#D85A30"];
@@ -932,6 +932,35 @@ function subTasks(){
   });
 }
 subTasks();
+
+// 팀원 모드: sharedTasks 직접 구독 (내가 members에 포함된 공통업무)
+if(!isMgr){
+  onSnapshot(query(collection(db,'sharedTasks'),where('members','array-contains',ME.id)), snap=>{
+    // sharedTasks에서 온 taskEvents 제거 후 재적재
+    taskEvents = taskEvents.filter(t => !t._fromShared);
+    snap.docs.forEach(d=>{
+      const t = d.data();
+      if(t.isPrivate) return; // 비공개 공통업무는 제외 (팀장+본인만)
+      if(!(t.startDate||t.due)) return;
+      // members 중 첫 번째를 대표 _mid로 사용하되 _fromShared 표시
+      const repMid = (t.members&&t.members[0]) || ME.id;
+      taskEvents.push({
+        id:d.id, _mid:repMid, _fromShared:true,
+        title:t.title,
+        startDate:t.startDate||t.due, endDate:t.due||t.startDate,
+        status:t.status, priority:t.priority||3,
+        desc:t.desc||'', reporter:t.reporter||'',
+        occurredDate:t.occurredDate||'', updated:t.updated||'',
+        history:t.history||[], isTask:true,
+        isPrivate:false, isShared:true,
+        members:t.members||[],
+        sharedTaskId:d.id
+      });
+    });
+    renderWeeklySchedule();
+  });
+}
+
 function renderFilters(){
   const tEl=document.getElementById('typeFilterRow');
   tEl.innerHTML=[{v:'all',l:'전체'},{v:'task',l:'업무 스케줄'},{v:'personal',l:'개별 일정'},{v:'common',l:'공통 일정'}]
@@ -1007,7 +1036,7 @@ function renderWeeklySchedule() {
     (()=>{
       const seen = new Set();
       taskEvents
-        .filter(t => isMgr?(memberFilter==='all'||t._mid===memberFilter):activeMemberWeekly.has(t._mid))
+        .filter(t => isMgr?(memberFilter==='all'||t._mid===memberFilter):(activeMemberWeekly.has(t._mid)||t.isShared))
         .filter(t => {
           const sid = t.sharedTaskId || (t.isShared ? t.id : null);
           if(sid){

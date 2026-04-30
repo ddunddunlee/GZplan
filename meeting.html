@@ -2525,16 +2525,13 @@ ${text}` : text;
         isDeleting = true;
         const savedMode = curMode;
         const m = (savedMode === 'shared' ? sharedMeetings : meetings).find(x => x.id === pendingDeleteId);
-        console.log('[삭제 시도]', savedMode, pendingDeleteId, m);
         if (m?.calendarId) {
           try { await deleteDoc(doc(db, "schedules", m.calendarId)) } catch (e) { }
         }
         const targetRef = savedMode === 'shared'
           ? doc(db, 'meetings_shared', pendingDeleteId)
           : doc(db, 'meetings', ME.id, 'items', pendingDeleteId);
-        console.log('[삭제 경로]', targetRef.path);
         await deleteDoc(targetRef);
-        console.log('[삭제 완료]');
         if (savedMode === 'shared') {
           sharedMeetings = sharedMeetings.filter(x => x.id !== pendingDeleteId);
         } else {

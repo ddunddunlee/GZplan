@@ -465,8 +465,8 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
   </div>
   <div class="sb-bottom">
     <div class="sb-sync"><div class="sync-dot" id="syncDot"></div><span>실시간 동기화</span></div>
-    <button class="btn-ghost" id="logoutBtn" onclick="localStorage.removeItem('tt_user');sessionStorage.clear();location.href='index.html'" style="width:100%;font-size:11px;padding:5px">로그아웃</button>
-    <button class="btn-ghost" id="notifBtn" onclick="if(window.toggleNotification)window.toggleNotification()" style="width:100%;font-size:11px;padding:5px">🔔 알림 설정</button>
+    <button class="btn-ghost" id="logoutBtn" style="width:100%;font-size:11px;padding:5px">로그아웃</button>
+    <button class="btn-ghost" id="notifBtn" style="width:100%;font-size:11px;padding:5px">🔔 알림 설정</button>
   </div>
 </div>
 <div class="main-wrap">
@@ -476,7 +476,7 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
   </button>
     <div class="page-title" id="pageTitle">내 업무</div>
     <div class="topbar-right">
-      <button class="btn-solid" id="addTaskBtn" onclick="if(window.openModal)window.openModal()" style="touch-action:manipulation">+ 업무 추가</button>
+      <button class="btn-solid" id="addTaskBtn" style="touch-action:manipulation">+ 업무 추가</button>
     </div>
   </div>
   <div style="flex:1;padding:20px 24px 80px;display:flex;gap:16px;align-items:flex-start">
@@ -499,14 +499,14 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
         <div style="flex:1;min-width:0">
           <input class="dp-title-input" id="dpTitle"/>
         </div>
-        <button class="dp-close" id="closeDetailBtn" onclick="if(window.closeDetail)window.closeDetail()" style="touch-action:manipulation">✕</button>
+        <button class="dp-close" id="closeDetailBtn" style="touch-action:manipulation">✕</button>
       </div>
       <div class="dp-meta" id="dpMeta"></div>
       <div class="dp-sec">히스토리</div>
       <div class="timeline" id="dpTimeline"></div>
       <div class="dp-note">
         <textarea class="note-input" id="noteInput" placeholder="메모 또는 업데이트 입력..."></textarea>
-        <button class="note-submit" id="addNoteBtn" onclick="if(window.addNote)window.addNote()" style="touch-action:manipulation">메모 추가</button>
+        <button class="note-submit" id="addNoteBtn" style="touch-action:manipulation">메모 추가</button>
       </div>
     </div>
   </div>
@@ -541,7 +541,7 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
       </label>
     </div>
     <div class="modal-btns">
-      <button class="btn-cancel" id="modalCancelBtn" onclick="if(window.closeModal)window.closeModal()" style="touch-action:manipulation">취소</button>
+      <button class="btn-cancel" id="modalCancelBtn" style="touch-action:manipulation">취소</button>
       <button class="btn-ok" id="addTaskOkBtn" style="touch-action:manipulation">추가하기</button>
     </div>
   </div>
@@ -1707,14 +1707,6 @@ document.addEventListener('DOMContentLoaded', function() {
       if (_pt) _pt.textContent = (_u.displayName || '') + '의 업무';
     }
   } catch(e) {}
-  // 로그아웃
-  var logoutBtn = document.getElementById('logoutBtn');
-  if (logoutBtn) logoutBtn.addEventListener('click', function() {
-    localStorage.removeItem('tt_user');
-    sessionStorage.clear();
-    location.href = 'index.html';
-  });
-
   // 사이드바 네비
   document.querySelectorAll('[data-nav]').forEach(function(el) {
     el.addEventListener('click', function() { location.href = el.dataset.nav; });
@@ -1748,26 +1740,6 @@ document.addEventListener('DOMContentLoaded', function() {
   safeBind('closeDetailBtn', function() { if(window.closeDetail) window.closeDetail(); });
   safeBind('notifBtn', function() { if(window.toggleNotification) window.toggleNotification(); });
   safeBind('logoutBtn', function() { localStorage.removeItem('tt_user'); sessionStorage.clear(); location.href='index.html'; });
-
-  // 알림 버튼
-  var notifBtn = document.getElementById('notifBtn');
-  if (notifBtn) notifBtn.addEventListener('click', function() {
-    if (window.toggleNotification) window.toggleNotification();
-  });
-
-  // 모달 버튼들
-  var cancelBtn = document.getElementById('modalCancelBtn');
-  if (cancelBtn) cancelBtn.addEventListener('click', function() {
-    if (window.closeModal) window.closeModal();
-  });
-  var noteBtn = document.getElementById('addNoteBtn');
-  if (noteBtn) noteBtn.addEventListener('click', function() {
-    if (window.addNote) window.addNote();
-  });
-  var closeDetailBtn = document.getElementById('closeDetailBtn');
-  if (closeDetailBtn) closeDetailBtn.addEventListener('click', function() {
-    if (window.closeDetail) window.closeDetail();
-  });
 
   // 필터 칩 (이벤트 위임)
   var filterRow = document.getElementById('filterRow');

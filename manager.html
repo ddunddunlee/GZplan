@@ -269,7 +269,7 @@ button, [onclick], [data-nav], .sb-item, .task-card, .chip {
     <button class="hamburger" id="hamburgerBtn" aria-label="메뉴"><span></span><span></span><span></span></button>
     <div class="page-title">팀 업무 현황</div>
     <div class="topbar-right">
-      <button class="btn-solid" id="addBtn" onclick="if(window.openModal)window.openModal()" style="touch-action:manipulation">+ 업무 추가</button>
+      <button class="btn-solid" id="addBtn" style="touch-action:manipulation">+ 업무 추가</button>
     </div>
   </div>
 
@@ -305,14 +305,14 @@ button, [onclick], [data-nav], .sb-item, .task-card, .chip {
             </div>
             <input class="dp-title-input" id="dpTitle" onblur="if(window.updateTitle&&this.dataset.id)window.updateTitle(this.dataset.id,this.dataset.mid,this.value)"/>
           </div>
-          <button class="dp-close" id="closeDetailBtn" onclick="if(window.closeDetail)window.closeDetail()" style="touch-action:manipulation">✕</button>
+          <button class="dp-close" id="closeDetailBtn" style="touch-action:manipulation">✕</button>
         </div>
         <div class="dp-meta" id="dpMeta"></div>
         <div class="dp-sec">히스토리</div>
         <div class="timeline" id="dpTimeline"></div>
         <div class="dp-note">
           <textarea class="note-input" id="noteInput" placeholder="팀장 코멘트 입력..."></textarea>
-          <button class="note-submit" id="addNoteBtn" onclick="if(window.addNote)window.addNote()" style="touch-action:manipulation">메모 추가</button>
+          <button class="note-submit" id="addNoteBtn" style="touch-action:manipulation">메모 추가</button>
         </div>
       </div>
     </div>
@@ -375,7 +375,7 @@ button, [onclick], [data-nav], .sb-item, .task-card, .chip {
     </div>
     <div class="fg"><label>최종보고자</label><select id="iReporter"><option value="">없음</option></select></div>
     <div class="modal-btns">
-      <button class="btn-cancel" id="modalCancelBtn" onclick="if(window.closeModal)window.closeModal()" style="touch-action:manipulation">취소</button>
+      <button class="btn-cancel" id="modalCancelBtn" style="touch-action:manipulation">취소</button>
       <button class="btn-ok" id="addTaskOkBtn" onclick="if(window.addTask)window.addTask()" style="touch-action:manipulation">추가하기</button>
     </div>
   </div>
@@ -1632,7 +1632,7 @@ document.getElementById('overlay').addEventListener('click', e => {
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') window.closeModal();
 });
-document.getElementById('addBtn')?.addEventListener('click', () => window.openModal());
+
 
 // ════════════════════════════════════════════
 // 상세 패널 리사이즈
@@ -1685,10 +1685,10 @@ document.querySelectorAll('[data-mfilter]').forEach(btn => {
 });
 
 // ── DOM 이벤트 바인딩 (module defer 대응) ──
-document.getElementById('modalCancelBtn')?.addEventListener('click', () => window.closeModal?.());
 
-document.getElementById('addNoteBtn')?.addEventListener('click', () => window.addNote?.());
-document.getElementById('closeDetailBtn')?.addEventListener('click', () => window.closeDetail?.());
+
+
+
 // 필터 칩
 document.querySelectorAll('[data-filter]').forEach(btn => {
   btn.addEventListener('click', function() { window.setFilter?.(this.dataset.filter, this); });
@@ -1710,27 +1710,6 @@ document.addEventListener('DOMContentLoaded', function() {
   // 사이드바 네비
   document.querySelectorAll('[data-nav]').forEach(function(el) {
     el.addEventListener('click', function() { location.href = el.dataset.nav; });
-  });
-
-  // 업무 추가
-  var addBtn = document.getElementById('addBtn');
-  if (addBtn) addBtn.addEventListener('click', function() {
-    if (window.openModal) window.openModal();
-  });
-
-  // 모달
-  var cancelBtn = document.getElementById('modalCancelBtn');
-  if (cancelBtn) cancelBtn.addEventListener('click', function() {
-    if (window.closeModal) window.closeModal();
-  });
-
-  var noteBtn = document.getElementById('addNoteBtn');
-  if (noteBtn) noteBtn.addEventListener('click', function() {
-    if (window.addNote) window.addNote();
-  });
-  var closeDetailBtn = document.getElementById('closeDetailBtn');
-  if (closeDetailBtn) closeDetailBtn.addEventListener('click', function() {
-    if (window.closeDetail) window.closeDetail();
   });
 
   // 필터

@@ -376,7 +376,7 @@ button, [onclick], [data-nav], .sb-item, .task-card, .chip {
     <div class="fg"><label>최종보고자</label><select id="iReporter"><option value="">없음</option></select></div>
     <div class="modal-btns">
       <button class="btn-cancel" id="modalCancelBtn" style="touch-action:manipulation">취소</button>
-      <button class="btn-ok" id="addTaskOkBtn" onclick="if(window.addTask)window.addTask()" style="touch-action:manipulation">추가하기</button>
+      <button class="btn-ok" id="addTaskOkBtn" style="touch-action:manipulation">추가하기</button>
     </div>
   </div>
 </div>
@@ -1701,6 +1701,18 @@ document.getElementById('sbAvatar').textContent = (ME.displayName||'').slice(0,1
 </script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+  // 업무 추가 버튼
+  var addBtn = document.getElementById('addBtn');
+  if (addBtn) addBtn.addEventListener('click', function() {
+    if (window.openModal) window.openModal();
+  });
+
+  // 추가하기 확인 버튼
+  var addTaskOkBtn = document.getElementById('addTaskOkBtn');
+  if (addTaskOkBtn) addTaskOkBtn.addEventListener('click', function() {
+    if (window.addTask) window.addTask();
+  });
+
   // 로그아웃
   var logoutBtn = document.getElementById('logoutBtn');
   if (logoutBtn) logoutBtn.addEventListener('click', function() {

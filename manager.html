@@ -195,8 +195,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 
 /* ── 모바일 반응형 ── */
 @media(max-width:768px){
-  .sidebar{transform:translateX(-100%)}
-  .sidebar.open{transform:translateX(0)}
   .hamburger{display:flex}
   .main-wrap{margin-left:0}
   .stats{grid-template-columns:repeat(2,1fr)}
@@ -236,27 +234,23 @@ button, [onclick], [data-nav], .sb-item, .task-card, .chip {
 
   /* ── 사이드바 토글 ── */
   :root{--sw-col:56px;--sb-ease:.22s cubic-bezier(.4,0,.2,1)}
-  .sidebar{transition:width var(--sb-ease);overflow:hidden;position:fixed;top:0;left:0;height:100vh;z-index:300}
+  .sidebar{transition:width var(--sb-ease)!important;overflow:hidden!important}
   .sidebar.collapsed{width:var(--sw-col)!important}
-  .main-wrap{transition:margin-left var(--sb-ease)}
-  .sidebar.collapsed ~ .main-wrap, body.sb-collapsed .main-wrap{margin-left:var(--sw-col)}
-  .sb-label,.sb-brand-sub,.sb-user-name,.sb-user-role,.sb-badge,.sb-sec,.sb-sync,.sb-bottom .btn-ghost{transition:opacity var(--sb-ease),width var(--sb-ease)}
+  .main-wrap{transition:margin-left var(--sb-ease)!important}
+  .sidebar.collapsed ~ .main-wrap{margin-left:var(--sw-col)!important}
+  .sb-label,.sb-brand-sub,.sb-user-name,.sb-user-role,.sb-badge,.sb-sec,.sb-sync{transition:opacity var(--sb-ease),width var(--sb-ease)}
   .sidebar.collapsed .sb-label,
   .sidebar.collapsed .sb-brand-sub,
   .sidebar.collapsed .sb-user-name,
   .sidebar.collapsed .sb-user-role,
   .sidebar.collapsed .sb-badge,
   .sidebar.collapsed .sb-sec,
-  .sidebar.collapsed .sb-sync,
-  .sidebar.collapsed .sb-bottom .btn-ghost{opacity:0;width:0;overflow:hidden;pointer-events:none}
-  .sidebar.collapsed .sb-brand-name{font-size:11px;letter-spacing:0}
-  .sb-toggle-btn{position:absolute;top:12px;right:10px;width:22px;height:22px;border-radius:6px;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);z-index:10;flex-shrink:0;transition:all .15s}
-  .sb-toggle-btn:hover{background:var(--bg2)}
-  .sb-toggle-btn svg{transition:transform var(--sb-ease)}
+  .sidebar.collapsed .sb-sync{opacity:0;width:0;overflow:hidden;pointer-events:none}
+  .sb-toggle-btn{position:absolute;top:12px;right:10px;width:22px;height:22px;border-radius:6px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;flex-shrink:0;transition:all .15s}
+  .sb-toggle-btn:hover{background:rgba(255,255,255,.2)}
+  .sb-toggle-btn svg{transition:transform var(--sb-ease);stroke:#fff}
   .sidebar.collapsed .sb-toggle-btn svg{transform:rotate(180deg)}
-  .sidebar.collapsed .sb-item:hover::after{content:attr(data-label);position:fixed;left:calc(var(--sw-col) + 6px);background:var(--text);color:#fff;font-size:11px;padding:4px 9px;border-radius:6px;white-space:nowrap;pointer-events:none;z-index:999;top:auto}
-  /* 회의록 비활성화 */
-  .sb-item-disabled{opacity:.35;pointer-events:none;cursor:default}
+  .sidebar.collapsed .sb-item[data-label]:hover::after{content:attr(data-label);position:fixed;left:calc(var(--sw-col) + 8px);background:#1a1a1a;color:#fff;font-size:11px;padding:4px 9px;border-radius:6px;white-space:nowrap;pointer-events:none;z-index:9999}
 
 </style>
 </head>
@@ -272,14 +266,15 @@ button, [onclick], [data-nav], .sb-item, .task-card, .chip {
   </div>
   <div class="sb-nav">
     <div class="sb-sec">업무</div>
-    <div class="sb-item active" data-nav="manager.html"><div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg></div><div class="sb-label">팀 업무 현황</div></div>
-    <div class="sb-item" data-nav="report.html"><div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 1 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div><div class="sb-label">주간 보고</div></div>
-      <div class="sb-item" data-nav="report_all.html"><div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="sb-label">주간보고(전체)</div></div>
+    <div class="sb-item" data-label="홈" data-nav="dashboard.html"><div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg></div><div class="sb-label">홈</div></div>
+    <div class="sb-item active" data-label="내 업무" data-nav="manager.html"><div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg></div><div class="sb-label">팀 업무 현황</div></div>
+    <div class="sb-item" data-label="주간보고" data-nav="report.html"><div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 1 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div><div class="sb-label">주간 보고</div></div>
+      <div class="sb-item" data-label="주간보고(전체)" data-nav="report_all.html"><div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="sb-label">주간보고(전체)</div></div>
     <div class="sb-sec">도구</div>
-    <div class="sb-item" data-nav="calendar.html"><div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="sb-label">캘린더</div></div>
-    <div class="sb-item" data-nav="weekly.html"><div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg></div><div class="sb-label">주간 스케줄</div></div><div class="sb-label">회의록</div></div>
+    <div class="sb-item" data-label="캘린더" data-nav="calendar.html"><div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="sb-label">캘린더</div></div>
+    <div class="sb-item" data-label="주간 스케줄" data-nav="weekly.html"><div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg></div><div class="sb-label">주간 스케줄</div></div>
     <!-- 메모장: 팀원 전용 -->
-    <div class="sb-item" data-nav="memo.html"><div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div><div class="sb-label">메모장</div></div>
+    <div class="sb-item" data-label="메모장" data-nav="memo.html"><div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div><div class="sb-label">메모장</div></div>
     <!-- 계정 관리: 어드민 전용 -->
   </div>
   <div class="sb-bottom">
@@ -1725,6 +1720,18 @@ document.getElementById('sbAvatar').textContent = (ME.displayName||'').slice(0,1
 </script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+  // 사이드바 토글
+  (function(){
+    var sb = document.querySelector('.sidebar');
+    var toggle = document.getElementById('sbToggleBtn');
+    if(!sb || !toggle) return;
+    if(localStorage.getItem('gz_sb_collapsed')==='1') sb.classList.add('collapsed');
+    toggle.addEventListener('click', function(){
+      sb.classList.toggle('collapsed');
+      localStorage.setItem('gz_sb_collapsed', sb.classList.contains('collapsed')?'1':'0');
+    });
+  })();
+
   // 업무 추가 버튼
   var addBtn = document.getElementById('addBtn');
   if (addBtn) addBtn.addEventListener('click', function() { if (window.openModal) window.openModal(); });

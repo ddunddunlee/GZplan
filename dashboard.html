@@ -21,7 +21,7 @@
   --red:#EF4444;--red-bg:#FEF2F2;--red-dk:#991B1B;
   --sw:220px;--sw-col:56px;--sb-ease:.22s cubic-bezier(.4,0,.2,1);
 }
-body{font-family:'Apple SD Gothic Neo','Pretendard',system-ui,sans-serif;background:var(--bg3);color:var(--text);font-size:13px;line-height:1.5}
+body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-serif;background:var(--bg3);color:var(--text);font-size:14px;line-height:1.5}
 html,body{height:100%;overflow:hidden}
 
 /* ── 사이드바 ── */
@@ -35,13 +35,13 @@ html,body{height:100%;overflow:hidden}
 }
 .sidebar.collapsed{width:var(--sw-col)}
 
-.sb-toggle-btn{
-  position:absolute;top:12px;right:10px;
+.sb-toggle-btn{margin-left:auto;
   width:22px;height:22px;border-radius:6px;
   border:1px solid rgba(255,255,255,.2);
   background:rgba(255,255,255,.1);
   display:flex;align-items:center;justify-content:center;
-  cursor:pointer;z-index:10;flex-shrink:0;transition:all .15s;
+  cursor:pointer;flex-shrink:0;transition:all .15s;
+  
 }
 .sb-toggle-btn:hover{background:rgba(255,255,255,.2)}
 .sb-toggle-btn svg{transition:transform var(--sb-ease)}
@@ -316,21 +316,54 @@ html,body{height:100%;overflow:hidden}
   opacity:0;transition:opacity .2s;pointer-events:none;z-index:999;white-space:nowrap;
 }
 .toast.show{opacity:1}
+
+  /* ── 아이콘 흰색 ── */
+  .sb-icon svg{stroke:#fff}
+  .sb-icon svg *{stroke:#fff}
+
+  /* ── collapsed: 토글버튼 중앙 ── */
+  .sidebar.collapsed .sb-toggle-btn{
+    position:static;
+    margin:10px auto;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .sidebar.collapsed .sb-brand{
+    justify-content:center;
+    padding:10px 0;
+  }
+  .sidebar.collapsed .sb-item{
+    justify-content:center;
+    padding:8px 0;
+  }
+  .sidebar.collapsed .sb-logout{
+    justify-content:center;
+    padding:8px 0;
+  }
+  /* ── collapsed: 텍스트 완전 숨김 ── */
+  .sidebar.collapsed .sb-brand-name,
+  .sidebar.collapsed .sb-brand-sub,
+  .sidebar.collapsed .sb-user-info,
+  .sidebar.collapsed .sb-sec,
+  .sidebar.collapsed .sb-label,
+  .sidebar.collapsed .sb-badge,
+  .sidebar.collapsed .sb-logout-lbl{
+    opacity:0;width:0;max-width:0;overflow:hidden;pointer-events:none;
+  }
+
 </style>
 </head>
 <body>
 
 <div class="sidebar" id="sidebar">
-  <div class="sb-toggle-btn" id="sbToggleBtn">
-    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 3L5 8l5 5"/></svg>
-  </div>
-
-  <div class="sb-brand">
+      <div class="sb-brand">
     <div class="sb-mark">GZ</div>
     <div class="sb-brand-name">GZ Plan</div>
+    <div class="sb-toggle-btn" id="sbToggleBtn">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 3L5 8l5 5"/></svg>
+    </div>
   </div>
 
-  <div class="sb-user">
+<div class="sb-user">
     <div class="sb-avatar" id="sbAvatar">—</div>
     <div class="sb-user-info">
       <div class="sb-user-name" id="sbName">—</div>

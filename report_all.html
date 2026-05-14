@@ -8,122 +8,14 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>GZ Plan — 주간보고(전체)</title>
 <style>
-:root{
-  --bg:#fff;--bg2:#f7f7f5;--bg3:#f0f4f8;
-  --text:#1a1a1a;--text2:#6b6b6b;--text3:#a8a8a8;
-  --border:#e5e5e3;--border2:#d0d0cc;
-  --radius:10px;--radius-sm:6px;
-  --blue:#2563EB;--blue-bg:#EFF4FF;--blue-dk:#1D4ED8;
-  --green:#10B981;--green-bg:#ECFDF5;--green-dk:#065F46;
-  --amber:#F59E0B;--amber-bg:#FFFBEB;--amber-dk:#92400E;
-  --red:#EF4444;--red-bg:#FEF2F2;--red-dk:#991B1B;
-  --sw:220px;--sw-col:56px;--sb-ease:.22s cubic-bezier(.4,0,.2,1);
-}
-.main-wrap{
-  margin-left:var(--sw);
-  transition:margin-left var(--sb-ease);
-  display:flex;flex-direction:column;height:100vh;overflow:hidden;
-}
-.sidebar.collapsed ~ .main-wrap{margin-left:var(--sw-col)}
-/* ── 사이드바 ── */
-.sidebar{
-  position:fixed;top:0;left:0;height:100vh;
-  width:var(--sw);
-  background:#0C447C;color:#fff;
-  display:flex;flex-direction:column;
-  transition:width var(--sb-ease);
-  overflow:hidden;z-index:300;flex-shrink:0;
-}
-.sidebar.collapsed{width:var(--sw-col)}
-
-.sb-toggle-btn{
-  position:absolute;top:12px;right:10px;
-  width:22px;height:22px;border-radius:6px;
-  border:1px solid rgba(255,255,255,.2);
-  background:rgba(255,255,255,.1);
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;z-index:10;flex-shrink:0;transition:all .15s;
-}
-.sb-toggle-btn:hover{background:rgba(255,255,255,.2)}
-.sb-toggle-btn svg{transition:transform var(--sb-ease)}
-.sidebar.collapsed .sb-toggle-btn svg{transform:rotate(180deg)}
-
-.sb-brand{
-  display:flex;align-items:center;gap:10px;
-  padding:14px 14px 16px;border-bottom:1px solid rgba(255,255,255,.1);
-  flex-shrink:0;white-space:nowrap;overflow:hidden;
-}
-.sb-mark{
-  width:28px;height:28px;border-radius:8px;
-  background:rgba(255,255,255,.2);
-  display:flex;align-items:center;justify-content:center;
-  font-size:12px;font-weight:700;flex-shrink:0;
-}
-.sb-brand-name{font-size:14px;font-weight:700;letter-spacing:-.2px;transition:opacity var(--sb-ease)}
-.sidebar.collapsed .sb-brand-name{opacity:0;width:0;overflow:hidden}
-
-.sb-user{
-  display:flex;align-items:center;gap:9px;
-  padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.1);
-  flex-shrink:0;white-space:nowrap;overflow:hidden;
-}
-.sb-avatar{
-  width:28px;height:28px;border-radius:50%;
-  background:rgba(255,255,255,.25);
-  display:flex;align-items:center;justify-content:center;
-  font-size:13px;font-weight:700;flex-shrink:0;
-}
-.sb-user-info{transition:opacity var(--sb-ease)}
-.sidebar.collapsed .sb-user-info{opacity:0;width:0;overflow:hidden}
-.sb-user-name{font-size:13px;font-weight:600}
-.sb-user-role{font-size:11px;opacity:.6}
-
-.sb-nav{flex:1;padding:10px 8px;overflow-y:auto;overflow-x:hidden}
-.sb-nav::-webkit-scrollbar{display:none}
-.sb-sec{
-  font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;
-  opacity:.45;padding:0 8px;margin:14px 0 4px;
-  white-space:nowrap;transition:opacity var(--sb-ease);
-}
-.sidebar.collapsed .sb-sec{opacity:0}
-.sb-item{
-  display:flex;align-items:center;gap:10px;
-  padding:8px 10px;border-radius:var(--radius-sm);
-  color:rgba(255,255,255,.7);font-size:13px;
-  cursor:pointer;margin-bottom:1px;
-  white-space:nowrap;overflow:hidden;
-  transition:background .12s,color .12s;
-  position:relative;text-decoration:none;
-}
-.sb-item:hover{background:rgba(255,255,255,.12);color:#fff}
-.sb-item.active{background:rgba(255,255,255,.2);color:#fff;font-weight:600}
-.sb-icon{width:20px;height:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.sb-label{transition:opacity var(--sb-ease);overflow:hidden}
-.sidebar.collapsed .sb-label{opacity:0;width:0}
-.sb-badge{
-  margin-left:auto;background:var(--red);color:#fff;
-  font-size:10px;font-weight:700;padding:1px 6px;border-radius:999px;
-  flex-shrink:0;transition:opacity var(--sb-ease);
-}
-.sidebar.collapsed .sb-badge{opacity:0;width:0;overflow:hidden;padding:0}
-
-/* 툴팁 (collapsed) */
-.sidebar.collapsed .sb-item:hover::after{
-  content:attr(data-label);
-  position:fixed;left:calc(var(--sw-col) + 8px);
-  background:#1a1a1a;color:#fff;
-  font-size:12px;padding:5px 10px;border-radius:6px;
-  white-space:nowrap;pointer-events:none;z-index:999;
-}
-
-.sb-bottom{
-  padding:10px 8px;
-  border-top:1px solid rgba(255,255,255,.1);
-  flex-shrink:0;
-}
-
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-
+:root{
+  --bg:#fff;--bg2:#F0F4F8;--bg3:#DDE3EA;
+  --text:#1a1a1a;--text2:#6b6b6b;--text3:#a8a8a8;
+  --border:#DDE3EA;--radius:10px;--radius-sm:6px;--pill:999px;
+  --blue:#378ADD;--blue-bg:#E6F1FB;--blue-t:#0C447C;
+  --sw:220px;--topbar-h:52px;--touch-min:44px;
+}
 html,body{height:100%}
 body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-serif;
   background:var(--bg2);color:var(--text);min-height:100vh;font-size:14px}
@@ -148,7 +40,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 .sb-bottom{padding:12px 16px;border-top:1px solid rgba(255,255,255,0.1);display:flex;flex-direction:column;gap:8px;flex-shrink:0}
 .sb-sync{display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,0.45)}
 .sync-dot{width:6px;height:6px;border-radius:50%;background:#639922;flex-shrink:0}
-
+.main-wrap{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;min-height:100vh;min-width:0}
 .topbar{background:var(--bg);border-bottom:0.5px solid var(--border);padding:0 24px;height:var(--topbar-h);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;flex-shrink:0;gap:12px;}
 .page-title{font-size:15px;font-weight:600;color:var(--text);flex:1}
 .topbar-right{display:flex;gap:8px;align-items:center;flex-shrink:0}
@@ -208,25 +100,95 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
   .content-wrap{padding:14px 14px 80px}
   .week-label{min-width:140px;font-size:13px}
 }
-  
+  /* ── 사이드바 표준 CSS ── */
+  :root{--sw:220px;--sw-col:56px;--sb-ease:.22s cubic-bezier(.4,0,.2,1)}
+  .sidebar{position:fixed;top:0;left:0;height:100vh;width:var(--sw);background:#0C447C;color:#fff;display:flex;flex-direction:column;transition:width var(--sb-ease);overflow:hidden;z-index:300}
+  .sidebar.collapsed{width:var(--sw-col)}
+  .main-wrap{margin-left:var(--sw);transition:margin-left var(--sb-ease)}
+  .sidebar.collapsed ~ .main-wrap{margin-left:var(--sw-col)}
+  .sb-brand{display:flex;align-items:center;gap:10px;padding:13px 12px;border-bottom:1px solid rgba(255,255,255,.1);flex-shrink:0;min-height:52px;overflow:hidden}
+  .sb-mark{width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;color:#fff}
+  .sb-brand-texts{overflow:hidden;white-space:nowrap;flex:1;min-width:0;transition:opacity var(--sb-ease),max-width var(--sb-ease);max-width:200px}
+  .sidebar.collapsed .sb-brand-texts{opacity:0;max-width:0}
+  .sb-brand-name{font-size:14px;font-weight:700;color:#fff;letter-spacing:-.2px}
+  .sb-brand-sub{font-size:11px;color:rgba(255,255,255,.5);margin-top:1px}
+  .sb-toggle-btn{margin-left:auto;flex-shrink:0;width:22px;height:22px;border-radius:6px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s}
+  .sb-toggle-btn:hover{background:rgba(255,255,255,.2)}
+  .sb-toggle-btn svg{transition:transform var(--sb-ease);stroke:#fff;flex-shrink:0}
+  .sidebar.collapsed .sb-toggle-btn svg{transform:rotate(180deg)}
+  .sb-user{display:flex;align-items:center;gap:9px;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.1);flex-shrink:0;overflow:hidden}
+  .sb-avatar{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;color:#fff}
+  .sb-user-info{white-space:nowrap;overflow:hidden;transition:opacity var(--sb-ease),max-width var(--sb-ease);max-width:200px}
+  .sidebar.collapsed .sb-user-info{opacity:0;max-width:0}
+  .sb-user-name{font-size:13px;font-weight:600;color:#fff}
+  .sb-user-role{font-size:11px;color:rgba(255,255,255,.5)}
+  .sb-nav{flex:1;padding:8px;overflow-y:auto;overflow-x:hidden}
+  .sb-nav::-webkit-scrollbar{display:none}
+  .sb-sec{font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:rgba(255,255,255,.4);padding:0 8px;margin:12px 0 3px;white-space:nowrap;transition:opacity var(--sb-ease)}
+  .sidebar.collapsed .sb-sec{opacity:0}
+  .sb-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:6px;color:rgba(255,255,255,.7);font-size:13px;cursor:pointer;margin-bottom:1px;overflow:hidden;transition:background .12s,color .12s;white-space:nowrap}
+  .sb-item:hover{background:rgba(255,255,255,.12);color:#fff}
+  .sb-item.active{background:rgba(255,255,255,.2);color:#fff;font-weight:600}
+  .sidebar.collapsed .sb-item{justify-content:center;padding:8px 0}
+  .sb-icon{width:20px;height:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .sb-label{transition:opacity var(--sb-ease),max-width var(--sb-ease);max-width:200px;overflow:hidden;white-space:nowrap}
+  .sidebar.collapsed .sb-label{opacity:0;max-width:0}
+  .sb-badge{background:#EF4444;color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:999px;flex-shrink:0;white-space:nowrap;transition:opacity var(--sb-ease),max-width var(--sb-ease);max-width:50px}
+  .sidebar.collapsed .sb-badge{opacity:0;max-width:0;overflow:hidden;padding:0}
+  .sidebar.collapsed .sb-item[data-label]:hover::after{content:attr(data-label);position:fixed;left:calc(var(--sw-col) + 8px);background:#1a1a1a;color:#fff;font-size:11px;padding:4px 10px;border-radius:6px;white-space:nowrap;pointer-events:none;z-index:9999}
+  .sb-bottom{padding:8px;border-top:1px solid rgba(255,255,255,.1);flex-shrink:0}
+  .sb-logout{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:6px;color:rgba(255,255,255,.5);font-size:12px;cursor:pointer;transition:all .12s;white-space:nowrap;overflow:hidden}
   .sb-logout:hover{background:rgba(255,255,255,.1);color:rgba(255,255,255,.8)}
   .sidebar.collapsed .sb-logout{justify-content:center;padding:7px 0}
   .sb-logout-lbl{transition:opacity var(--sb-ease),max-width var(--sb-ease);max-width:200px;overflow:hidden}
   .sidebar.collapsed .sb-logout-lbl{opacity:0;max-width:0}
+
+  /* ── 아이콘 흰색 ── */
+  .sb-icon svg{stroke:#fff}
+  .sb-icon svg *{stroke:#fff}
+
+  /* ── collapsed: 토글버튼 중앙 ── */
+  .sidebar.collapsed .sb-toggle-btn{
+    position:static;
+    margin:10px auto;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .sidebar.collapsed .sb-brand{
+    justify-content:center;
+    padding:10px 0;
+  }
+  .sidebar.collapsed .sb-item{
+    justify-content:center;
+    padding:8px 0;
+  }
+  .sidebar.collapsed .sb-logout{
+    justify-content:center;
+    padding:8px 0;
+  }
+  /* ── collapsed: 텍스트 완전 숨김 ── */
+  .sidebar.collapsed .sb-brand-name,
+  .sidebar.collapsed .sb-brand-sub,
+  .sidebar.collapsed .sb-user-info,
+  .sidebar.collapsed .sb-sec,
+  .sidebar.collapsed .sb-label,
+  .sidebar.collapsed .sb-badge,
+  .sidebar.collapsed .sb-logout-lbl{
+    opacity:0;width:0;max-width:0;overflow:hidden;pointer-events:none;
+  }
+
 </style>
 </head>
 <body>
 <div class="sidebar" id="sidebar">
-  <div class="sb-toggle-btn" id="sbToggleBtn">
-    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 3L5 8l5 5"/></svg>
-  </div>
-
-  <div class="sb-brand">
+      <div class="sb-brand">
     <div class="sb-mark">GZ</div>
     <div class="sb-brand-name">GZ Plan</div>
+    <div class="sb-toggle-btn" id="sbToggleBtn">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 3L5 8l5 5"/></svg>
+    </div>
   </div>
 
-  <div class="sb-user">
+<div class="sb-user">
     <div class="sb-avatar" id="sbAvatar">—</div>
     <div class="sb-user-info">
       <div class="sb-user-name" id="sbName">—</div>
@@ -277,6 +239,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
     </div>
   </div>
 </div>
+
 
 <div class="toast" id="toast"></div>
 
@@ -479,7 +442,16 @@ document.getElementById('nextBtn').onclick = () => { curDate.setDate(curDate.get
 document.getElementById('todayBtn').onclick = () => { curDate=new Date(); updateWeekLabel(); render(); };
 
 // 사이드바
-
+(function(){
+  function openSB(){document.querySelector('.sidebar').classList.add('open');document.getElementById('sidebarDim').classList.add('show');document.body.style.overflow='hidden';}
+  function closeSB(){document.querySelector('.sidebar').classList.remove('open');document.getElementById('sidebarDim').classList.remove('show');document.body.style.overflow='';}
+  document.getElementById('hamburgerBtn').onclick=openSB;
+  document.getElementById('sidebarDim').onclick=closeSB;
+  document.querySelectorAll('.sidebar [data-nav]').forEach(el=>{
+    el.addEventListener('click',()=>{location.href=el.dataset.nav;});
+  });
+  document.getElementById('logoutBtn').onclick=()=>{localStorage.removeItem('tt_user');sessionStorage.clear();location.href='index.html';};
+})();
 
 updateWeekLabel();
 render();
@@ -496,9 +468,6 @@ render();
     });
   })();
 
-</script>
-<script>
-  
 </script>
 </body>
 </html>

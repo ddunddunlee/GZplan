@@ -49,7 +49,7 @@ html,body{height:100%;overflow:hidden}
 
 .sb-brand{
   display:flex;align-items:center;gap:10px;
-  padding:14px 14px 16px;border-bottom:1px solid rgba(255,255,255,.1);
+  padding:14px 14px 16px;border-bottom:1px solid rgba(255,255,255,0.15);
   flex-shrink:0;white-space:nowrap;overflow:hidden;
 }
 .sb-mark{
@@ -63,7 +63,7 @@ html,body{height:100%;overflow:hidden}
 
 .sb-user{
   display:flex;align-items:center;gap:9px;
-  padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.1);
+  padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.15);
   flex-shrink:0;white-space:nowrap;overflow:hidden;
 }
 .sb-avatar{
@@ -183,7 +183,7 @@ html,body{height:100%;overflow:hidden}
 .kpi-sub.dn{color:var(--red)}
 
 /* 중앙 2단 */
-.mid-row{display:grid;grid-template-columns:340px 1fr;gap:12px;min-height:0}
+
 
 /* 카드 공통 */
 .card{
@@ -261,7 +261,7 @@ html,body{height:100%;overflow:hidden}
 .cal-more:hover{color:var(--blue)}
 
 /* 하단 2단 */
-.bot-row{display:grid;grid-template-columns:1fr 240px;gap:12px}
+
 
 /* 팀 업데이트 */
 .upd-list{display:flex;flex-direction:column;flex:1;overflow-y:auto}
@@ -276,21 +276,13 @@ html,body{height:100%;overflow:hidden}
 .upd-time{font-size:10px;color:var(--text3);flex-shrink:0;margin-top:2px}
 
 /* 바로가기 */
-.shortcut-list{display:flex;flex-direction:column;gap:6px;padding:10px 12px;flex:1}
-.shortcut{
-  display:flex;align-items:center;gap:10px;
-  padding:8px 10px;border-radius:var(--radius-sm);
-  border:1px solid var(--border);cursor:pointer;
-  transition:background .12s;text-decoration:none;
-}
-.shortcut:hover{background:var(--bg2)}
-.sc-icon{
-  width:28px;height:28px;border-radius:var(--radius-sm);
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;
-}
-.sc-txt{font-size:12px;font-weight:600;color:var(--text)}
-.sc-sub{font-size:11px;color:var(--text3)}
-.sc-arr{margin-left:auto;color:var(--text3);font-size:14px}
+
+
+
+
+
+
+
 
 /* 알림 배너 */
 .alert-banner{
@@ -349,7 +341,21 @@ html,body{height:100%;overflow:hidden}
 
 
 .main-wrap{margin-left:var(--sw);transition:margin-left var(--sb-ease);display:flex;flex-direction:column;min-height:100vh;min-width:0}
-.sidebar.collapsed ~ .main-wrap{margin-left:var(--sw-col)}
+.sidebar.collapsed ~ 
+
+  /* collapsed 상태 */
+  .sidebar.collapsed .sb-brand{justify-content:center;padding:10px 0}
+  .sidebar.collapsed .sb-mark{display:none}
+  .sidebar.collapsed .sb-brand-name{display:none}
+  .sidebar.collapsed .sb-toggle-btn{margin-left:0}
+  .sidebar.collapsed .sb-user{justify-content:center;padding:10px 0}
+  .sidebar.collapsed .sb-user-info{display:none}
+  .sidebar.collapsed .sb-sec{display:none}
+  .sidebar.collapsed .sb-label{display:none}
+  .sidebar.collapsed .sb-badge{display:none !important}
+  .sidebar.collapsed .sb-logout-lbl{display:none}
+  .sidebar.collapsed .sb-logout{justify-content:center;padding:8px 0}
+  .sidebar.collapsed .sb-item{justify-content:center;padding:8px 0}
 </style>
 </head>
 <body>
@@ -432,11 +438,11 @@ html,body{height:100%;overflow:hidden}
 
   <div class="dash-body" id="dashBody">
 
-    <!-- 기한초과 알림 배너 -->
+    <!-- 알림 배너 -->
     <div class="alert-banner" id="alertBanner" style="display:none">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
       <span id="alertText"></span>
-      <span class="al-close" onclick="document.getElementById('alertBanner').style.display='none'">×</span>
+      <span class="al-close" id="alertClose">×</span>
     </div>
 
     <!-- KPI -->
@@ -449,7 +455,7 @@ html,body{height:100%;overflow:hidden}
       <div class="kpi">
         <div class="kpi-top"><div class="kpi-dot" style="background:var(--blue)"></div><div class="kpi-lbl">진행 중</div></div>
         <div class="kpi-num" id="kDoing">—</div>
-        <div class="kpi-sub up" id="kDoingTrend">실시간</div>
+        <div class="kpi-sub up">실시간</div>
       </div>
       <div class="kpi">
         <div class="kpi-top"><div class="kpi-dot" style="background:var(--amber)"></div><div class="kpi-lbl">기한 임박</div></div>
@@ -463,59 +469,43 @@ html,body{height:100%;overflow:hidden}
       </div>
     </div>
 
-    <!-- 중앙: 오늘할일 + 캘린더 -->
-    <div class="mid-row">
-      <!-- 오늘 할 일 -->
+    <!-- 캘린더 (전체 너비) -->
+    <div class="card" style="flex-shrink:0">
+      <div class="card-hdr" style="padding:10px 13px">
+        <div class="card-title">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          캘린더
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <div class="cal-nav" id="calPrev">‹</div>
+          <div class="cal-month" id="calTitle"></div>
+          <div class="cal-nav" id="calNext">›</div>
+          <div class="card-link" onclick="location.href='calendar.html'" style="margin-left:8px">전체보기 →</div>
+        </div>
+      </div>
+      <div class="cal-grid">
+        <div class="cal-day-row">
+          <div class="cal-dlbl">월</div><div class="cal-dlbl">화</div><div class="cal-dlbl">수</div>
+          <div class="cal-dlbl">목</div><div class="cal-dlbl">금</div>
+          <div class="cal-dlbl" style="opacity:.4">토</div>
+          <div class="cal-dlbl" style="color:var(--red);opacity:.6">일</div>
+        </div>
+        <div class="cal-cells" id="calCells"></div>
+      </div>
+    </div>
+
+    <!-- 하단: 오늘할일(50%) + 팀업데이트(50%) -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;flex:1;min-height:0">
       <div class="card">
         <div class="card-hdr">
           <div class="card-title">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
             오늘 할 일
             <span style="font-size:11px;color:var(--text3);font-weight:400" id="todayLbl"></span>
           </div>
           <div class="card-link" onclick="location.href='member.html'">전체보기 →</div>
         </div>
         <div class="today-list" id="todayList">
-          <div class="empty-state"><div class="empty-icon">✓</div><div class="empty-txt">불러오는 중...</div></div>
-        </div>
-      </div>
-
-      <!-- 캘린더 -->
-      <div class="card">
-        <div class="card-hdr" style="padding:11px 14px">
-          <div class="card-title">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            캘린더
-          </div>
-          <div style="display:flex;align-items:center;gap:6px">
-            <div class="cal-nav" id="calPrev">‹</div>
-            <div class="cal-month" id="calTitle"></div>
-            <div class="cal-nav" id="calNext">›</div>
-            <div class="card-link" onclick="location.href='calendar.html'" style="margin-left:8px">전체보기 →</div>
-          </div>
-        </div>
-        <div class="cal-grid">
-          <div class="cal-day-row">
-            <div class="cal-dlbl">월</div><div class="cal-dlbl">화</div><div class="cal-dlbl">수</div>
-            <div class="cal-dlbl">목</div><div class="cal-dlbl">금</div>
-            <div class="cal-dlbl" style="opacity:.4">토</div>
-            <div class="cal-dlbl" style="color:var(--red);opacity:.6">일</div>
-          </div>
-          <div class="cal-cells" id="calCells"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 하단: 팀 업데이트 + 바로가기 -->
-    <div class="bot-row">
-      <div class="card">
-        <div class="card-hdr">
-          <div class="card-title">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-            팀 업데이트
-          </div>
-        </div>
-        <div class="upd-list" id="updList">
           <div class="empty-state"><div class="empty-txt">불러오는 중...</div></div>
         </div>
       </div>
@@ -523,37 +513,17 @@ html,body{height:100%;overflow:hidden}
       <div class="card">
         <div class="card-hdr">
           <div class="card-title">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-            바로가기
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            팀 업데이트
           </div>
         </div>
-        <div class="shortcut-list">
-          <div class="shortcut" onclick="location.href='member.html'">
-            <div class="sc-icon" style="background:var(--blue-bg)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg></div>
-            <div><div class="sc-txt">내 업무</div><div class="sc-sub" id="sc1Sub">—</div></div>
-            <div class="sc-arr">›</div>
-          </div>
-          <div class="shortcut" onclick="location.href='weekly.html'">
-            <div class="sc-icon" style="background:var(--amber-bg)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg></div>
-            <div><div class="sc-txt">주간 스케줄</div><div class="sc-sub">이번주 일정</div></div>
-            <div class="sc-arr">›</div>
-          </div>
-          <div class="shortcut" onclick="location.href='report.html'">
-            <div class="sc-icon" style="background:var(--green-bg)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
-            <div><div class="sc-txt">주간보고</div><div class="sc-sub">이번주 보고서</div></div>
-            <div class="sc-arr">›</div>
-          </div>
-          <div class="shortcut" onclick="location.href='memo.html'">
-            <div class="sc-icon" style="background:var(--bg2)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg></div>
-            <div><div class="sc-txt">메모장</div><div class="sc-sub">빠른 메모</div></div>
-            <div class="sc-arr">›</div>
-          </div>
+        <div class="upd-list" id="updList">
+          <div class="empty-state"><div class="empty-txt">불러오는 중...</div></div>
         </div>
       </div>
     </div>
 
   </div>
-</div>
 
 <div class="toast" id="toast"></div>
 

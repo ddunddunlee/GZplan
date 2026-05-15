@@ -41,7 +41,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 .sb-sync{display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,0.45)}
 .sync-dot{width:6px;height:6px;border-radius:50%;background:#639922;flex-shrink:0}
 .main-wrap{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;min-height:100vh;min-width:0}
-.topbar{background:var(--bg);border-bottom:0.5px solid var(--border);padding:0 24px;height:var(--topbar-h);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;flex-shrink:0;gap:12px;}
+.topbar{background:var(--bg);border-bottom:1px solid var(--border);height:48px;display:flex;align-items:center;padding:0 20px;gap:10px;flex-shrink:0;position:sticky;top:0;z-index:50}
 .page-title{font-size:15px;font-weight:600;color:var(--text);flex:1}
 .topbar-right{display:flex;gap:8px;align-items:center;flex-shrink:0}
 .hamburger{display:none;width:36px;height:36px;border:none;background:transparent;cursor:pointer;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:4px;border-radius:var(--radius-sm);flex-shrink:0}
@@ -106,6 +106,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
   /* ── collapsed 표준 ── */
   .sidebar.collapsed{width:var(--sw-col)}
   .sidebar.collapsed ~ .main-wrap{margin-left:var(--sw-col)}
+  .sidebar.collapsed ~ 
   .sidebar.collapsed .sb-brand{justify-content:center;padding:10px 0;gap:0}
   .sidebar.collapsed .sb-mark{display:none}
   .sidebar.collapsed .sb-brand-name{display:none}
@@ -193,7 +194,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 
 <div class="main-wrap">
     <div class="topbar">
-      <button class="hamburger" id="hamburgerBtn"><span></span><span></span><span></span></button>
       <div class="page-title">주간보고 (전체)</div>
       <div class="topbar-right">
         <div class="week-nav">

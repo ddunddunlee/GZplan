@@ -193,7 +193,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
   .stats{grid-template-columns:repeat(2,1fr)}
   .detail-panel{position:fixed;inset:0;width:100%;max-width:100%;border-radius:0;z-index:350;max-height:100vh;overflow-y:auto}
   .resizer{display:none}
-  .topbar{padding:0 16px}
+  .topbar{background:var(--bg);border-bottom:1px solid var(--border);height:48px;display:flex;align-items:center;padding:0 20px;gap:10px;flex-shrink:0;position:sticky;top:0;z-index:50}
 }
 
 /* ── 터치 이벤트 지원 ── */
@@ -261,7 +261,8 @@ button, [onclick], [data-nav], .sb-item, .task-card, .chip {
   /* ── collapsed 표준 ── */
   .sidebar.collapsed{width:var(--sw-col)}
   .sidebar.collapsed ~ .main-wrap{margin-left:var(--sw-col)}
-  .sidebar.collapsed .sb-brand{justify-content:center;padding:10px 0;gap:0}
+  .sidebar.collapsed ~ 
+  .sidebar.collapsed .sb-brand{justify-content:center;padding:10px 0;gap:0;border-bottom:1px solid rgba(255,255,255,0.15)}
   .sidebar.collapsed .sb-mark{display:none}
   .sidebar.collapsed .sb-brand-name{display:none}
   .sidebar.collapsed .sb-brand-sub{display:none}

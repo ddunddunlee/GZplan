@@ -103,19 +103,31 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
   .week-label{min-width:140px;font-size:13px}
 }
 
-  .sidebar.collapsed .sb-brand{justify-content:center;padding:10px 0}
+  /* ── collapsed 표준 ── */
+  .sidebar.collapsed{width:var(--sw-col)}
+  .sidebar.collapsed ~ .main-wrap{margin-left:var(--sw-col)}
+  .sidebar.collapsed .sb-brand{justify-content:center;padding:10px 0;gap:0}
   .sidebar.collapsed .sb-mark{display:none}
   .sidebar.collapsed .sb-brand-name{display:none}
-  .sidebar.collapsed .sb-toggle-btn{margin-left:0}
-  .sidebar.collapsed .sb-user{justify-content:center;padding:10px 0}
+  .sidebar.collapsed .sb-brand-sub{display:none}
+  .sidebar.collapsed .sb-brand-texts{display:none}
+  .sidebar.collapsed .sb-toggle-btn{margin-left:0;position:static}
+  .sidebar.collapsed .sb-toggle-btn svg{transform:rotate(180deg)}
+  .sidebar.collapsed .sb-user{justify-content:center;padding:8px 0}
   .sidebar.collapsed .sb-user-info{display:none}
   .sidebar.collapsed .sb-sec{display:none}
+  .sidebar.collapsed .sb-item{justify-content:center;padding:8px 0}
   .sidebar.collapsed .sb-label{display:none}
   .sidebar.collapsed .sb-badge{display:none !important}
-  .sidebar.collapsed .sb-logout-lbl{display:none}
   .sidebar.collapsed .sb-logout{justify-content:center;padding:8px 0}
-  .sidebar.collapsed .sb-item{justify-content:center;padding:8px 0}
-</style>
+  .sidebar.collapsed .sb-logout-lbl{display:none}
+  .sidebar.collapsed .sb-item[data-label]:hover::after{
+    content:attr(data-label);position:fixed;
+    left:calc(var(--sw-col) + 8px);
+    background:#1a1a1a;color:#fff;font-size:11px;
+    padding:4px 10px;border-radius:6px;
+    white-space:nowrap;pointer-events:none;z-index:9999;
+  }</style>
 </head>
 <body>
 <div class="sidebar-dim" id="sidebarDim"></div>

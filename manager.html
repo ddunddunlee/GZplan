@@ -63,8 +63,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 .topbar-right{display:flex;gap:8px;align-items:center;flex-shrink:0}
 
 /* ── 햄버거 버튼 (모바일) ── */
-.hamburger{display:none;width:36px;height:36px;border:none;background:transparent;cursor:pointer;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:4px;border-radius:var(--radius-sm);flex-shrink:0}
-.hamburger span{display:block;width:20px;height:2px;background:var(--text);border-radius:2px;transition:all .2s}
+
+
 .hamburger:hover{background:var(--bg2)}
 
 /* ── 모바일 딤 ── */
@@ -194,7 +194,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 
 /* ── 모바일 반응형 ── */
 @media(max-width:768px){
-  .hamburger{display:flex}
+  
   
   .stats{grid-template-columns:repeat(2,1fr)}
   .detail-panel{position:fixed;inset:0;width:100%;max-width:100%;border-radius:0;z-index:350;max-height:100vh;overflow-y:auto}
@@ -368,7 +368,6 @@ button, [onclick], [data-nav], .sb-item, .task-card, .chip {
 <div class="main-wrap">
   <!-- 탑바 -->
   <div class="topbar">
-    <button class="hamburger" id="hamburgerBtn" aria-label="메뉴"><span></span><span></span><span></span></button>
     <div class="page-title">팀 업무 현황</div>
     <div class="topbar-right">
       <button class="btn-solid" id="addBtn" style="touch-action:manipulation">+ 업무 추가</button>

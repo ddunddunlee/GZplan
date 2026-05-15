@@ -44,8 +44,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 .topbar{background:var(--bg);border-bottom:0.5px solid var(--border);padding:0 24px;height:var(--topbar-h);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;flex-shrink:0;gap:12px;}
 .page-title{font-size:15px;font-weight:600;color:var(--text);flex:1}
 .topbar-right{display:flex;gap:8px;align-items:center;flex-shrink:0}
-.hamburger{display:none;width:36px;height:36px;border:none;background:transparent;cursor:pointer;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:4px;border-radius:var(--radius-sm);flex-shrink:0}
-.hamburger span{display:block;width:20px;height:2px;background:var(--text);border-radius:2px}
+
+
 .sidebar-dim{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:290}
 .sidebar-dim.show{display:block}
 .btn-ghost{background:transparent;color:var(--text2);border:0.5px solid var(--border);border-radius:var(--radius-sm);padding:0 14px;height:32px;font-size:13px;cursor:pointer;font-family:inherit}
@@ -94,7 +94,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 @media(max-width:767px){
-  .hamburger{display:flex}
+  
   
   .topbar{padding:0 14px}
   .content-wrap{padding:14px 14px 80px}

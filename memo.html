@@ -10,7 +10,9 @@
 <meta name="theme-color" content="#ffffff"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>메모장 — GZ 경영기획팀</title>
-<style>
+<style>.main-wrap{margin-left:var(--sw);transition:margin-left var(--sb-ease);display:flex;flex-direction:column;min-height:100vh;min-width:0}
+  .sidebar.collapsed ~ .main-wrap{margin-left:var(--sw-col)}
+
 /* ════════════════════════════════════════════
    GZ Plan — 공통 반응형 CSS
    PC(1024+) / Tablet(768-1023) / Mobile(~767)
@@ -41,6 +43,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
   -webkit-text-size-adjust:100%}
 .app{display:flex;min-height:100vh}
 
+
+
+  /* ── 아이콘 흰색 ── */
+  .sb-icon svg{stroke:#fff}
+  .sb-icon svg *{stroke:#fff}
+
+  
+.topbar{background:var(--bg);border-bottom:1px solid var(--border);height:48px;display:flex;align-items:center;padding:0 20px;gap:10px;flex-shrink:0;position:sticky;top:0;z-index:50}
 /* ── 사이드바 ── */
 .sidebar{
   width:var(--sw);flex-shrink:0;
@@ -158,10 +168,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 /* ── 통계 카드 ── */
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
 .stat{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px 16px}
-.stat-label{font-size:11px;color:var(--text3);margin-bottom:6px;white-space:nowrap}
-.stat-value{font-size:22px;font-weight:600;color:var(--text);line-height:1}
+.stat-card{background:#fff;border:0.5px solid var(--border);border-radius:var(--radius);padding:14px 18px;display:flex;flex-direction:column;gap:6px;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+.member-filter-row{display:flex;gap:6px;flex-wrap:wrap;padding:8px 0 4px;align-items:center}
+.member-chip{padding:5px 12px;font-size:12px;font-weight:600;border-radius:999px;border:0.5px solid var(--border);background:#fff;cursor:pointer;color:var(--text2);transition:all .12s;display:flex;align-items:center;gap:5px}
+.member-chip.active{background:#0C447C;color:#fff;border-color:#0C447C}
+.member-chip.other-active{color:#fff;border-color:transparent}
+.shared-badge{font-size:10px;padding:2px 8px;border-radius:999px;background:#E6F1FB;color:#0C447C;border:0.5px solid #B5D4F4;display:inline-flex;align-items:center;gap:3px;margin-right:4px}
+.member-avatars{display:flex;gap:3px;flex-wrap:wrap;margin-top:4px}
+.member-avatar{width:20px;height:20px;border-radius:50%;background:#0C447C;color:#fff;font-size:8px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.private-badge{font-size:10px;padding:2px 7px;border-radius:999px;background:#F0F4F8;color:var(--text3);border:0.5px solid var(--border);display:inline-flex;align-items:center;gap:3px}
+.private-badge.on{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
+.readonly-overlay{pointer-events:none;opacity:.75}
+.stat-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.stat-value{font-size:26px;font-weight:700;color:var(--text);line-height:1}
 .stat-value.warn{color:#BA7517}.stat-value.danger{color:var(--red)}
 
 /* ── 필터 칩 ── */
@@ -186,8 +207,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 }
 .task-card:hover{border-color:var(--border2)}.task-card.selected{border-color:var(--text)}
 .task-card.pinned{border-left:3px solid var(--blue)}
-.task-card.overdue{border-left:3px solid var(--red)}
-.task-card.stale{border-left:3px solid var(--orange)}
+.task-card.overdue{border-left:3px solid var(--red);background:#fff8f8}
+.task-card.stale{border-left:3px solid var(--orange);background:#fffbf3}
+.flag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:999px;flex-shrink:0}
+.flag-overdue{background:var(--red-bg);color:var(--red)}
+.flag-stale{background:var(--amber-bg);color:var(--amber-t)}
 .priority-bar{width:3px;border-radius:var(--pill);align-self:stretch;flex-shrink:0;min-height:32px}
 .drag-handle{color:var(--text3);font-size:14px;cursor:grab;user-select:none;flex-shrink:0}
 .task-check{
@@ -375,51 +399,17 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
 /* ── 페이지 고유 CSS ── */
 
 @media(max-width:767px){
-  .content-area,.memo-layout{flex-direction:column!important}
-  .input-panel{width:100%!important;min-width:0!important}
-  .memo-list-panel{width:100%!important}
-  .memo-card{padding:12px}
-  .header{height:auto!important;padding:12px 14px!important;flex-wrap:wrap;gap:8px}
-  .header-left h1{font-size:14px!important}
-  .stats-bar,.tag-chips{flex-wrap:wrap;overflow-x:auto}
+  .content-wrap{padding:14px 14px 80px!important}
+  .task-title{font-size:12px}
+  .badge{font-size:10px;padding:2px 6px}
+  .task-date{font-size:10px}
+  .topbar{padding:0 14px}
 }
 
 /* ── 메인 ── */
 .pin-btn,.del-btn{width:24px;height:24px;border-radius:var(--radius-sm);border:none;background:transparent;cursor:pointer;font-size:13px;color:var(--text3);display:flex;align-items:center;justify-content:center}
 .pin-btn:hover{background:var(--bg3);color:var(--text)}
 .pin-btn.on{color:var(--blue)}
-/* ── 메모장 전용 ── */
-.memo-input-wrap{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:1.25rem}
-.memo-textarea{width:100%;min-height:120px;padding:10px 12px;font-size:13px;line-height:1.7;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-family:inherit;resize:vertical;outline:none}
-.memo-textarea:focus{border-color:var(--border2)}
-.quick-tags{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0}
-.quick-tag-btn{padding:3px 10px;border-radius:var(--pill);font-size:11px;border:0.5px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;touch-action:manipulation}
-.quick-tag-btn:hover{border-color:var(--border2);color:var(--text)}
-.memo-actions-row{display:flex;flex-direction:column;gap:8px;align-items:stretch;margin-top:10px}
-.stats-bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
-.stat-pill{font-size:12px;color:var(--text2);background:var(--bg);border:0.5px solid var(--border);padding:4px 12px;border-radius:var(--pill)}
-.stat-pill span{font-weight:600;color:var(--text)}
-.tag-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
-.tag-chip{padding:3px 10px;border-radius:var(--pill);font-size:11px;border:0.5px solid var(--border);background:var(--bg);color:var(--text2);cursor:pointer}
-.tag-chip:hover{border-color:var(--border2)}
-.tag-chip.active{background:var(--text);color:var(--bg);border-color:var(--text)}
-.search-bar{display:flex;align-items:center;gap:8px;background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-sm);padding:7px 12px;margin-bottom:12px}
-.search-bar input{flex:1;border:none;background:transparent;font-size:13px;color:var(--text);outline:none;font-family:inherit}
-.search-bar button{border:none;background:transparent;color:var(--text3);cursor:pointer;font-size:12px;padding:0}
-.date-group{margin-bottom:1.25rem}
-.date-label{font-size:11px;font-weight:600;color:var(--text3);padding:6px 0;margin-bottom:6px;border-bottom:0.5px solid var(--border)}
-.memo-card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:6px;position:relative}
-.memo-card:hover{border-color:var(--border2)}
-.memo-time{font-size:11px;color:var(--text3);margin-bottom:6px}
-.memo-text{font-size:13px;color:var(--text);line-height:1.7;white-space:pre-wrap;word-break:break-word}
-.memo-text .hashtag{color:var(--blue);cursor:pointer;font-weight:500}
-.memo-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
-.memo-tag{font-size:10px;padding:2px 8px;border-radius:var(--pill);background:var(--blue-bg);color:var(--blue-t);cursor:pointer}
-.memo-actions{position:absolute;top:10px;right:12px;display:flex;gap:4px;opacity:0;transition:opacity .12s}
-.memo-card:hover .memo-actions{opacity:1}
-.act-btn{width:24px;height:24px;border-radius:4px;border:none;background:transparent;cursor:pointer;font-size:13px;color:var(--text3);display:flex;align-items:center;justify-content:center;touch-action:manipulation}
-.act-btn:hover{background:var(--bg2);color:var(--text)}
-.act-btn.del:hover{background:var(--red-bg);color:var(--red)}
 
 /* ── 사이드바 다크블루 override ── */
 .sb-user{border-bottom:1px solid rgba(255,255,255,0.15);}
@@ -464,19 +454,7 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
   .sb-logout{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:6px;color:rgba(255,255,255,.5);font-size:12px;cursor:pointer;transition:all .12s;white-space:nowrap;overflow:hidden}
   .sb-logout:hover{background:rgba(255,255,255,.1);color:rgba(255,255,255,.8)}
   .sb-logout-lbl{transition:opacity var(--sb-ease),max-width var(--sb-ease);max-width:200px;overflow:hidden}
-
-  /* ── 아이콘 흰색 ── */
-  .sb-icon svg{stroke:#fff}
-  .sb-icon svg *{stroke:#fff}
-
-  /* ── collapsed: 토글버튼 중앙 ── */
-  /* ── collapsed: 텍스트 완전 숨김 ── */
-
-
-
-.main-wrap{margin-left:var(--sw);transition:margin-left var(--sb-ease);display:flex;flex-direction:column;min-height:100vh;min-width:0}
-
-  /* ── collapsed 표준 ── */
+/* ── collapsed 표준 ── */
   .sidebar.collapsed{width:var(--sw-col)}
   .sidebar.collapsed ~ .main-wrap{margin-left:var(--sw-col)}
   .sidebar.collapsed ~ 
@@ -765,6 +743,7 @@ document.getElementById('memoInput').addEventListener('keydown',e=>{if(e.key==='
 // render를 window에 노출
 window.renderMemo = render;
 </script>
+
 <script>
 (function(){
   var sb  = document.getElementById('sidebar');
@@ -784,7 +763,7 @@ window.renderMemo = render;
   if(lo) lo.addEventListener('click', function(){
     localStorage.removeItem('tt_user'); sessionStorage.clear(); location.href='index.html';
   });
-  // 유저 이름 표시
+  // 유저 이름/역할/아바타 표시
   try {
     var u = JSON.parse(localStorage.getItem('tt_user')||'{}');
     var nm = document.getElementById('sbUserName');

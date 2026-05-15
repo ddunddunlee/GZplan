@@ -9,7 +9,9 @@
 <meta name="theme-color" content="#ffffff"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>GZ Plan — 내 업무</title>
-<style>
+<style>.main-wrap{margin-left:var(--sw);transition:margin-left var(--sb-ease);display:flex;flex-direction:column;min-height:100vh;min-width:0}
+  .sidebar.collapsed ~ .main-wrap{margin-left:var(--sw-col)}
+
 /* ════════════════════════════════════════════
    GZ Plan — 공통 반응형 CSS
    PC(1024+) / Tablet(768-1023) / Mobile(~767)
@@ -40,6 +42,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
   -webkit-text-size-adjust:100%}
 .app{display:flex;min-height:100vh}
 
+
+
+  /* ── 아이콘 흰색 ── */
+  .sb-icon svg{stroke:#fff}
+  .sb-icon svg *{stroke:#fff}
+
+  
+.topbar{background:var(--bg);border-bottom:1px solid var(--border);height:48px;display:flex;align-items:center;padding:0 20px;gap:10px;flex-shrink:0;position:sticky;top:0;z-index:50}
 /* ── 사이드바 ── */
 .sidebar{
   width:var(--sw);flex-shrink:0;
@@ -81,7 +91,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 /* ── 메인 ── */
 .page-title{font-size:15px;font-weight:600;color:var(--text);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0}
-.topbar-right{display:flex;gap:8px;align-items:center;flex-shrink:0;flex-wrap:wrap}
+.topbar-right{display:flex;gap:8px;align-items:center;flex-shrink:0;flex-wrap:wrap;margin-left:auto}
 
 /* ── 햄버거 ── */
 
@@ -443,19 +453,7 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
   .sb-logout{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:6px;color:rgba(255,255,255,.5);font-size:12px;cursor:pointer;transition:all .12s;white-space:nowrap;overflow:hidden}
   .sb-logout:hover{background:rgba(255,255,255,.1);color:rgba(255,255,255,.8)}
   .sb-logout-lbl{transition:opacity var(--sb-ease),max-width var(--sb-ease);max-width:200px;overflow:hidden}
-
-  /* ── 아이콘 흰색 ── */
-  .sb-icon svg{stroke:#fff}
-  .sb-icon svg *{stroke:#fff}
-
-  /* ── collapsed: 토글버튼 중앙 ── */
-  /* ── collapsed: 텍스트 완전 숨김 ── */
-
-
-
-.main-wrap{margin-left:var(--sw);transition:margin-left var(--sb-ease);display:flex;flex-direction:column;min-height:100vh;min-width:0}
-
-  /* ── collapsed 표준 ── */
+/* ── collapsed 표준 ── */
   .sidebar.collapsed{width:var(--sw-col)}
   .sidebar.collapsed ~ .main-wrap{margin-left:var(--sw-col)}
   .sidebar.collapsed ~ 
@@ -1821,6 +1819,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+
 <script>
 (function(){
   var sb  = document.getElementById('sidebar');
@@ -1840,7 +1839,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if(lo) lo.addEventListener('click', function(){
     localStorage.removeItem('tt_user'); sessionStorage.clear(); location.href='index.html';
   });
-  // 유저 이름 표시
+  // 유저 이름/역할/아바타 표시
   try {
     var u = JSON.parse(localStorage.getItem('tt_user')||'{}');
     var nm = document.getElementById('sbUserName');

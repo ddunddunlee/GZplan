@@ -41,32 +41,32 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-s
 /* ── 사이드바 ── */
 .sidebar{
   width:var(--sw);flex-shrink:0;
-  background:var(--bg);border-right:0.5px solid var(--border);
+  background:#0C447C;border-right:none;
   display:flex;flex-direction:column;
   position:fixed;top:0;left:0;height:100vh;z-index:300;
   transition:width var(--sb-ease);overflow:hidden;
 }
 .sb-brand{padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,0.15);flex-shrink:0}
-.sb-brand-name{font-size:15px;font-weight:600;color:var(--text);letter-spacing:-.3px}
-.sb-brand-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.sb-brand-name{font-size:15px;font-weight:600;color:#fff;letter-spacing:-.3px}
+.sb-brand-sub{font-size:11px;color:rgba(255,255,255,0.5);margin-top:2px}
 .sb-user{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.15);flex-shrink:0}
 .sb-avatar{width:30px;height:30px;border-radius:50%;background:var(--text);
   display:flex;align-items:center;justify-content:center;
   font-size:11px;font-weight:600;color:var(--bg);flex-shrink:0}
-.sb-user-name{font-size:13px;font-weight:500;color:var(--text);
+.sb-user-name{font-size:13px;font-weight:500;color:#fff;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sb-user-role{font-size:11px;color:var(--text3)}
+.sb-user-role{font-size:11px;color:rgba(255,255,255,0.5)}
 .sb-nav{flex:1;padding:8px 0;overflow-y:auto;overflow-x:hidden}
-.sb-sec{padding:4px 16px;font-size:10px;font-weight:600;color:var(--text3);
+.sb-sec{padding:4px 16px;font-size:10px;font-weight:600;color:rgba(255,255,255,0.4);
   letter-spacing:.08em;text-transform:uppercase;margin-top:10px}
 .sb-item{display:flex;align-items:center;gap:10px;padding:9px 16px;
   cursor:pointer;margin:1px 8px;border-radius:var(--radius-sm);
   transition:background .12s;min-height:var(--touch-min)}
-.sb-item:hover{background:var(--bg2)}
-.sb-item.active{background:var(--bg3)}
-.sb-item.active .sb-label,.sb-item.active .sb-icon{color:var(--text);font-weight:500}
-.sb-icon{font-size:15px;width:22px;text-align:center;color:var(--text2);flex-shrink:0}
-.sb-label{font-size:13px;color:var(--text2);flex:1;
+.sb-item:hover{background:rgba(255,255,255,0.1)}
+.sb-item.active{background:rgba(255,255,255,0.15)}
+.sb-item.active .sb-label,.sb-item.active .sb-icon{color:rgba(255,255,255,0.8);font-weight:500}
+.sb-icon{font-size:15px;width:22px;text-align:center;color:#fff;flex-shrink:0}
+.sb-label{font-size:13px;color:rgba(255,255,255,0.6);flex:1;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sb-badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:var(--pill);
   background:var(--red-bg);color:var(--red);flex-shrink:0}
@@ -386,7 +386,7 @@ button,[onclick],[data-nav],.sb-item,.task-card,.chip{
 /* ── 페이지 고유 CSS ── */
 
 @media(max-width:767px){
-  .content-wrap{padding:14px 14px 80px!important}
+  .content-wrap{padding:14px 14px 80px!important;flex:1}
   .task-title{font-size:12px}
   .badge{font-size:10px;padding:2px 6px}
   .task-date{font-size:10px}
@@ -1286,21 +1286,11 @@ if (isMgr) {
 </script>
 
 <script>
-/* ── 사이드바 공통 기능 ──────────────────────────
-   모든 페이지에서 동일하게 동작하는 사이드바 기능:
-   1. 접기/펼치기 토글 (localStorage로 상태 유지)
-   2. 메뉴 클릭 시 해당 페이지로 이동
-   3. 로그아웃 (세션 초기화 후 로그인 페이지로)
-   4. 유저 이름/역할/아바타 표시
-──────────────────────────────────────────────── */
 (function(){
   var sb  = document.getElementById('sidebar');
   var btn = document.getElementById('sbToggleBtn');
   var lo  = document.getElementById('logoutBtn');
-
-  /* 사이드바 접기/펼치기 토글 */
   if(sb && btn){
-    /* 이전 상태 복원 (localStorage에서 읽기) */
     if(localStorage.getItem('gz_sb_collapsed')==='1') sb.classList.add('collapsed');
     btn.addEventListener('click', function(e){
       e.stopPropagation();
@@ -1308,22 +1298,15 @@ if (isMgr) {
       localStorage.setItem('gz_sb_collapsed', sb.classList.contains('collapsed')?'1':'0');
     });
   }
-
-  /* 메뉴 항목 클릭 → 해당 페이지로 이동 */
   document.querySelectorAll('.sb-item[data-nav]').forEach(function(el){
     el.addEventListener('click', function(){ location.href = el.dataset.nav; });
   });
-
-  /* 로그아웃: 세션 초기화 후 로그인 페이지로 이동 */
   if(lo) lo.addEventListener('click', function(){
-    localStorage.removeItem('tt_user');
-    sessionStorage.clear();
-    location.href = 'index.html';
+    localStorage.removeItem('tt_user'); sessionStorage.clear(); location.href='index.html';
   });
-
-  /* 유저 정보 표시 (localStorage의 tt_user에서 읽기) */
+  // 유저 이름/역할/아바타 표시
   try {
-    var u  = JSON.parse(localStorage.getItem('tt_user') || '{}');
+    var u = JSON.parse(localStorage.getItem('tt_user')||'{}');
     var nm = document.getElementById('sbUserName');
     var rl = document.getElementById('sbUserRole');
     var av = document.getElementById('sbAvatar');

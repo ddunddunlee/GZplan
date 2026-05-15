@@ -1821,21 +1821,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 <script>
-/* ── 사이드바 공통 기능 ──────────────────────────
-   모든 페이지에서 동일하게 동작하는 사이드바 기능:
-   1. 접기/펼치기 토글 (localStorage로 상태 유지)
-   2. 메뉴 클릭 시 해당 페이지로 이동
-   3. 로그아웃 (세션 초기화 후 로그인 페이지로)
-   4. 유저 이름/역할/아바타 표시
-──────────────────────────────────────────────── */
 (function(){
   var sb  = document.getElementById('sidebar');
   var btn = document.getElementById('sbToggleBtn');
   var lo  = document.getElementById('logoutBtn');
-
-  /* 사이드바 접기/펼치기 토글 */
   if(sb && btn){
-    /* 이전 상태 복원 (localStorage에서 읽기) */
     if(localStorage.getItem('gz_sb_collapsed')==='1') sb.classList.add('collapsed');
     btn.addEventListener('click', function(e){
       e.stopPropagation();
@@ -1843,22 +1833,15 @@ document.addEventListener('DOMContentLoaded', function() {
       localStorage.setItem('gz_sb_collapsed', sb.classList.contains('collapsed')?'1':'0');
     });
   }
-
-  /* 메뉴 항목 클릭 → 해당 페이지로 이동 */
   document.querySelectorAll('.sb-item[data-nav]').forEach(function(el){
     el.addEventListener('click', function(){ location.href = el.dataset.nav; });
   });
-
-  /* 로그아웃: 세션 초기화 후 로그인 페이지로 이동 */
   if(lo) lo.addEventListener('click', function(){
-    localStorage.removeItem('tt_user');
-    sessionStorage.clear();
-    location.href = 'index.html';
+    localStorage.removeItem('tt_user'); sessionStorage.clear(); location.href='index.html';
   });
-
-  /* 유저 정보 표시 (localStorage의 tt_user에서 읽기) */
+  // 유저 이름/역할/아바타 표시
   try {
-    var u  = JSON.parse(localStorage.getItem('tt_user') || '{}');
+    var u = JSON.parse(localStorage.getItem('tt_user')||'{}');
     var nm = document.getElementById('sbUserName');
     var rl = document.getElementById('sbUserRole');
     var av = document.getElementById('sbAvatar');

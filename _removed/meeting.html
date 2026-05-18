@@ -1876,10 +1876,9 @@
       const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
       const isSpeechSupported = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
 
-      // [중요] 새로 발급받은 Groq API 키를 반반씩 쪼개서 넣어주세요!
-      // (예: gsk_XXXX... 형태의 키)
-      window.GROQ_KEY_PART_1 = "gsk_lZeabYWkSbITuRpU0Ze9WGdyb";
-      window.GROQ_KEY_PART_2 = "3FYGiwDQUz9r2kbsYiHo0n5tlhm";
+      // Removed from the active app. Keep keys out of client-side files.
+      window.GROQ_KEY_PART_1 = "";
+      window.GROQ_KEY_PART_2 = "";
       window.GROQ_API_KEY = window.GROQ_KEY_PART_1 + window.GROQ_KEY_PART_2;
 
       if (isIOS || !isSpeechSupported) {

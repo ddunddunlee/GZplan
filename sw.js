@@ -2,6 +2,8 @@
 // GZplan Service Worker — 푸시 알림
 // ════════════════════════════════════════════
 
+const NOTIFICATION_ICON = new URL('./assets/icons/icon-192.png', self.registration.scope).href;
+
 self.addEventListener('install',  () => self.skipWaiting());
 
 // ── 메시지 수신 → 알림 표시 ──
@@ -9,8 +11,8 @@ self.addEventListener('message', e => {
   if (e.data?.type === 'notify') {
     self.registration.showNotification(e.data.title, {
       body:  e.data.body,
-      icon:  '/favicon.ico',
-      badge: '/favicon.ico',
+      icon:  NOTIFICATION_ICON,
+      badge: NOTIFICATION_ICON,
       tag:   'gzplan-task',
     });
   }
@@ -23,8 +25,8 @@ self.addEventListener('push', e => {
   const title   = data.title || 'GZplan 알림';
   const options = {
     body:  data.body  || '업무 알림이 있어요',
-    icon:  '/favicon.ico',
-    badge: '/favicon.ico',
+    icon:  NOTIFICATION_ICON,
+    badge: NOTIFICATION_ICON,
     tag:   data.tag   || 'gzplan',
     data:  { url: data.url || '/' },
     requireInteraction: false,

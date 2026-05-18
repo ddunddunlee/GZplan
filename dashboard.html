@@ -11,18 +11,25 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#fff;--bg2:#f7f7f5;--bg3:#f0f4f8;
+  --bg:#fff;--bg2:#f7f7f5;--bg3:#f0f0ee;
   --text:#1a1a1a;--text2:#6b6b6b;--text3:#a8a8a8;
   --border:#e5e5e3;--border2:#d0d0cc;
-  --radius:10px;--radius-sm:6px;
-  --blue:#2563EB;--blue-bg:#EFF4FF;--blue-dk:#1D4ED8;
-  --green:#10B981;--green-bg:#ECFDF5;--green-dk:#065F46;
-  --amber:#F59E0B;--amber-bg:#FFFBEB;--amber-dk:#92400E;
-  --red:#EF4444;--red-bg:#FEF2F2;--red-dk:#991B1B;
-  --sw:220px;--sw-col:56px;--sb-ease:.22s cubic-bezier(.4,0,.2,1);
+  --radius:10px;--radius-sm:6px;--pill:999px;
+  --blue:#378ADD;--blue-bg:#E6F1FB;--blue-t:#0C447C;
+  --amber-bg:#FAEEDA;--amber-t:#633806;
+  --green:#639922;--green-bg:#EAF3DE;--green-t:#27500A;
+  --red:#A32D2D;--red-bg:#FCEBEB;--red-t:#791F1F;
+  --orange:#EF9F27;
+  --purple-bg:#EEEDFE;--purple-t:#3C3489;
+  --sw:220px;
+  --sw-col:56px;--sb-ease:.22s cubic-bezier(.4,0,.2,1);
+  --topbar-h:52px;
+  --touch-min:44px;
 }
-body{font-family:'Apple SD Gothic Neo','Pretendard',system-ui,sans-serif;background:var(--bg3);color:var(--text);font-size:13px;line-height:1.5}
-html,body{height:100%;overflow:hidden}
+body{font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-serif;
+  background:var(--bg2);color:var(--text);min-height:100vh;font-size:14px;
+  -webkit-text-size-adjust:100%;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;margin:0;padding:0}
 
 /* ── 사이드바 ── */
 .sidebar{
@@ -85,15 +92,9 @@ html,body{height:100%;overflow:hidden}
   white-space:nowrap;transition:opacity var(--sb-ease);
 }
 .sidebar.collapsed .sb-sec{opacity:0}
-.sb-item{
-  display:flex;align-items:center;gap:10px;
-  padding:8px 10px;border-radius:var(--radius-sm);
-  color:rgba(255,255,255,.7);font-size:13px;
-  cursor:pointer;margin-bottom:1px;
-  white-space:nowrap;overflow:hidden;
-  transition:background .12s,color .12s;
-  position:relative;text-decoration:none;
-}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 16px;
+  cursor:pointer;margin:1px 8px;border-radius:var(--radius-sm);
+  transition:background .12s;min-height:var(--touch-min)}
 .sb-item:hover{background:rgba(255,255,255,.12);color:#fff}
 .sb-item.active{background:rgba(255,255,255,.2);color:#fff;font-weight:600}
 .sb-icon{width:20px;height:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
@@ -142,7 +143,7 @@ html,body{height:100%;overflow:hidden}
 .topbar{
   height:48px;background:var(--bg);border-bottom:1px solid var(--border);
   display:flex;align-items:center;padding:0 20px;gap:10px;flex-shrink:0;
-}
+;position:sticky;top:0;z-index:50}
 .tb-title{font-size:14px;font-weight:600;color:var(--text)}
 .tb-sep{color:var(--border2)}
 .tb-sub{font-size:12px;color:var(--text3)}
@@ -166,14 +167,14 @@ html,body{height:100%;overflow:hidden}
 
 /* 대시보드 본문 */
 .dash-body{
-  flex:1;overflow-y:auto;padding:18px 20px;
+  flex:1;overflow-y:auto;padding:0 16px 60px;
   display:flex;flex-direction:column;gap:14px;
 }
 .dash-body::-webkit-scrollbar{width:4px}
 .dash-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px}
 
 /* KPI */
-.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
 .kpi{
   background:var(--bg);border:1px solid var(--border);
   border-radius:12px;padding:14px 16px;
@@ -230,7 +231,7 @@ html,body{height:100%;overflow:hidden}
 .empty-txt{font-size:12px;color:var(--text3);text-align:center}
 
 /* 캘린더 */
-.cal-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.cal-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:640px}
 .cal-toolbar{display:flex;align-items:center;gap:8px;padding:11px 14px;border-bottom:1px solid var(--border);flex-shrink:0}
 .cal-month{font-size:13px;font-weight:600;color:var(--text)}
 .cal-nav{width:24px;height:24px;border-radius:6px;border:1px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:var(--text2);transition:all .12s}
@@ -238,9 +239,9 @@ html,body{height:100%;overflow:hidden}
 .cal-grid{flex:1;display:flex;flex-direction:column;overflow:hidden}
 .cal-day-row{display:grid;grid-template-columns:repeat(7,1fr);border-bottom:1px solid var(--border);flex-shrink:0}
 .cal-dlbl{padding:6px 0;text-align:center;font-size:10px;font-weight:600;color:var(--text3)}
-.cal-cells{display:grid;grid-template-columns:repeat(7,1fr);flex:1;overflow-y:auto}
+.cal-cells{display:grid;grid-template-columns:repeat(7,1fr);flex:1;overflow-y:visible}
 .cal-cell{
-  min-height:72px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);
+  min-height:90px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);
   padding:5px;overflow:hidden;
 }
 .cal-cell:nth-child(7n){border-right:none}
@@ -279,22 +280,10 @@ html,body{height:100%;overflow:hidden}
 .upd-txt strong{color:var(--text);font-weight:600}
 .upd-time{font-size:10px;color:var(--text3);flex-shrink:0;margin-top:2px}
 
-/* 바로가기 */
-.shortcut-list{display:flex;flex-direction:column;gap:6px;padding:10px 12px;flex:1}
-.shortcut{
-  display:flex;align-items:center;gap:10px;
-  padding:8px 10px;border-radius:var(--radius-sm);
-  border:1px solid var(--border);cursor:pointer;
-  transition:background .12s;text-decoration:none;
-}
-.shortcut:hover{background:var(--bg2)}
-.sc-icon{
-  width:28px;height:28px;border-radius:var(--radius-sm);
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;
-}
-.sc-txt{font-size:12px;font-weight:600;color:var(--text)}
-.sc-sub{font-size:11px;color:var(--text3)}
-.sc-arr{margin-left:auto;color:var(--text3);font-size:14px}
+
+
+
+
 
 /* 알림 배너 */
 .alert-banner{
@@ -366,7 +355,6 @@ html,body{height:100%;overflow:hidden}
       <div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg></div>
       <div class="sb-label">주간 스케줄</div>
     </div>
-      <div class="sb-label">회의록</div>
     </div>
     <div class="sb-item" data-nav="memo.html" data-label="메모장">
       <div class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
@@ -418,7 +406,7 @@ html,body{height:100%;overflow:hidden}
       <div class="kpi">
         <div class="kpi-top"><div class="kpi-dot" style="background:var(--blue)"></div><div class="kpi-lbl">진행 중</div></div>
         <div class="kpi-num" id="kDoing">—</div>
-        <div class="kpi-sub up" id="kDoingTrend">실시간</div>
+        <div class="kpi-sub up">실시간</div>
       </div>
       <div class="kpi">
         <div class="kpi-top"><div class="kpi-dot" style="background:var(--amber)"></div><div class="kpi-lbl">기한 임박</div></div>
@@ -432,8 +420,34 @@ html,body{height:100%;overflow:hidden}
       </div>
     </div>
 
-    <!-- 중앙: 오늘할일 + 캘린더 -->
-    <div class="mid-row">
+    <!-- 캘린더 (전체 너비) -->
+    <div class="card">
+      <div class="card-hdr">
+        <div class="card-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          캘린더
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <div class="cal-nav" id="calPrev">‹</div>
+          <div class="cal-month" id="calTitle"></div>
+          <div class="cal-nav" id="calNext">›</div>
+          <div class="card-link" onclick="location.href='calendar.html'" style="margin-left:8px">전체보기 →</div>
+        </div>
+      </div>
+      <div class="cal-grid">
+        <div class="cal-day-row">
+          <div class="cal-dlbl">월</div><div class="cal-dlbl">화</div><div class="cal-dlbl">수</div>
+          <div class="cal-dlbl">목</div><div class="cal-dlbl">금</div>
+          <div class="cal-dlbl" style="opacity:.4">토</div>
+          <div class="cal-dlbl" style="color:var(--red);opacity:.6">일</div>
+        </div>
+        <div class="cal-cells" id="calCells"></div>
+      </div>
+    </div>
+
+    <!-- 오늘할일 + 팀업데이트 (50:50) -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+
       <!-- 오늘 할 일 -->
       <div class="card">
         <div class="card-hdr">
@@ -445,38 +459,11 @@ html,body{height:100%;overflow:hidden}
           <div class="card-link" onclick="location.href='member.html'">전체보기 →</div>
         </div>
         <div class="today-list" id="todayList">
-          <div class="empty-state"><div class="empty-icon">✓</div><div class="empty-txt">불러오는 중...</div></div>
+          <div class="empty-state"><div class="empty-txt">불러오는 중...</div></div>
         </div>
       </div>
 
-      <!-- 캘린더 -->
-      <div class="card">
-        <div class="card-hdr" style="padding:11px 14px">
-          <div class="card-title">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            캘린더
-          </div>
-          <div style="display:flex;align-items:center;gap:6px">
-            <div class="cal-nav" id="calPrev">‹</div>
-            <div class="cal-month" id="calTitle"></div>
-            <div class="cal-nav" id="calNext">›</div>
-            <div class="card-link" onclick="location.href='calendar.html'" style="margin-left:8px">전체보기 →</div>
-          </div>
-        </div>
-        <div class="cal-grid">
-          <div class="cal-day-row">
-            <div class="cal-dlbl">월</div><div class="cal-dlbl">화</div><div class="cal-dlbl">수</div>
-            <div class="cal-dlbl">목</div><div class="cal-dlbl">금</div>
-            <div class="cal-dlbl" style="opacity:.4">토</div>
-            <div class="cal-dlbl" style="color:var(--red);opacity:.6">일</div>
-          </div>
-          <div class="cal-cells" id="calCells"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 하단: 팀 업데이트 + 바로가기 -->
-    <div class="bot-row">
+      <!-- 팀 업데이트 -->
       <div class="card">
         <div class="card-hdr">
           <div class="card-title">
@@ -489,40 +476,9 @@ html,body{height:100%;overflow:hidden}
         </div>
       </div>
 
-      <div class="card">
-        <div class="card-hdr">
-          <div class="card-title">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-            바로가기
-          </div>
-        </div>
-        <div class="shortcut-list">
-          <div class="shortcut" onclick="location.href='member.html'">
-            <div class="sc-icon" style="background:var(--blue-bg)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg></div>
-            <div><div class="sc-txt">내 업무</div><div class="sc-sub" id="sc1Sub">—</div></div>
-            <div class="sc-arr">›</div>
-          </div>
-          <div class="shortcut" onclick="location.href='weekly.html'">
-            <div class="sc-icon" style="background:var(--amber-bg)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg></div>
-            <div><div class="sc-txt">주간 스케줄</div><div class="sc-sub">이번주 일정</div></div>
-            <div class="sc-arr">›</div>
-          </div>
-          <div class="shortcut" onclick="location.href='report.html'">
-            <div class="sc-icon" style="background:var(--green-bg)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
-            <div><div class="sc-txt">주간보고</div><div class="sc-sub">이번주 보고서</div></div>
-            <div class="sc-arr">›</div>
-          </div>
-          <div class="shortcut" onclick="location.href='memo.html'">
-            <div class="sc-icon" style="background:var(--bg2)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg></div>
-            <div><div class="sc-txt">메모장</div><div class="sc-sub">빠른 메모</div></div>
-            <div class="sc-arr">›</div>
-          </div>
-        </div>
-      </div>
     </div>
 
-  </div>
-</div>
+  </div></div>
 
 <div class="toast" id="toast"></div>
 

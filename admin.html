@@ -681,10 +681,10 @@ window.switchAdminTab = function(tab) {
   document.getElementById('tabReporters').style.display = tab==='reporters' ? '' : 'none';
   document.getElementById('tabOrgs').style.display = tab==='orgs' ? '' : 'none';
   document.getElementById('tabOrder').style.display = tab==='order' ? '' : 'none';
-  document.getElementById('navAccounts').classList.toggle('active', tab==='accounts');
-  document.getElementById('navReporters').classList.toggle('active', tab==='reporters');
-  document.getElementById('navOrgs').classList.toggle('active', tab==='orgs');
-  document.getElementById('navOrder').classList.toggle('active', tab==='order');
+  (document.getElementById('navAccounts')||{classList:{toggle:()=>{}}}).classList.toggle('active', tab==='accounts');
+  (document.getElementById('navReporters')||{classList:{toggle:()=>{}}}).classList.toggle('active', tab==='reporters');
+  (document.getElementById('navOrgs')||{classList:{toggle:()=>{}}}).classList.toggle('active', tab==='orgs');
+  (document.getElementById('navOrder')||{classList:{toggle:()=>{}}}).classList.toggle('active', tab==='order');
   if (tab === 'orgs') window.loadOrgs?.();
   if (tab === 'order') window.loadOrder?.();
 };
